@@ -1,11 +1,12 @@
 
 import pygame
+from render.GameLoader import GameLoader
 
 
 class Screen:
-    def __init__(self, size: tuple[int, int]) -> None:
+    def __init__(self) -> None:
         pygame.init()
-        self.__screen_size = size
+        self.__screen_size = GameLoader.screen_size
         self.__screen_name = 'PACMAN'
         self.__screen = pygame.display.set_mode(
             self.__screen_size
@@ -29,3 +30,13 @@ class Screen:
             if event.type == pygame.QUIT:
                 return False
         return True
+
+    # GETTERS / SETTERS
+
+    @property
+    def screen(self):
+        return self.__screen
+
+    @screen.setter
+    def screen(self, value):
+        self.__screen = value
