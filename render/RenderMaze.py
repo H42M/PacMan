@@ -18,12 +18,10 @@ class RenderMaze(RenderOBJ):
 
     def render(self) -> None:
         for y, row in enumerate(self.__maze.maze):
-            print()
             for x, cell in enumerate(row):
                 cell_pos = (x * GameLoader.cell_size[0],
                             y * GameLoader.cell_size[1])
                 cell_decoded = self.__decode_cell(cell)
-                print(cell_decoded)
 
                 if 'N' in cell_decoded:
                     cell_surface = Surface((GameLoader.cell_size[0], 
