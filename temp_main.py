@@ -9,4 +9,5 @@ if __name__ == "__main__":
     maze = RenderMaze(screen)
 
     while screen.handle_events():
+        maze.render()
         screen.flip()
