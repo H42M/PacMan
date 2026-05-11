@@ -1,5 +1,6 @@
 from sys import argv
 from pacman.app import run
+from pacman.game_config import GameConfig
 
 
 def main() -> int:
@@ -8,8 +9,8 @@ def main() -> int:
         print("Usage: make run")
         return 1
 
-    config_path = argv[1]
-    return run(config_path)
+    config = GameConfig()
+    return run(config)
 
 
 if __name__ == "__main__":

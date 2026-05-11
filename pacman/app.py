@@ -2,11 +2,12 @@
 
 import pygame
 from pacman.constants import FPS, WINDOW_HEIGHT, WINDOW_TITLE, WINDOW_WIDTH
+from pacman.game_config import GameConfig
 
 
-def run(config_path: str) -> int:
+def run(config: GameConfig) -> int:
     """Run the Pac-Man application."""
-    print(f"Starting Pac-Man with config: {config_path}")
+    print(f"Starting Pac-Man with config: {config}")
     try:
         # pygame initialization
         pygame.init()
