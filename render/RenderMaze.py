@@ -19,8 +19,11 @@ class RenderMaze(RenderOBJ):
     def render(self) -> None:
         for y, row in enumerate(self.__maze.maze):
             for x, cell in enumerate(row):
-                cell_pos = (x * GameLoader.cell_size[0],
-                            y * GameLoader.cell_size[1])
+                x_maze = self.x if self.x else 0
+                y_maze = self.y if self.y else 0
+                cell_pos = (x * GameLoader.cell_size[0] + x_maze,
+                            y * GameLoader.cell_size[1] + y_maze)
+                # print(f'Maze: {self.x}, {self.y}')
                 cell_decoded = self.__decode_cell(cell)
 
                 if 'N' in cell_decoded:
