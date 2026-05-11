@@ -34,9 +34,9 @@ class Screen:
     # GETTERS / SETTERS
 
     @property
-    def screen(self):
+    def screen(self) -> pygame.Surface:
         return self.__screen
 
     @screen.setter
-    def screen(self, value):
+    def screen(self, value: pygame.Surface) -> None:
         self.__screen = value

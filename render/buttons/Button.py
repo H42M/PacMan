@@ -4,6 +4,7 @@ import pygame
 
 from typing import Optional, Union, Callable, Any
 
+
 class Button(RenderOBJ):
     """Render an interactive button."""
 
@@ -81,7 +82,7 @@ class Button(RenderOBJ):
                 border_radius=self.BORDER_RADIUS,
             )
             screen.blit(shadow, (int(self._pos[0]) + offset,
-                                int(self._pos[1]) + offset))
+                                 int(self._pos[1]) + offset))
 
     def _draw_rounded_rect(
         self,
@@ -94,7 +95,7 @@ class Button(RenderOBJ):
             rect = (0, 0, *self._size)
 
             pygame.draw.rect(surface, fill_color, rect,
-                            border_radius=self.BORDER_RADIUS)
+                             border_radius=self.BORDER_RADIUS)
             pygame.draw.rect(
                 surface, border_color, rect, self.BORDER_WIDTH,
                 border_radius=self.BORDER_RADIUS
@@ -113,7 +114,7 @@ class Button(RenderOBJ):
             surface.blit(
                 text_surf,
                 text_surf.get_rect(center=(self._size[0] // 2,
-                                        self._size[1] // 2)),
+                                           self._size[1] // 2)),
             )
 
     def _resolve_color(self) -> tuple[int, int, int]:
@@ -162,6 +163,7 @@ class Button(RenderOBJ):
         rect = self._get_rect()
         if rect:
             return rect.collidepoint(mouse_pos)
+        return None
 
     def update_hover(self, mouse_pos: tuple[int, int]) -> None:
         """Update the hover state."""

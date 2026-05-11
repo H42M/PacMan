@@ -24,21 +24,21 @@ class RenderMaze(RenderOBJ):
                 cell_decoded = self.__decode_cell(cell)
 
                 if 'N' in cell_decoded:
-                    cell_surface = Surface((GameLoader.cell_size[0], 
+                    cell_surface = Surface((GameLoader.cell_size[0],
                                             GameLoader.wall_thickness))
                     cell_surface.fill(self.__color)
                     self._screen.screen.blit(cell_surface, cell_pos)
-                
+
                 if 'S' in cell_decoded:
                     cell_y = (cell_pos[1] + GameLoader.cell_size[1] -
                               GameLoader.wall_thickness)
-                    cell_surface = Surface((GameLoader.cell_size[0], 
+                    cell_surface = Surface((GameLoader.cell_size[0],
                                             GameLoader.wall_thickness))
                     cell_surface.fill(self.__color)
                     self._screen.screen.blit(
                         cell_surface,
                         (cell_pos[0], cell_y))
-                
+
                 if 'E' in cell_decoded:
                     cell_x = (cell_pos[0] + GameLoader.cell_size[0] -
                               GameLoader.wall_thickness)
@@ -54,7 +54,7 @@ class RenderMaze(RenderOBJ):
                                             GameLoader.cell_size[1]))
                     cell_surface.fill(self.__color)
                     self._screen.screen.blit(
-                        cell_surface, 
+                        cell_surface,
                         cell_pos)
 
     def __decode_cell(self, value: int) -> list[str]:
