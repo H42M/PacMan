@@ -1,0 +1,19 @@
+{
+  "window_width": 800,
+  "window_height": 600,
+  "window_title": "Pac-Man",
+  "highscore_filename": "highscores.json",
+  "lives": 3,
+  "points_per_pacgum": 10,
+  "points_per_super_pacgum": 50,
+  "points_per_ghost": 200,
+  "levels": [
+    {
+      "width": 21,
+      "height": 21,
+      "pacgum": 42,
+      "seed": 42,
+      "level_max_time": 90
+    }
+  ]
+}
