@@ -199,3 +199,37 @@ class Button(RenderOBJ):
     @text.setter
     def text(self, value: str) -> None:
         self._text = value
+
+    @property
+    def size(self) -> Optional[tuple[int, int]]:
+        return self._size
+
+    @size.setter
+    def size(self, value: Optional[tuple[int, int]]) -> None:
+        if value:
+            self._size = value
+            self._surface = pygame.Surface(self._size)
+
+    @property
+    def w(self) -> Optional[int]:
+        if self._size:
+            return self._size[0]
+        return None
+
+    @w.setter
+    def w(self, value: Optional[int]) -> None:
+        if value and self._size:
+            self._size = (value, self._size[1])
+            self._surface = pygame.Surface(self._size)
+
+    @property
+    def h(self) -> Optional[int]:
+        if self._size:
+            return self._size[1]
+        return None
+
+    @h.setter
+    def h(self, value: Optional[int]) -> None:
+        if value and self._size:
+            self._size = (self._size[0], value)
+            self._surface = pygame.Surface(self._size)
