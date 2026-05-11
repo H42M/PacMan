@@ -40,6 +40,7 @@ class Button(RenderOBJ):
             self._surface = pygame.Surface(self._size)
         else:
             self._surface = None
+        screen.record_clickable(self)
 
     # ------------------------------------------------------------------ #
     #  Helpers partagés                                                    #
@@ -138,7 +139,6 @@ class Button(RenderOBJ):
         """Render the button."""
         color = self._resolve_color()
         if self._surface:
-            print('SURFACECECECE')
             self._draw_shadow(self._screen.screen)
             self._draw_rounded_rect(self._surface, color,
                                     self._get_border_color(color))
