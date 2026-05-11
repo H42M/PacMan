@@ -16,3 +16,53 @@ class RenderOBJ:
 
     def render(self) -> None:
         pass
+
+    # Getters / Setters
+
+    @property
+    def surface(self) -> Optional[pygame.Surface]:
+        return self._surface
+
+    @surface.setter
+    def surface(self, value: pygame.Surface) -> None:
+        self._surface = value
+
+    @property
+    def size(self) -> Optional[tuple[int, int]]:
+        return self._size
+
+    @size.setter
+    def size(self, value: Optional[tuple[int, int]]) -> None:
+        if value:
+            self._size = value
+
+    @property
+    def pos(self) -> Optional[tuple[int, int]]:
+        return self._pos
+
+    @pos.setter
+    def pos(self, value: Optional[tuple[int, int]]) -> None:
+        if value:
+            self._pos = value
+
+    @property
+    def x(self) -> Optional[int]:
+        if self._pos:
+            return self._pos[0]
+        return None
+
+    @x.setter
+    def x(self, value: Optional[int]) -> None:
+        if value and self._pos:
+            self._pos = (value, self._pos[1])
+
+    @property
+    def y(self) -> Optional[int]:
+        if self._pos:
+            return self._pos[1]
+        return None
+
+    @y.setter
+    def y(self, value: Optional[int]) -> None:
+        if value and self._pos:
+            self._pos = (self._pos[1], value)
