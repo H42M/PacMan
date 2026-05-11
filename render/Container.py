@@ -36,6 +36,9 @@ class Container(RenderOBJ):
                 for i, elm in enumerate(self.__content):
                     elm.w = elm_size
                     elm.x = (self.__gap * (i + 1)) + (elm_size * i)
+                    print(f'JSDLFKJFD {elm.h}')
+                    if not elm.h or elm.h <= 0:
+                        elm.h = self.h
 
     def render(self) -> None:
         for elm in self.__content:

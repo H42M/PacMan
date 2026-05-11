@@ -19,27 +19,28 @@ if __name__ == "__main__":
         maze = RenderMaze(screen)
 
         ctn = Container(screen, 'HORIZONTAL', (0, 0),
-                        (GameLoader.screen_size), 20)
+                        (GameLoader.screen_size[0], 50), 20)
         ctn.add_content([
-            Button(screen, 'Un Bouton', (0, 0), (100, 50)),
-            Button(screen, 'Un Bouton', (0, 0), (100, 100)),
-            Button(screen, 'Un Bouton', (0, 0), (100, 150)),
+            Button(screen, 'Un Bouton'),
+            Button(screen, 'Un Bouton'),
+            Button(screen, 'Un Bouton'),
         ])
+        # maze.y = (ctn.y if ctn.y else 0) + (ctn.h if ctn.h else 0) + 20
+        print(f'maze Y : {maze.y}, ctn y: {ctn.y}, ctn h: {ctn.h}')
 
         pacman = Entity(screen, (100, 100), GameLoader.cell_size)
         pacman.set_skin(GameLoader.get_asset('pacman'))
         ghost = Entity(screen, (300, 300), GameLoader.cell_size)
         ghost.set_skin(GameLoader.get_asset('ghost-blue'))
     except Exception as e:
-        print(f'Error: {e}')
+        print(f'Error: {e} , {e.__traceback__}')
         exit()
     while screen.handle_events():
         screen.clear()
         ghost.x = (ghost.x + 1 if ghost.x is not None and
                    ghost.x <= GameLoader.screen_size[0] else 1)
-        print(f'ghost.x: {ghost.x}, width: {GameLoader.screen_size[0]}')
         pacman.set_rotation('W')
-        # maze.render()
+        maze.render()
         pacman.render()
         ghost.render()
         ctn.render()

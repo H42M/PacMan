@@ -44,8 +44,11 @@ class RenderOBJ:
 
     @w.setter
     def w(self, value: Optional[int]) -> None:
-        if value and self._size:
-            self._size = (value, self._size[1])
+        if value:
+            if self._size:
+                self._size = (value, self._size[1])
+            else:
+                self._size = (value, 0)
 
     @property
     def h(self) -> Optional[int]:
@@ -55,8 +58,11 @@ class RenderOBJ:
 
     @h.setter
     def h(self, value: Optional[int]) -> None:
-        if value and self._size:
-            self._size = (self._size[0], value)
+        if value:
+            if self._size:
+                self._size = (self._size[0], value)
+            else:
+                self._size = (0, value)
 
     @property
     def pos(self) -> Optional[tuple[int, int]]:
@@ -75,8 +81,11 @@ class RenderOBJ:
 
     @x.setter
     def x(self, value: Optional[int]) -> None:
-        if value and self._pos:
-            self._pos = (value, self._pos[1])
+        if value:
+            if self._pos:
+                self._pos = (value, self._pos[1])
+            else:
+                self._pos = (value, 0)
 
     @property
     def y(self) -> Optional[int]:
@@ -86,5 +95,8 @@ class RenderOBJ:
 
     @y.setter
     def y(self, value: Optional[int]) -> None:
-        if value and self._pos:
-            self._pos = (self._pos[0], value)
+        if value:
+            if self._pos:
+                self._pos = (self._pos[0], value)
+            else:
+                self._pos = (0, value)
