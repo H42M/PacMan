@@ -32,7 +32,7 @@ lint-doc: install
 
 
 run: install
-	.venv/bin/python temp_main.py
+	.venv/bin/python render_main.py
 	make clean
 
 package: install
