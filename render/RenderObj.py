@@ -14,5 +14,5 @@ class RenderOBJ:
         self._pos: Optional[tuple[int, int]] = pos
         self._size: Optional[tuple[int, int]] = size
 
-    def render(self):
+    def render(self) -> None:
         pass
