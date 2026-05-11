@@ -4,6 +4,7 @@ from render.Screen import Screen
 from render.RenderMaze import RenderMaze
 from render.buttons.Button import Button
 from render.Entity import Entity
+from render.Container import Container
 
 
 if __name__ == "__main__":
@@ -16,7 +17,14 @@ if __name__ == "__main__":
 
         screen = Screen()
         maze = RenderMaze(screen)
-        button = Button(screen, 'Un Bouton', (0, 0), (100, 100))
+
+        ctn = Container(screen, 'HORIZONTAL', (0, 0),
+                        (GameLoader.screen_size), 20)
+        ctn.add_content([
+            Button(screen, 'Un Bouton', (0, 0), (100, 50)),
+            Button(screen, 'Un Bouton', (0, 0), (100, 100)),
+            Button(screen, 'Un Bouton', (0, 0), (100, 150)),
+        ])
 
         pacman = Entity(screen, (100, 100), GameLoader.cell_size)
         pacman.set_skin(GameLoader.get_asset('pacman'))
@@ -31,9 +39,9 @@ if __name__ == "__main__":
                    ghost.x <= GameLoader.screen_size[0] else 1)
         print(f'ghost.x: {ghost.x}, width: {GameLoader.screen_size[0]}')
         pacman.set_rotation('W')
-        maze.render()
+        # maze.render()
         pacman.render()
         ghost.render()
-        button.render()
+        ctn.render()
 
         screen.flip()
