@@ -26,8 +26,14 @@ if __name__ == "__main__":
         print(f'Error: {e}')
         exit()
     while screen.handle_events():
+        screen.clear()
+        ghost.x = (ghost.x + 1 if ghost.x is not None and
+                   ghost.x <= GameLoader.screen_size[0] else 1)
+        print(f'ghost.x: {ghost.x}, width: {GameLoader.screen_size[0]}')
+        pacman.set_rotation('W')
         maze.render()
-        screen.flip()
         pacman.render()
         ghost.render()
         button.render()
+
+        screen.flip()

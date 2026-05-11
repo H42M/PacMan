@@ -22,7 +22,7 @@ class GameLoader:
         cls.maze_size = maze_size
         cls.cell_size = (screen_size[0] // maze_size[0],
                          screen_size[1] // maze_size[1])
-        cls.wall_thickness = 5
+        cls.wall_thickness = 3
         cls.assets = {}
 
     @classmethod
