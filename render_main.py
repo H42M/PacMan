@@ -11,12 +11,17 @@ if __name__ == "__main__":
 
         GameLoader.init((800, 800), (15, 15))
         GameLoader.load_asset('pacman', 'assets/sprites/pacman.png')
+        GameLoader.load_asset('ghost-blue',
+                              'assets/sprites/ghost-blue.png')
 
         screen = Screen()
         maze = RenderMaze(screen)
         button = Button(screen, 'Un Bouton', (0, 0), (100, 100))
-        pacman = Entity(screen, (100, 100), (50, 50))
+
+        pacman = Entity(screen, (100, 100), GameLoader.cell_size)
         pacman.set_skin(GameLoader.get_asset('pacman'))
+        ghost = Entity(screen, (300, 300), GameLoader.cell_size)
+        ghost.set_skin(GameLoader.get_asset('ghost-blue'))
     except Exception as e:
         print(f'Error: {e}')
         exit()
@@ -24,4 +29,5 @@ if __name__ == "__main__":
         maze.render()
         screen.flip()
         pacman.render()
-        # button.render()
+        ghost.render()
+        button.render()
