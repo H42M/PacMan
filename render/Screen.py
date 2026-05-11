@@ -1,6 +1,12 @@
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 import pygame
 from render.GameLoader import GameLoader
+
+if TYPE_CHECKING:
+    from render.buttons.Button import Button
 
 
 class Screen:
@@ -14,6 +20,7 @@ class Screen:
         self.__clock = pygame.time.Clock()
         pygame.display.set_caption(self.__screen_name)
         self.__background = None
+        self.__clickables: list[Button] = []
 
     def clear(self) -> None:
         if self.__background:
@@ -26,10 +33,22 @@ class Screen:
         pygame.display.flip()
 
     def handle_events(self) -> bool:
+        mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for button in self.__clickables:
+                    if button.is_clicked(mouse_pos):
+                        button.execute()
+
+        for button in self.__clickables:
+            button.update_hover(mouse_pos)
         return True
+
+    def record_clickable(self, obj: Button):
+        self.__clickables.append(obj)
 
     # GETTERS / SETTERS
 
