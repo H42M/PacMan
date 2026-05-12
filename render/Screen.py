@@ -47,7 +47,7 @@ class Screen:
             button.update_hover(mouse_pos)
         return True
 
-    def record_clickable(self, obj: Button):
+    def record_clickable(self, obj: Button) -> None:
         self.__clickables.append(obj)
 
     # GETTERS / SETTERS

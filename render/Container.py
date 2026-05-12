@@ -29,14 +29,15 @@ class Container(RenderOBJ):
             return False
         return True
 
-    def __are_all_elm_0(self):
+    def __are_all_elm_0(self) -> bool:
         for elm, size in self.__content.items():
             if size != 0:
                 return False
         return True
 
     def add_content(self, objs: Union[dict[RenderOBJ, str],
-                                      list[dict[RenderOBJ, str]]]):
+                                      list[dict[RenderOBJ, str]]]
+                    ) -> None:
         if isinstance(objs, dict):
             for key, value in objs.items():
                 if not self.__is_valid_percentage(value):
@@ -52,7 +53,7 @@ class Container(RenderOBJ):
                     self.__content[key] = int(value[:-1])
         self.__resize()
 
-    def __resize(self):
+    def __resize(self) -> None:
         if self._size and self._pos:
             nb_gap = len(self.__content) + 1
             total_gap = nb_gap * self.__gap

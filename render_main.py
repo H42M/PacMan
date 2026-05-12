@@ -8,6 +8,11 @@ from render.Container import Container
 from render.RenderText import RenderText
 
 
+def reset_ghost_pos() -> None:
+    ghost.x = 1
+    ghost.y = GameLoader.screen_size[1] // 2
+
+
 if __name__ == "__main__":
 
     GameLoader.init((1000, 1000), (15, 15))
@@ -23,7 +28,7 @@ if __name__ == "__main__":
                       size=(GameLoader.screen_size[0], 0),
                       gap=20)
     ctn_h.add_content([
-        {Button(screen, 'Un Bouton'): '0%'},
+        {Button(screen, 'Rest ghost pos', callback=reset_ghost_pos): '0%'},
         {Button(screen, 'Un Bouton'): '0%'},
         {Button(screen, 'Un Bouton'): "0%"},
     ])
