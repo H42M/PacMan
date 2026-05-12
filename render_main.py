@@ -6,6 +6,7 @@ from render.buttons.Button import Button
 from render.Entity import Entity
 from render.Container import Container
 from render.RenderText import RenderText
+from render.Window import Window
 
 
 def reset_ghost_pos() -> None:
@@ -63,6 +64,9 @@ if __name__ == "__main__":
     ghost = Entity(screen, (300, 300), GameLoader.cell_size)
     ghost.set_skin(GameLoader.get_asset('ghost-blue'))
 
+    window_menu = Window(screen, 'VERTICAL', (50, 50), (500, 500))
+    window_menu.add_content({Button(screen, 'UN BOUTON', size=(100, 100)): '100%'})
+
     while screen.handle_events():
         screen.clear()
         ghost.x = (ghost.x + 1 if ghost.x is not None and
@@ -76,5 +80,5 @@ if __name__ == "__main__":
         # maze.render()
         # ctn_h.render()
         ctn_v.render()
-
+        window_menu.render()
         screen.flip()
