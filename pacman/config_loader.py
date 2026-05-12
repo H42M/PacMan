@@ -70,8 +70,30 @@ def build_game_config(config_data: dict[str, object]) -> GameConfig:
     default_config = GameConfig()
     lives = read_int(config_data, key="lives", default=default_config.lives,
                      min_value=1, max_value=9)
+    points_per_pacgum = read_int(config_data,
+                                 key="points_per_pacgum",
+                                 default=default_config.points_per_pacgum,
+                                 min_value=1, max_value=100,
+                                 )
+    points_per_super_pacgum = read_int(
+        config_data,
+        key="points_per_super_pacgum",
+        default=default_config.points_per_super_pacgum,
+        min_value=5,
+        max_value=500,
+    )
+    points_per_ghost = read_int(config_data,
+                                key="points_per_ghost",
+                                default=default_config.points_per_ghost,
+                                min_value=20,
+                                max_value=2000,
+                                )
 
-    return GameConfig(lives=lives)
+    return GameConfig(lives=lives,
+                      points_per_pacgum=points_per_pacgum,
+                      points_per_super_pacgum=points_per_super_pacgum,
+                      points_per_ghost=points_per_ghost,
+                      )
 
 
 def load_config(config_path: str) -> GameConfig:
