@@ -8,41 +8,54 @@ from render.Container import Container
 
 
 if __name__ == "__main__":
-    try:
 
-        GameLoader.init((800, 800), (15, 15))
-        GameLoader.load_asset('pacman', 'assets/sprites/pacman.png')
-        GameLoader.load_asset('ghost-blue',
-                              'assets/sprites/ghost-blue.png')
+    GameLoader.init((800, 800), (15, 15))
+    GameLoader.load_asset('pacman', 'assets/sprites/pacman.png')
+    GameLoader.load_asset('ghost-blue',
+                          'assets/sprites/ghost-blue.png')
 
-        screen = Screen()
-        maze = RenderMaze(screen)
+    screen = Screen()
 
-        ctn = Container(screen, 'HORIZONTAL', (0, 0),
-                        (GameLoader.screen_size[0], 50), 20)
-        ctn.add_content([
-            Button(screen, 'Un Bouton'),
-            Button(screen, 'Un Bouton'),
-            Button(screen, 'Un Bouton'),
-        ])
-        # maze.y = (ctn.y if ctn.y else 0) + (ctn.h if ctn.h else 0) + 20
-        print(f'maze Y : {maze.y}, ctn y: {ctn.y}, ctn h: {ctn.h}')
+    # BUTTONS CONTAINER
+    ctn_h = Container(screen, 'HORIZONTAL',
+                      pos=(0, 0),
+                      size=(GameLoader.screen_size[0], 0),
+                      gap=20)
+    ctn_h.add_content([
+        {Button(screen, 'Un Bouton'): '0%'},
+        {Button(screen, 'Un Bouton'): '0%'},
+        {Button(screen, 'Un Bouton'): "0%"},
+    ])
+    # MAZE CONTAINER
+    maze = RenderMaze(screen, (GameLoader.screen_size))
+    ctn_maze = Container(screen, 'HORIZONTAL', size=(GameLoader.screen_size),
+                         gap=0)
+    ctn_maze.add_content({maze: '80%'})
 
-        pacman = Entity(screen, (100, 100), GameLoader.cell_size)
-        pacman.set_skin(GameLoader.get_asset('pacman'))
-        ghost = Entity(screen, (300, 300), GameLoader.cell_size)
-        ghost.set_skin(GameLoader.get_asset('ghost-blue'))
-    except Exception as e:
-        print(f'Error: {e} , {e.__traceback__}')
-        exit()
+    # TOTAL CONTAINER
+    ctn_v = Container(screen, 'VERTICAL', (0, 0), GameLoader.screen_size, 0)
+    ctn_v.add_content([
+        {ctn_h: '5%'},
+        {ctn_maze: '90%'}
+    ])
+
+    print(f'maze Y : {maze.y}, MAZE.H: {maze.h},'
+          f' ctn_h y: {ctn_h.y}, ctn_h h: {ctn_h.h}')
+
+    pacman = Entity(screen, (100, 100), GameLoader.cell_size)
+    pacman.set_skin(GameLoader.get_asset('pacman'))
+    ghost = Entity(screen, (300, 300), GameLoader.cell_size)
+    ghost.set_skin(GameLoader.get_asset('ghost-blue'))
+
     while screen.handle_events():
         screen.clear()
         ghost.x = (ghost.x + 1 if ghost.x is not None and
                    ghost.x <= GameLoader.screen_size[0] else 1)
         pacman.set_rotation('W')
-        maze.render()
-        pacman.render()
-        ghost.render()
-        ctn.render()
+        # pacman.render()
+        # ghost.render()
+        # maze.render()
+        # ctn_h.render()
+        ctn_v.render()
 
         screen.flip()
