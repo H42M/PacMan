@@ -5,11 +5,12 @@ from render.RenderMaze import RenderMaze
 from render.buttons.Button import Button
 from render.Entity import Entity
 from render.Container import Container
+from render.RenderText import RenderText
 
 
 if __name__ == "__main__":
 
-    GameLoader.init((800, 800), (15, 15))
+    GameLoader.init((1000, 1000), (15, 15))
     GameLoader.load_asset('pacman', 'assets/sprites/pacman.png')
     GameLoader.load_asset('ghost-blue',
                           'assets/sprites/ghost-blue.png')
@@ -32,11 +33,21 @@ if __name__ == "__main__":
                          gap=0)
     ctn_maze.add_content({maze: '80%'})
 
+    # Info CONTAINER
+    info_container = Container(screen, 'HORIZONTAL',
+                               size=GameLoader.screen_size)
+    ghost_x = RenderText(screen, '', (0, 0), (100, 100))
+    ghost_y = RenderText(screen, '', (0, 0), (100, 100))
+    info_container.add_content([
+        {ghost_x: '50%'},
+        {ghost_y: '50%'}])
+
     # TOTAL CONTAINER
     ctn_v = Container(screen, 'VERTICAL', (0, 0), GameLoader.screen_size, 0)
     ctn_v.add_content([
         {ctn_h: '5%'},
-        {ctn_maze: '90%'}
+        {ctn_maze: '85%'},
+        {info_container: '5%'}
     ])
 
     print(f'maze Y : {maze.y}, MAZE.H: {maze.h},'
@@ -51,9 +62,12 @@ if __name__ == "__main__":
         screen.clear()
         ghost.x = (ghost.x + 1 if ghost.x is not None and
                    ghost.x <= GameLoader.screen_size[0] else 1)
+        ghost_x.text = f'GHOST X: {ghost.x}'
+        ghost_y.text = f'GHOST Y: {ghost.y}'
+
         pacman.set_rotation('W')
-        # pacman.render()
-        # ghost.render()
+        pacman.render()
+        ghost.render()
         # maze.render()
         # ctn_h.render()
         ctn_v.render()
