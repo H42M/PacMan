@@ -14,20 +14,64 @@ def strip_comment_lines(raw_text: str) -> str:
     return "\n".join(clean_lines)
 
 
-def check_config_object(parsed_config: object) -> dict[str, object]:
-    """Return config if it is a JSON object, otherwise empty defaults."""
+def check_config_object(parsed_config: object) -> dict[str, object] | None:
+    """Return config if it is a JSON object, otherwise None."""
     if not isinstance(parsed_config, dict):
         print(
             "Warning: config root must be a JSON object "
             f"but got {type(parsed_config).__name__}."
         )
-        return {}
+        return None
     return parsed_config
+
+
+def read_int(
+    config_data: dict[str, object],
+    key: str,
+    default: int,
+    min_value: int,
+    max_value: int,
+) -> int:
+    """Read an integer config value with defaulting and clamping."""
+    if key not in config_data:
+        print(f"Warning: config key '{key}' not found.")
+        print(f"Using default value: {default}.")
+        return default
+
+    value = config_data[key]
+
+    if isinstance(value, bool) or not isinstance(value, int):
+        print(
+            f"Warning: config key '{key}' must be an int, "
+            f"got {type(value).__name__}."
+        )
+        print(f"Using default value: {default}.")
+        return default
+
+    if value < min_value:
+        print(
+            f"Warning: config key '{key}' is under minimum {min_value}."
+        )
+        print(f"Using minimum value: {min_value}.")
+        return min_value
+
+    if value > max_value:
+        print(
+            f"Warning: config key '{key}' is above maximum {max_value}."
+        )
+        print(f"Using maximum value: {max_value}.")
+        return max_value
+
+    return value
 
 
 def build_game_config(config_data: dict[str, object]) -> GameConfig:
     """Build a validated game config from raw config data."""
-    return GameConfig()
+    default_config = GameConfig()
+    lives = read_int(config_data, key="lives", default=default_config.lives,
+                     min_value=1, max_value=9)
+
+    return GameConfig(lives=lives)
 
 
 def load_config(config_path: str) -> GameConfig:
@@ -37,9 +81,12 @@ def load_config(config_path: str) -> GameConfig:
             raw_text = config_file.read()
             parsed_config: object = json.loads(strip_comment_lines(raw_text))
             config_data = check_config_object(parsed_config)
+            if config_data is None:
+                print("Using default configuration.")
+                return GameConfig()
 
-    except FileNotFoundError:
-        print(f"Warning: config file not found: {config_path}")
+    except OSError as error:
+        print(f"Warning: could not read config file '{config_path}': {error}")
         print("Using default configuration.")
         return GameConfig()
 
@@ -52,4 +99,4 @@ def load_config(config_path: str) -> GameConfig:
 
 
 if __name__ == "__main__":
-    load_config("config/config.json")
+    print(load_config("config/config.json"))
