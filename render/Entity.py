@@ -19,7 +19,7 @@ class Entity(RenderOBJ):
         if skin_texture:
             self.__saved_texture = skin_texture
 
-    def set_rotation(self, rotation: str):
+    def set_rotation(self, rotation: str) -> None:
         if rotation not in ['N', 'S', 'E', 'W']:
             raise ValueError(f'Invalid rotation provided: {rotation}')
         self.__current_rotation = rotation
