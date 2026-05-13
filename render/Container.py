@@ -57,27 +57,30 @@ class Container(RenderOBJ):
 
     def __resize(self) -> None:
         if self._size and self._pos:
+            available_width = self._size[0] - 2 * self.__padding
+            available_height = self._size[1] - 2 * self.__padding
+
             nb_gap = len(self.__content) + 1
             total_gap = nb_gap * self.__gap
 
             if self.__way == "HORIZONTAL":
-                end_x = self._pos[0] + self.__gap
+                end_x = self._pos[0] + self.__padding + self.__gap
 
                 if self.__are_all_elm_0():
-                    elm_size = ((self._size[0] - total_gap) //
+                    elm_size = ((available_width - total_gap) //
                                 len(self.__content))
                     for i, (elm, size) in enumerate(self.__content.items()):
-                        elm.y = self._pos[1]
+                        elm.y = self._pos[1] + self.__padding
                         elm.w = elm_size
                         elm.x = end_x
-                        elm.h = self._size[1]
+                        elm.h = available_height
                         end_x = elm.x + elm_size + self.__gap
                         if isinstance(elm, Container):
                             elm.__resize()
                 else:
                     for i, (elm, size) in enumerate(self.__content.items()):
-                        elm.y = self._pos[1]
-                        elm.w = int(self._size[0] * (size / 100))
+                        elm.y = self._pos[1] + self.__padding
+                        elm.w = int(available_width * (size / 100))
 
                     if self.__gap == 0 and not self.__are_all_elm_0():
                         gap = self.__process_gap()
@@ -91,25 +94,25 @@ class Container(RenderOBJ):
                         if isinstance(elm, Container):
                             elm.__resize()
 
-                        elm.h = self._size[1]
+                        elm.h = available_height
             if self.__way == 'VERTICAL':
-                end_y = self._pos[1]
+                end_y = self._pos[1] + self.__padding
 
                 if self.__are_all_elm_0():
-                    elm_size = ((self._size[1] - total_gap) //
+                    elm_size = ((available_height - total_gap) //
                                 len(self.__content))
                     for i, (elm, size) in enumerate(self.__content.items()):
                         elm.h = elm_size
-                        elm.w = self._size[0]
-                        elm.x = self._pos[0]
-                        elm.y = self._pos[1] + ((self.__gap * (i + 1)) +
-                                                (elm_size * i))
+                        elm.w = available_width
+                        elm.x = self._pos[0] + self.__padding
+                        elm.y = (self._pos[1] + self.__padding +
+                                 ((self.__gap * (i + 1)) + (elm_size * i)))
                         if isinstance(elm, Container):
                             elm.__resize()
                 else:
                     # Set all new size first
                     for i, (elm, size) in enumerate(self.__content.items()):
-                        elm.h = int(self._size[1] * (size / 100))
+                        elm.h = int(available_height * (size / 100))
 
                     if self.__gap == 0 and not self.__are_all_elm_0():
                         gap = self.__process_gap()
@@ -118,8 +121,8 @@ class Container(RenderOBJ):
 
                     # Set all new pos then
                     for i, (elm, size) in enumerate(self.__content.items()):
-                        elm.x = self._pos[0]
-                        elm.w = self._size[0]
+                        elm.x = self._pos[0] + self.__padding
+                        elm.w = available_width
                         elm.y = end_y + gap
                         end_y = ((elm.y if elm.y else 0) +
                                  (elm.h if elm.h else 0))
@@ -129,14 +132,16 @@ class Container(RenderOBJ):
     def __process_gap(self) -> int:
         if self._size and self._pos:
             if self.__way == 'VERTICAL':
+                available_height = self._size[1] - 2 * self.__padding
                 total_height = sum(elm.h if elm.h else 0
                                    for elm, _ in self.__content.items())
-                return ((self._size[1] - total_height) //
+                return ((available_height - total_height) //
                         (len(self.__content) + 1))
             else:
+                available_width = self._size[0] - 2 * self.__padding
                 total_width = sum(elm.w if elm.w else 0
                                   for elm, _ in self.__content.items())
-                return ((self._size[0] - total_width) //
+                return ((available_width - total_width) //
                         (len(self.__content) + 1))
         raise ValueError('size or pos not defined: cant process gap')
 
@@ -184,3 +189,21 @@ class Container(RenderOBJ):
             else:
                 self._size = (0, value)
             # self.__resize()
+
+    @property
+    def gap(self) -> int:
+        return self.__gap
+
+    @gap.setter
+    def gap(self, value: int) -> None:
+        self.__gap = value
+        self.__resize()
+
+    @property
+    def padding(self) -> int:
+        return self.__padding
+
+    @padding.setter
+    def padding(self, value: int) -> None:
+        self.__padding = value
+        self.__resize()

@@ -136,11 +136,10 @@ class Button(RenderOBJ):
         """Render the button."""
         if not self._size or not self._pos:
             return
-        
-        # Créer la surface si elle n'existe pas ou si la taille a changé
+
         if not self._surface or self._surface.get_size() != self._size:
             self._surface = pygame.Surface(self._size)
-        
+
         color = self._resolve_color()
         self._draw_shadow(self._screen.screen)
         self._draw_rounded_rect(self._surface, color,
