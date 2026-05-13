@@ -1,5 +1,6 @@
 PYTHON = python3
 MAIN = pac-man.py
+MAIN_RENDER = render_main.py
 CONFIG = config/config.json
 DEPENDENCIES = requirements.txt
 
@@ -10,6 +11,10 @@ install:
 
 run:
 	$(PYTHON) $(MAIN) $(CONFIG)
+
+run-render:
+	$(PYTHON) $(MAIN_RENDER)
+	make clean
 
 debug:
 	$(PYTHON) -m pdb $(MAIN) $(CONFIG)
