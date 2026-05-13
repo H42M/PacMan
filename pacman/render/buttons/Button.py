@@ -1,5 +1,5 @@
-from render.RenderObj import RenderOBJ
-from render.Screen import Screen
+from pacman.render.RenderObj import RenderOBJ
+from pacman.render.Screen import Screen
 import pygame
 
 from typing import Optional, Union, Callable, Any

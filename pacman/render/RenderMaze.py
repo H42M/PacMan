@@ -1,8 +1,8 @@
-from render.Screen import Screen
-from render.GameLoader import GameLoader
+from pacman.render.Screen import Screen
+from pacman.render.GameLoader import GameLoader
 from Errors import MazeError
-from render.RenderObj import RenderOBJ
-from mazegenerator.mazegenerator import MazeGenerator
+from pacman.render.RenderObj import RenderOBJ
+from pacman.mazegenerator import MazeGenerator
 
 from pygame import Surface
 

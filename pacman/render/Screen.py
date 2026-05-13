@@ -3,11 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pygame
-from render.GameLoader import GameLoader
+from pacman.render.GameLoader import GameLoader
 
 if TYPE_CHECKING:
-    from render.Window import Window
-    from render.buttons.Button import Button
+    from pacman.render.Window import Window
+    from pacman.render.buttons.Button import Button
 
 
 class Screen:
@@ -64,14 +64,14 @@ class Screen:
             self.__clickables.remove(obj)
 
     def __load_menu(self) -> Window:
-        from render.Container import Container
-        from render.Window import Window
-        from render.RenderText import RenderText
-        from render.buttons.Button import Button
-        from render.Divider import Divider
+        from pacman.render.Container import Container
+        from pacman.render.Window import Window
+        from pacman.render.RenderText import RenderText
+        from pacman.render.buttons.Button import Button
+        from pacman.render.Divider import Divider
 
         # WINDOW MENU
-        window_menu = Window(self, 'VERTICAL', (200, 200), (200, 500),
+        window_menu = Window(self, 'VERTICAL', (200, 200), (500, 500),
                              display_default=True, padding=20)
         title_ctn = Container(self, 'VERTICAL')
         title_ctn.add_content([{

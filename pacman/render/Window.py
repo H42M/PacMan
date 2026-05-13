@@ -1,7 +1,7 @@
-from render.Container import Container
-from render.Screen import Screen
+from pacman.render.Container import Container
+from pacman.render.Screen import Screen
 from typing import Optional
-from render.buttons.Button import Button
+from pacman.render.buttons.Button import Button
 import pygame
 
 

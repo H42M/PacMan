@@ -1,6 +1,6 @@
 import pygame
 from typing import Optional
-from render.Screen import Screen
+from pacman.render.Screen import Screen
 
 
 class RenderOBJ:
