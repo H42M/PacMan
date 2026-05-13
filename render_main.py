@@ -1,11 +1,11 @@
-from render.GameLoader import GameLoader
+from pacman.render.GameLoader import GameLoader
 
-from render.Screen import Screen
-from render.RenderMaze import RenderMaze
-from render.buttons.Button import Button
-from render.Entity import Entity
-from render.Container import Container
-from render.RenderText import RenderText
+from pacman.render.Screen import Screen
+from pacman.render.RenderMaze import RenderMaze
+from pacman.render.buttons.Button import Button
+from pacman.render.Entity import Entity
+from pacman.render.Container import Container
+from pacman.render.RenderText import RenderText
 
 
 def reset_ghost_pos() -> None:

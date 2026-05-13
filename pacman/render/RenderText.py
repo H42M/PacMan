@@ -1,8 +1,8 @@
-from render.RenderObj import RenderOBJ
+from pacman.render.RenderObj import RenderOBJ
 
 import pygame
 from typing import Optional
-from render.Screen import Screen
+from pacman.render.Screen import Screen
 
 
 class RenderText(RenderOBJ):
