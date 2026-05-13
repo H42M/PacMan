@@ -10,11 +10,12 @@ class Window(Container):
                  way: str,
                  pos: Optional[tuple[int, int]] = None,
                  size: Optional[tuple[int, int]] = None,
-                 gap: Optional[int] = None,
+                 gap: int = 0,
+                 padding: int = 0,
                  bg_color: Optional[tuple[int, int, int]] = None,
                  display_default: bool = False,
                  ) -> None:
-        super().__init__(screen, way, pos, size, gap)
+        super().__init__(screen, way, pos, size, gap, padding)
         self.__bg_color = bg_color
         self.__display = display_default
         self.__cross_btn = Button(self._screen, 'X',
@@ -51,7 +52,7 @@ class Window(Container):
         print('=== ')
 
     def switch_display(self) -> None:
-        self.__display = not self.__display
+        self.display = not self.display
 
     @property
     def display(self) -> bool:
@@ -60,3 +61,7 @@ class Window(Container):
     @display.setter
     def display(self, value: bool) -> None:
         self.__display = value
+        if self.__display:
+            self._screen.record_clickable(self.__cross_btn)
+        else:
+            self._screen.delete_clickable(self.__cross_btn)

@@ -56,7 +56,12 @@ class Screen:
         return True
 
     def record_clickable(self, obj: Button) -> None:
-        self.__clickables.append(obj)
+        if obj not in self.__clickables:
+            self.__clickables.append(obj)
+
+    def delete_clickable(self, obj: Button) -> None:
+        if obj in self.__clickables:
+            self.__clickables.remove(obj)
 
     def __load_menu(self) -> Window:
         from render.Container import Container
@@ -64,9 +69,10 @@ class Screen:
         from render.RenderText import RenderText
         from render.buttons.Button import Button
         from render.Divider import Divider
+
         # WINDOW MENU
-        window_menu = Window(self, 'VERTICAL', (200, 200), (500, 500),
-                             display_default=True)
+        window_menu = Window(self, 'VERTICAL', (200, 200), (200, 500),
+                             display_default=True, padding=20)
         title_ctn = Container(self, 'VERTICAL')
         title_ctn.add_content([{
             RenderText(self, "Menu", font_size=40): '20%'},
