@@ -1,6 +1,7 @@
 from render.Container import Container
 from render.Screen import Screen
 from typing import Optional
+from render.buttons.Button import Button
 import pygame
 
 
@@ -10,16 +11,20 @@ class Window(Container):
                  pos: Optional[tuple[int, int]] = None,
                  size: Optional[tuple[int, int]] = None,
                  gap: Optional[int] = None,
-                 bg_color: Optional[tuple[int, int, int]] = None
+                 bg_color: Optional[tuple[int, int, int]] = None,
+                 display_default: bool = False,
                  ) -> None:
         super().__init__(screen, way, pos, size, gap)
         self.__bg_color = bg_color
+        self.__display = display_default
+        self.__cross_btn = Button(self._screen, 'X',
+                                  callback=self.switch_display)
 
     def render(self) -> None:
+        if not self.__display:
+            return
+
         if self._pos and self._size:
-            # window = pygame.Surface(self._size)
-            # window.set_colorkey(self.__bg_color
-            #                     if self.__bg_color else (0, 0, 0))
             pygame.draw.rect(
                 # window,
                 self._screen.screen,
@@ -34,4 +39,24 @@ class Window(Container):
                 width=2,
                 border_radius=10
             )
+            end_window = (self._pos[0] + self._size[0],
+                          self._pos[1] + self._size[1])
+            cross_size = (50, 40)
+            self.__cross_btn.size = cross_size
+            self.__cross_btn.pos = (end_window[0] - cross_size[0],
+                                    self._pos[1])
+            self.__cross_btn.render()
+        print('=== WINDOW: ')
         super().render()
+        print('=== ')
+
+    def switch_display(self) -> None:
+        self.__display = not self.__display
+
+    @property
+    def display(self) -> bool:
+        return self.__display
+
+    @display.setter
+    def display(self, value: bool) -> None:
+        self.__display = value

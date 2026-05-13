@@ -74,16 +74,13 @@ class Button(RenderOBJ):
         """Draw the button shadow."""
         if self._size and self._pos:
             offset = 4 if self._is_hovered else 2
-            shadow = pygame.Surface(self._size)
-            shadow.set_colorkey((0, 0, 0))
             pygame.draw.rect(
-                shadow,
+                screen,
                 self.SHADOW_COLOR,
-                (0, 0, *self._size),
+                (int(self._pos[0]) + offset, int(self._pos[1]) + offset,
+                 *self._size),
                 border_radius=self.BORDER_RADIUS,
             )
-            screen.blit(shadow, (int(self._pos[0]) + offset,
-                                 int(self._pos[1]) + offset))
 
     def _draw_rounded_rect(
         self,
@@ -137,15 +134,19 @@ class Button(RenderOBJ):
 
     def render(self) -> None:
         """Render the button."""
+        if not self._size or not self._pos:
+            return
+        
+        # Créer la surface si elle n'existe pas ou si la taille a changé
+        if not self._surface or self._surface.get_size() != self._size:
+            self._surface = pygame.Surface(self._size)
+        
         color = self._resolve_color()
-        if self._surface:
-            self._draw_shadow(self._screen.screen)
-            self._draw_rounded_rect(self._surface, color,
-                                    self._get_border_color(color))
-            self._blit_centered_text(self._surface, self._text)
-            self._blit_to_screen(self._screen.screen)
-        else:
-            print('Cant render Button')
+        self._draw_shadow(self._screen.screen)
+        self._draw_rounded_rect(self._surface, color,
+                                self._get_border_color(color))
+        self._blit_centered_text(self._surface, self._text)
+        self._blit_to_screen(self._screen.screen)
 
     # ------------------------------------------------------------------ #
     #  Interactions                                                        #
@@ -208,7 +209,6 @@ class Button(RenderOBJ):
     def size(self, value: Optional[tuple[int, int]]) -> None:
         if value:
             self._size = value
-            self._surface = pygame.Surface(self._size)
 
     @property
     def w(self) -> Optional[int]:
@@ -223,7 +223,6 @@ class Button(RenderOBJ):
                 self._size = (value, self._size[1])
             else:
                 self._size = (value, 0)
-            self._surface = pygame.Surface(self._size)
 
     @property
     def h(self) -> Optional[int]:
@@ -238,4 +237,3 @@ class Button(RenderOBJ):
                 self._size = (self._size[0], value)
             else:
                 self._size = (0, value)
-            self._surface = pygame.Surface(self._size)

@@ -11,11 +11,13 @@ class Container(RenderOBJ):
                  way: str,
                  pos: Optional[tuple[int, int]] = None,
                  size: Optional[tuple[int, int]] = None,
-                 gap: Optional[int] = None
+                 gap: int = 0,
+                 padding: int = 0
                  ) -> None:
         super().__init__(screen, pos, size)
         self.__way = way
-        self.__gap = gap if gap else 0
+        self.__gap = gap
+        self.__padding = padding
         self.__content: dict[RenderOBJ, int] = {}
 
     def __is_valid_percentage(self, value: str) -> bool:
@@ -59,21 +61,22 @@ class Container(RenderOBJ):
             total_gap = nb_gap * self.__gap
 
             if self.__way == "HORIZONTAL":
-                end_x = self.__gap
+                end_x = self._pos[0] + self.__gap
 
                 if self.__are_all_elm_0():
                     elm_size = ((self._size[0] - total_gap) //
                                 len(self.__content))
                     for i, (elm, size) in enumerate(self.__content.items()):
-                        elm.y = self.y
+                        elm.y = self._pos[1]
                         elm.w = elm_size
-                        elm.x = (self.__gap * (i + 1)) + (elm_size * i)
-                        elm.h = self.h
+                        elm.x = end_x
+                        elm.h = self._size[1]
+                        end_x = elm.x + elm_size + self.__gap
                         if isinstance(elm, Container):
                             elm.__resize()
                 else:
                     for i, (elm, size) in enumerate(self.__content.items()):
-                        elm.y = self.y
+                        elm.y = self._pos[1]
                         elm.w = int(self._size[0] * (size / 100))
 
                     if self.__gap == 0 and not self.__are_all_elm_0():
@@ -83,21 +86,24 @@ class Container(RenderOBJ):
 
                     for i, (elm, size) in enumerate(self.__content.items()):
                         elm.x = end_x + gap
-                        end_x = elm.x if elm.x else 0 + elm.w if elm.w else 0
+                        end_x = ((elm.x if elm.x else 0) +
+                                 (elm.w if elm.w else 0))
                         if isinstance(elm, Container):
                             elm.__resize()
 
-                        elm.h = self.h
+                        elm.h = self._size[1]
             if self.__way == 'VERTICAL':
-                end_y = 0
+                end_y = self._pos[1]
 
                 if self.__are_all_elm_0():
                     elm_size = ((self._size[1] - total_gap) //
                                 len(self.__content))
                     for i, (elm, size) in enumerate(self.__content.items()):
                         elm.h = elm_size
-                        print(f'elm.h: {elm.h}')
-                        elm.y = (self.__gap * (i + 1)) + (elm_size * i)
+                        elm.w = self._size[0]
+                        elm.x = self._pos[0]
+                        elm.y = self._pos[1] + ((self.__gap * (i + 1)) +
+                                                (elm_size * i))
                         if isinstance(elm, Container):
                             elm.__resize()
                 else:
@@ -112,11 +118,11 @@ class Container(RenderOBJ):
 
                     # Set all new pos then
                     for i, (elm, size) in enumerate(self.__content.items()):
+                        elm.x = self._pos[0]
+                        elm.w = self._size[0]
                         elm.y = end_y + gap
                         end_y = ((elm.y if elm.y else 0) +
                                  (elm.h if elm.h else 0))
-                        print(f'* elm : ({elm.x, elm.y}), ({elm.w, elm.h})')
-                        print(f'** GAP: {gap}')
                         if isinstance(elm, Container):
                             elm.__resize()
 
@@ -136,6 +142,7 @@ class Container(RenderOBJ):
 
     def render(self) -> None:
         for elm in self.__content:
+            print(f'Element rendered at {elm.pos} with size: {elm.size}')
             elm.render()
 
     @property
@@ -146,7 +153,7 @@ class Container(RenderOBJ):
     def size(self, value: Optional[tuple[int, int]]) -> None:
         if value:
             self._size = value
-            self.__resize()
+            # self.__resize()
 
     @property
     def w(self) -> Optional[int]:
@@ -161,7 +168,7 @@ class Container(RenderOBJ):
                 self._size = (value, self._size[1])
             else:
                 self._size = (value, 0)
-            self.__resize()
+            # self.__resize()
 
     @property
     def h(self) -> Optional[int]:
@@ -176,4 +183,4 @@ class Container(RenderOBJ):
                 self._size = (self._size[0], value)
             else:
                 self._size = (0, value)
-            self.__resize()
+            # self.__resize()

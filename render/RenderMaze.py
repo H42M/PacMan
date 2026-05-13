@@ -11,7 +11,7 @@ class RenderMaze(RenderOBJ):
     def __init__(self, screen: Screen, size: tuple[int, int]) -> None:
         self.__maze = MazeGenerator(size=GameLoader.maze_size)
         self.__maze.generate()
-        self.__color = (255, 255, 0)
+        self.__color = (255, 255, 255)
         print(self.__maze.maze)
 
         super().__init__(screen, size=size)
