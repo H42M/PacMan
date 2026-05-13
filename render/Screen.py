@@ -6,6 +6,7 @@ import pygame
 from render.GameLoader import GameLoader
 
 if TYPE_CHECKING:
+    from render.Window import Window
     from render.buttons.Button import Button
 
 
@@ -21,6 +22,7 @@ class Screen:
         pygame.display.set_caption(self.__screen_name)
         self.__background = None
         self.__clickables: list[Button] = []
+        self.__menu = self.__load_menu()
 
     def clear(self) -> None:
         if self.__background:
@@ -29,7 +31,9 @@ class Screen:
             self.__screen.fill((0, 0, 0))
 
     def flip(self) -> None:
-        self.__clock.tick(360)
+        self.__clock.tick(60)
+        if self.__menu.display:
+            self.__menu.render()
         pygame.display.flip()
 
     def handle_events(self) -> bool:
@@ -43,12 +47,41 @@ class Screen:
                     if button.is_clicked(mouse_pos):
                         button.execute()
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.__menu.switch_display()
+
         for button in self.__clickables:
             button.update_hover(mouse_pos)
         return True
 
     def record_clickable(self, obj: Button) -> None:
         self.__clickables.append(obj)
+
+    def __load_menu(self) -> Window:
+        from render.Container import Container
+        from render.Window import Window
+        from render.RenderText import RenderText
+        from render.buttons.Button import Button
+        from render.Divider import Divider
+        # WINDOW MENU
+        window_menu = Window(self, 'VERTICAL', (200, 200), (500, 500),
+                             display_default=True)
+        title_ctn = Container(self, 'VERTICAL')
+        title_ctn.add_content([{
+            RenderText(self, "Menu", font_size=40): '20%'},
+            {Divider(self): "1%"}])
+
+        btn_ctn = Container(self, 'VERTICAL', gap=20)
+        btn_ctn.add_content([
+            {Button(self, 'UN BOUTON'): '0%'},
+            {Button(self, "Encore un bouton"): '0%'}])
+
+        window_menu.add_content([
+            {title_ctn: '30%'},
+            {btn_ctn: '70%'},])
+
+        return window_menu
 
     # GETTERS / SETTERS
 
@@ -59,3 +92,11 @@ class Screen:
     @screen.setter
     def screen(self, value: pygame.Surface) -> None:
         self.__screen = value
+
+    @property
+    def menu(self) -> Window:
+        return self.__menu
+
+    @menu.setter
+    def menu(self, value: Window) -> None:
+        self.__menu = value

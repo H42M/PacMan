@@ -11,8 +11,8 @@ class RenderText(RenderOBJ):
     def __init__(self,
                  screen: Screen,
                  text: str,
-                 pos: tuple[int, int],
-                 size: tuple[int, int],
+                 pos: Optional[tuple[int, int]] = None,
+                 size: Optional[tuple[int, int]] = None,
                  bg_color: Optional[tuple[int, int, int]] = None,
                  font_size: Optional[int] = None
                  ) -> None:
