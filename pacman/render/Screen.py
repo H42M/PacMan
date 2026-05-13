@@ -7,7 +7,7 @@ from pacman.render.GameLoader import GameLoader
 
 if TYPE_CHECKING:
     from pacman.render.Window import Window
-    from pacman.render.buttons.Button import Button
+    from pacman.render.interactives.Button import Button
 
 
 class Screen:
@@ -67,7 +67,7 @@ class Screen:
         from pacman.render.Container import Container
         from pacman.render.Window import Window
         from pacman.render.RenderText import RenderText
-        from pacman.render.buttons.Button import Button
+        from pacman.render.interactives.Button import Button
         from pacman.render.Divider import Divider
 
         # WINDOW MENU

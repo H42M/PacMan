@@ -2,7 +2,7 @@ from pacman.render.GameLoader import GameLoader
 
 from pacman.render.Screen import Screen
 from pacman.render.RenderMaze import RenderMaze
-from pacman.render.buttons.Button import Button
+from pacman.render.interactives import Button, ToggleButton
 from pacman.render.Entity import Entity
 from pacman.render.Container import Container
 from pacman.render.RenderText import RenderText
@@ -11,6 +11,10 @@ from pacman.render.RenderText import RenderText
 def reset_ghost_pos() -> None:
     ghost.x = 1
     ghost.y = GameLoader.screen_size[1] // 2
+
+
+def ghost_pos_half() -> bool:
+    return True if ghost.x and ghost.x > 100 else False
 
 
 if __name__ == "__main__":
@@ -29,7 +33,8 @@ if __name__ == "__main__":
                       gap=20)
     ctn_h.add_content([
         {Button(screen, 'Rest ghost pos', callback=reset_ghost_pos): '0%'},
-        {Button(screen, 'Un Bouton'): '0%'},
+        {ToggleButton(screen, 'Un Bouton', state_callback=ghost_pos_half
+                      ): '0%'},
         {Button(screen, 'Un Bouton'): "0%"},
     ])
     # MAZE CONTAINER

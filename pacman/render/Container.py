@@ -53,6 +53,8 @@ class Container(RenderOBJ):
                         raise ValueError(f"La valeur '{value}' n'est pas un "
                                          "pourcentage valide (format: '10%')")
                     self.__content[key] = int(value[:-1])
+        if sum(size for _, size in self.__content.items()) > 100:
+            raise ValueError("Sum of sizes is over 100% in container")
         self.__resize()
 
     def __resize(self) -> None:
