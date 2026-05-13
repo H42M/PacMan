@@ -1,5 +1,7 @@
 import json
-from pacman.game_config import GameConfig
+from pacman.game_config import GameConfig, LevelConfig
+
+# Parsing helpers
 
 
 def strip_comment_lines(raw_text: str) -> str:
@@ -23,6 +25,9 @@ def check_config_object(parsed_config: object) -> dict[str, object] | None:
         )
         return None
     return parsed_config
+
+
+# Value readers
 
 
 def read_str(
@@ -90,6 +95,97 @@ def read_int(
     return value
 
 
+def read_optional_int(config_data: dict[str, object],
+                      key: str,
+                      default: int | None,
+                      ) -> int | None:
+    """Read an optional integer config value with defaulting."""
+    if key not in config_data:
+        print(f"Warning: config key '{key}' not found.")
+        print(f"Using default value: {default}.")
+        return default
+    value = config_data[key]
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, int):
+        print(f"Warning: config key '{key}' must be an integer or null, "
+              f"got {type(value).__name__}.")
+        print(f"Using default value: {default}.")
+        return default
+    return value
+
+
+# Config builders
+
+
+def build_level_config(level_data: dict[str, object],
+                       default_level: LevelConfig,) -> LevelConfig:
+    """Build a validated level config from raw level data."""
+    width = read_int(config_data=level_data,
+                     key="width",
+                     default=default_level.width,
+                     min_value=7,
+                     max_value=100,)
+    height = read_int(config_data=level_data,
+                      key="height",
+                      default=default_level.height,
+                      min_value=7,
+                      max_value=100,)
+    seed = read_optional_int(config_data=level_data,
+                             key="seed",
+                             default=default_level.seed)
+    level_max_time = read_int(config_data=level_data,
+                              key="level_max_time",
+                              default=default_level.level_max_time,
+                              min_value=1,
+                              max_value=999,)
+
+    return LevelConfig(
+        width=width,
+        height=height,
+        seed=seed,
+        level_max_time=level_max_time,
+    )
+
+
+def read_levels(
+    config_data: dict[str, object],
+    default: tuple[LevelConfig, ...],
+) -> tuple[LevelConfig, ...]:
+    """Read level configs with defaulting."""
+    if "levels" not in config_data:
+        print("Warning: no levels found in config.")
+        print("Using default levels.")
+        return default
+
+    value = config_data["levels"]
+
+    if not isinstance(value, list):
+        print("Warning: config key 'levels' must be a list.")
+        print("Using default levels.")
+        return default
+    if not value:
+        print("Warning: config key 'levels' is an empty list.")
+        print("Using default levels.")
+        return default
+
+    levels_list: list[LevelConfig] = []
+    for i, level in enumerate(value):
+        default_level = default[i % len(default)]
+        if not isinstance(level, dict):
+            print(
+                f"Warning: level {i} must be a JSON object, "
+                f"got {type(level).__name__}."
+            )
+            levels_list.append(default_level)
+        else:
+            levels_list.append(build_level_config(
+                level_data=level,
+                default_level=default_level
+                ))
+    return tuple(levels_list)
+
+
 def build_game_config(config_data: dict[str, object]) -> GameConfig:
     """Build a validated game config from raw config data."""
     default_config = GameConfig()
@@ -117,12 +213,17 @@ def build_game_config(config_data: dict[str, object]) -> GameConfig:
                                 min_value=20,
                                 max_value=2000,
                                 )
+    levels = read_levels(
+        config_data=config_data,
+        default=default_config.levels
+    )
 
     return GameConfig(highscore_filename=highscore_filename,
                       lives=lives,
                       points_per_pacgum=points_per_pacgum,
                       points_per_super_pacgum=points_per_super_pacgum,
                       points_per_ghost=points_per_ghost,
+                      levels=levels,
                       )
 
 
