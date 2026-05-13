@@ -25,6 +25,31 @@ def check_config_object(parsed_config: object) -> dict[str, object] | None:
     return parsed_config
 
 
+def read_str(
+        config_data: dict[str, object],
+        key: str,
+        default: str,
+        ) -> str:
+    """Read a string config value with defaulting."""
+
+    if key not in config_data:
+        print(f"Warning: config key '{key}' not found.")
+        print(f"Using default value: {default}.")
+        return default
+    value = config_data[key]
+    if not isinstance(value, str):
+        print(f"Warning: config key '{key}' must be a string, "
+              f"got {type(value).__name__}.")
+        print(f"Using default value: {default}.")
+        return default
+    if not value.strip():
+        print(f"Warning: config key '{key}' cannot be empty.")
+        print(f"Using default value: {default}.")
+        return default
+
+    return value.strip()
+
+
 def read_int(
     config_data: dict[str, object],
     key: str,
@@ -68,6 +93,10 @@ def read_int(
 def build_game_config(config_data: dict[str, object]) -> GameConfig:
     """Build a validated game config from raw config data."""
     default_config = GameConfig()
+
+    highscore_filename = read_str(config_data,
+                                  key="highscore_filename",
+                                  default=default_config.highscore_filename)
     lives = read_int(config_data, key="lives", default=default_config.lives,
                      min_value=1, max_value=9)
     points_per_pacgum = read_int(config_data,
@@ -89,7 +118,8 @@ def build_game_config(config_data: dict[str, object]) -> GameConfig:
                                 max_value=2000,
                                 )
 
-    return GameConfig(lives=lives,
+    return GameConfig(highscore_filename=highscore_filename,
+                      lives=lives,
                       points_per_pacgum=points_per_pacgum,
                       points_per_super_pacgum=points_per_super_pacgum,
                       points_per_ghost=points_per_ghost,
