@@ -6,6 +6,8 @@ import pygame
 
 
 class Window(Container):
+    """Window class.
+    Container with cross btn to close it and borders"""
     def __init__(self, screen: Screen,
                  way: str,
                  pos: Optional[tuple[int, int]] = None,
@@ -22,6 +24,7 @@ class Window(Container):
                                   callback=self.switch_display)
 
     def render(self) -> None:
+        """Display Window and contained elements on screen."""
         if not self.__display:
             return
 
@@ -50,6 +53,7 @@ class Window(Container):
         super().render()
 
     def switch_display(self) -> None:
+        """Reverse the display state"""
         self.display = not self.display
 
     @property

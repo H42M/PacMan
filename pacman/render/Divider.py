@@ -6,14 +6,17 @@ from typing import Optional
 
 
 class Divider(RenderOBJ):
+    """Just a visual line."""
     def __init__(self, screen: Screen,
                  color: Optional[tuple[int, int, int]] = None,
                  pos: Optional[tuple[int, int]] = None,
                  size: Optional[tuple[int, int]] = None) -> None:
+        """Initialize Divider."""
         super().__init__(screen, pos, size)
         self.__color = color if color else (255, 255, 255)
 
     def render(self) -> None:
+        """Display line on screen."""
         if self.pos and self.size:
             pygame.draw.rect(
                 self._screen.screen,

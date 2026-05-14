@@ -6,6 +6,8 @@ from Errors import LoadingError
 
 
 class GameLoader:
+    """Class Game Loader.
+    Load textures and keep usefull info like cell width, wall thicknes, ..."""
 
     screen_size: tuple[int, int]
     maze_size: tuple[int, int]

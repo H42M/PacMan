@@ -6,25 +6,33 @@ import pygame
 
 
 class Entity(RenderOBJ):
+    """Entity class.
+    Used to display entities like pacman or ghosts.
+    Can be rotated if needed.
+    Initial direction must be east"""
     def __init__(self, screen: Screen,
                  pos: Optional[tuple[int, int]] = None,
                  size: Optional[tuple[int, int]] = None
                  ) -> None:
+        """Initialize Entity class."""
         self.__saved_texture: Optional[pygame.Surface] = None
         self.__current_rotation: str = 'E'
         super().__init__(screen, pos, size)
 
     def set_skin(self, skin_texture: Optional[pygame.Surface]
                  ) -> None:
+        """Set creature skin."""
         if skin_texture:
             self.__saved_texture = skin_texture
 
     def set_rotation(self, rotation: str) -> None:
+        """Set creature rotation"""
         if rotation not in ['N', 'S', 'E', 'W']:
             raise ValueError(f'Invalid rotation provided: {rotation}')
         self.__current_rotation = rotation
 
     def render(self) -> None:
+        """Display the creature on screen based on his direction"""
         if self.__saved_texture and self._pos and self._size:
             angle_registry = {
                 'S': 270,
