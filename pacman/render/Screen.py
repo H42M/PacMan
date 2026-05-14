@@ -37,6 +37,7 @@ class Screen:
         pygame.display.flip()
 
     def handle_events(self) -> bool:
+        from pacman.render.interactives.Input import Input
         mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -46,10 +47,16 @@ class Screen:
                 for button in self.__clickables:
                     if button.is_clicked(mouse_pos):
                         button.execute()
+                    elif isinstance(button, Input):
+                        button.focus = False
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.__menu.switch_display()
+
+                for button in self.__clickables:
+                    if isinstance(button, Input):
+                        button.handle_key(event)
 
         for button in self.__clickables:
             button.update_hover(mouse_pos)
@@ -64,11 +71,13 @@ class Screen:
             self.__clickables.remove(obj)
 
     def __load_menu(self) -> Window:
+        """Generate an exemple of menu"""
         from pacman.render.Container import Container
         from pacman.render.Window import Window
         from pacman.render.RenderText import RenderText
         from pacman.render.interactives.Button import Button
         from pacman.render.Divider import Divider
+        from pacman.render.interactives.Input import Input
 
         # WINDOW MENU
         window_menu = Window(self, 'VERTICAL', (200, 200), (500, 500),
@@ -78,10 +87,26 @@ class Screen:
             RenderText(self, "Menu", font_size=40): '20%'},
             {Divider(self): "1%"}])
 
+        # INPUT CONTAINER
+        input_area_ctn = Container(self, 'VERTICAL')
+
+        input_ctn = Container(self, 'HORIZONTAL', )
+        input_ctn.add_content([
+            {Input(self, placeholder="Ex: Joueur_1"): '70%'},
+            {Button(self, 'Enregistrer'): '25%'}
+            ])
+        input_area_ctn.add_content([
+            {RenderText(self, 'Nom du joueur'): '0%'},
+            {input_ctn: '0%'}
+        ])
+
+        # BTNS CONTAINER
         btn_ctn = Container(self, 'VERTICAL', gap=20)
         btn_ctn.add_content([
             {Button(self, 'UN BOUTON'): '0%'},
-            {Button(self, "Encore un bouton"): '0%'}])
+            {Button(self, "Encore un bouton"): '0%'},
+            {input_area_ctn: '0%'},
+            ])
 
         window_menu.add_content([
             {title_ctn: '30%'},
