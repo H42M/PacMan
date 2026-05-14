@@ -11,7 +11,9 @@ if TYPE_CHECKING:
 
 
 class Screen:
+    """Manage screen, all pygame stuff, and player interactions."""
     def __init__(self) -> None:
+        """Initialize Screen."""
         pygame.init()
         pygame.key.set_repeat(400, 40)
 
@@ -27,18 +29,21 @@ class Screen:
         self.__menu = self.__load_menu()
 
     def clear(self) -> None:
+        """Reset screen."""
         if self.__background:
             self.__screen.blit(self.__background, (0, 0))
         else:
             self.__screen.fill((0, 0, 0))
 
     def flip(self) -> None:
+        """Display all elements rendered on screen."""
         self.__clock.tick(60)
         if self.__menu.display:
             self.__menu.render()
         pygame.display.flip()
 
     def handle_events(self) -> bool:
+        """Manage players events like key pressed or mouse pressed."""
         from pacman.render.interactives.Input import Input
         mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
@@ -65,15 +70,17 @@ class Screen:
         return True
 
     def record_clickable(self, obj: Button) -> None:
+        """Add a clickable objet to the list"""
         if obj not in self.__clickables:
             self.__clickables.append(obj)
 
     def delete_clickable(self, obj: Button) -> None:
+        """Remove a clickable object to the list"""
         if obj in self.__clickables:
             self.__clickables.remove(obj)
 
     def __load_menu(self) -> Window:
-        """Generate an exemple of menu"""
+        """Generate an exemple of menu if needed"""
         from pacman.render.Container import Container
         from pacman.render.Window import Window
         from pacman.render.RenderText import RenderText

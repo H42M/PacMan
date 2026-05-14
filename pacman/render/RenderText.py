@@ -28,7 +28,7 @@ class RenderText(RenderOBJ):
         self.__bg_color = bg_color
 
     def render(self) -> None:
-        """Render the text."""
+        """Render the text to the screen."""
         if self._pos and self._size:
             text_surf = self.__font.render(self.__text, True, (255, 255, 255),
                                            self.__bg_color)

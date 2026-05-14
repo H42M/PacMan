@@ -4,10 +4,11 @@ from pacman.render.Screen import Screen
 
 
 class RenderOBJ:
-
+    """Set basics methods to all renderable objects."""
     def __init__(self, screen: Screen,
                  pos: Optional[tuple[int, int]] = None,
                  size: Optional[tuple[int, int]] = None) -> None:
+        """Initialize RenderObj."""
         self._screen = screen
 
         self._surface: Optional[pygame.Surface] = None
@@ -15,6 +16,7 @@ class RenderOBJ:
         self._size: Optional[tuple[int, int]] = size
 
     def render(self) -> None:
+        """Display objetc on screen."""
         pass
 
     # Getters / Setters

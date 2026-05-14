@@ -5,7 +5,9 @@ from typing import Optional, Union
 
 
 class Container(RenderOBJ):
-
+    """Container class.
+    Used to automaticly set elements sizes and positions.
+    Can be horizontal or vertical and can contain other container"""
     def __init__(self,
                  screen: Screen,
                  way: str,
@@ -14,6 +16,7 @@ class Container(RenderOBJ):
                  gap: int = 0,
                  padding: int = 0
                  ) -> None:
+        """Initialize Container class"""
         super().__init__(screen, pos, size)
         self.__way = way
         self.__gap = gap
@@ -40,6 +43,7 @@ class Container(RenderOBJ):
     def add_content(self, objs: Union[dict[RenderOBJ, str],
                                       list[dict[RenderOBJ, str]]]
                     ) -> None:
+        """Add element to container."""
         if isinstance(objs, dict):
             for key, value in objs.items():
                 if not self.__is_valid_percentage(value):
@@ -58,6 +62,7 @@ class Container(RenderOBJ):
         self.__resize()
 
     def __resize(self) -> None:
+        """Set size and pos for each contained elements"""
         if self._size and self._pos:
             available_width = self._size[0] - 2 * self.__padding
             available_height = self._size[1] - 2 * self.__padding
@@ -148,6 +153,7 @@ class Container(RenderOBJ):
         raise ValueError('size or pos not defined: cant process gap')
 
     def render(self) -> None:
+        """Display contained elements ont screen"""
         for elm in self.__content:
             elm.render()
 

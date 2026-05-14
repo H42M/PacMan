@@ -6,6 +6,7 @@ import pygame
 
 
 class Input(Button):
+    """Input text objetc."""
     def __init__(self, screen: Screen,
                  placeholder: str = "Text example",
                  base_color: Optional[tuple[int, int, int]] = None,
@@ -13,6 +14,7 @@ class Input(Button):
                  pos: Optional[tuple[int, int]] = None,
                  size: Optional[tuple[int, int]] = None,
                  ) -> None:
+        """Initialize Input."""
         super().__init__(screen, placeholder, pos, size)
         self.__focus = False
         self.__placeholder = placeholder
@@ -22,6 +24,7 @@ class Input(Button):
         self._color = base_color
 
     def handle_key(self, event: pygame.event.Event) -> None:
+        """Handle key interaction."""
         if not self.__focus:
             return
 
@@ -36,9 +39,11 @@ class Input(Button):
                 self.__focus = False
 
     def execute(self) -> None:
+        """Set focus on input text element."""
         self.__focus = True
 
     def render(self) -> None:
+        """Display input text element on screen"""
         if self.__focus:
             self._text = self.__value + '_'
         elif self.__value:
