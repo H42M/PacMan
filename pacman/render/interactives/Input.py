@@ -68,7 +68,7 @@ class Input(Button):
         return self.__base_color
 
     @base_color.setter
-    def _base_color(self, value: tuple[int, int, int]) -> None:
+    def base_color(self, value: tuple[int, int, int]) -> None:
         self.__base_color = value
 
     @property
@@ -76,5 +76,5 @@ class Input(Button):
         return self.__focus_color
 
     @focus_color.setter
-    def _focus_color(self, value: tuple[int, int, int]) -> None:
+    def focus_color(self, value: tuple[int, int, int]) -> None:
         self.__focus_color = value
