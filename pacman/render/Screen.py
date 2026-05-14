@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pygame
-from pacman.render.GameLoader import GameLoader
+from pacman.render.RenderLoader import GameLoader
 
 if TYPE_CHECKING:
     from pacman.render.Window import Window
@@ -13,6 +13,8 @@ if TYPE_CHECKING:
 class Screen:
     def __init__(self) -> None:
         pygame.init()
+        pygame.key.set_repeat(400, 40)
+
         self.__screen_size = GameLoader.screen_size
         self.__screen_name = 'PACMAN'
         self.__screen = pygame.display.set_mode(

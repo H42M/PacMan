@@ -1,5 +1,5 @@
 from pacman.render.Screen import Screen
-from pacman.render.GameLoader import GameLoader
+from pacman.render.RenderLoader import GameLoader
 from Errors import MazeError
 from pacman.render.RenderObj import RenderOBJ
 from pacman.mazegenerator import MazeGenerator

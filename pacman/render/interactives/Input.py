@@ -7,15 +7,19 @@ import pygame
 
 class Input(Button):
     def __init__(self, screen: Screen,
+                 placeholder: str = "Text example",
+                 base_color: Optional[tuple[int, int, int]] = None,
+                 focus_color: Optional[tuple[int, int, int]] = None,
                  pos: Optional[tuple[int, int]] = None,
                  size: Optional[tuple[int, int]] = None,
-                 placeholder: str = "Text example"
                  ) -> None:
         super().__init__(screen, placeholder, pos, size)
         self.__focus = False
         self.__placeholder = placeholder
         self.__value = ""
-        self._color = None
+        self.__base_color = base_color if base_color else (255, 0, 0)
+        self.__focus_color = focus_color if focus_color else (255, 100, 10)
+        self._color = base_color
 
     def handle_key(self, event: pygame.event.Event) -> None:
         if not self.__focus:
@@ -26,9 +30,10 @@ class Input(Button):
         elif event.key == pygame.K_RETURN:
             self.__focus = False
         else:
-            special = "!@#$%^&*()-_+= "
-            char: str = event.unicode
-            self.__value += char if char.isalnum() or char in special else ''
+            if event.unicode.isprintable():
+                self.__value += event.unicode
+            else:
+                self.__focus = False
 
     def execute(self) -> None:
         self.__focus = True
@@ -41,7 +46,7 @@ class Input(Button):
         else:
             self._text = self.__placeholder
 
-        self._color = (255, 100, 0) if self.__focus else None
+        self._color = self.__focus_color if self.__focus else self.__base_color
 
         super().render()
 
@@ -52,3 +57,19 @@ class Input(Button):
     @focus.setter
     def focus(self, value: bool) -> None:
         self.__focus = value
+
+    @property
+    def base_color(self) -> tuple[int, int, int]:
+        return self.__base_color
+
+    @base_color.setter
+    def _base_color(self, value: tuple[int, int, int]) -> None:
+        self.__base_color = value
+
+    @property
+    def focus_color(self) -> tuple[int, int, int]:
+        return self.__focus_color
+
+    @focus_color.setter
+    def _focus_color(self, value: tuple[int, int, int]) -> None:
+        self.__focus_color = value
