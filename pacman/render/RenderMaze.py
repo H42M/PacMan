@@ -2,14 +2,16 @@ from pacman.render.Screen import Screen
 from pacman.render.GameLoader import GameLoader
 from Errors import MazeError
 from pacman.render.RenderObj import RenderOBJ
-from pacman.mazegenerator import MazeGenerator
+from mazegenerator.mazegenerator import MazeGenerator
 
 from pygame import Surface
 
 
 class RenderMaze(RenderOBJ):
     def __init__(self, screen: Screen, size: tuple[int, int]) -> None:
-        self.__maze = MazeGenerator(size=GameLoader.maze_size)
+        self.__maze = MazeGenerator(size=GameLoader.maze_size,
+                                    perfect=False,
+                                    seed=0,)
         self.__maze.generate()
         self.__color = (255, 255, 255)
         print(self.__maze.maze)
