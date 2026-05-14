@@ -149,7 +149,6 @@ class Container(RenderOBJ):
 
     def render(self) -> None:
         for elm in self.__content:
-            print(f'Element rendered at {elm.pos} with size: {elm.size}')
             elm.render()
 
     @property

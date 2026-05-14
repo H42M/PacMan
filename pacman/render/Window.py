@@ -47,9 +47,7 @@ class Window(Container):
             self.__cross_btn.pos = (end_window[0] - cross_size[0],
                                     self._pos[1])
             self.__cross_btn.render()
-        print('=== WINDOW: ')
         super().render()
-        print('=== ')
 
     def switch_display(self) -> None:
         self.display = not self.display

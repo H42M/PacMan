@@ -1,4 +1,4 @@
-from pacman.render.GameLoader import GameLoader
+from pacman.render.RenderLoader import GameLoader
 
 from pacman.render.Screen import Screen
 from pacman.render.RenderMaze import RenderMaze
