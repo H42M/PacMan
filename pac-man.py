@@ -1,6 +1,7 @@
 from sys import argv
+
 from pacman.app import run
-from pacman.game_config import GameConfig
+from pacman.config_loader import load_config
 
 
 def main() -> int:
@@ -9,7 +10,7 @@ def main() -> int:
         print("Usage: make run")
         return 1
 
-    config = GameConfig()
+    config = load_config(argv[1])
     return run(config)
 
 
