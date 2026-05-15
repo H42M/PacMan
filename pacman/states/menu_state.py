@@ -10,7 +10,12 @@ import pygame
 class MenuState(GameState):
     def __init__(self, screen: Screen) -> None:
         self.__screen = screen
+        self.__state_manager = None
         self.__menu_ctn = self.__load_menu()
+
+    def set_state_manager(self, manager):
+        """Permet de définir le StateManager après la création"""
+        self.__state_manager = manager
 
     def handle_events(self, events: list[pygame.event.Event]) -> bool:
         for event in events:
@@ -57,15 +62,25 @@ class MenuState(GameState):
                                ])
         # BUTTONS
 
-        def print_something():
-            print('Button clicked')
+        def on_play():
+            if self.__state_manager:
+                print('Starting game...')
+
+        def on_settings():
+            if self.__state_manager:
+                print('Opening settings...')
+
+        def on_quit():
+            import pygame
+            pygame.quit()
+            exit()
 
         btns_ctn = Container(self.__screen, 'VERTICAL', gap=50)
         btns_ctn.add_content([
-            {Button(self.__screen, 'PLAY', callback=print_something): '0%'},
+            {Button(self.__screen, 'PLAY', callback=on_play): '0%'},
             {Button(self.__screen, 'SETTINGS',
-                    callback=print_something): '0%'},
-            {Button(self.__screen, 'QUIT', callback=print_something): '0%'},
+                    callback=on_settings): '0%'},
+            {Button(self.__screen, 'QUIT', callback=on_quit): '0%'},
         ])
 
         # FOOTER
