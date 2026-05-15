@@ -5,8 +5,8 @@ from dataclasses import dataclass
 class LevelConfig:
     """Configuration for one generated level."""
 
-    width: int = 28
-    height: int = 31
+    width: int = 15
+    height: int = 15
     seed: int | None = None
     level_max_time: int = 90
 
