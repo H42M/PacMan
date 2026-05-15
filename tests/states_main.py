@@ -16,7 +16,8 @@ if __name__ == '__main__':
     menu = MenuState(screen)
     manager = StateManager(menu)
 
-    while manager.handle_events(pygame.event.get()):
+    menu.set_state_manager(manager)
 
+    while manager.handle_events(pygame.event.get()):
         manager.update()
         manager.render(screen)
