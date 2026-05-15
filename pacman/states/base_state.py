@@ -4,7 +4,7 @@ import pygame
 
 class GameState(ABC):
     @abstractmethod
-    def handle_events(self, event) -> None:
+    def handle_events(self, events) -> bool:
         pass
 
     @abstractmethod
@@ -24,8 +24,8 @@ class StateManager:
     def __init__(self, initial_state: GameState) -> None:
         self.__current_state = initial_state
 
-    def handle_events(self, event: list[pygame.event.Event]) -> None:
-        self.__current_state.handle_events(event)
+    def handle_events(self, events: list[pygame.event.Event]) -> bool:
+        return self.__current_state.handle_events(events)
 
     def update(self) -> None:
         self.__current_state.update()

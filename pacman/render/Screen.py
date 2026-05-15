@@ -1,9 +1,9 @@
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import pygame
-from pacman.render.RenderLoader import GameLoader
+from pacman.render.RenderLoader import RenderLoader
 
 if TYPE_CHECKING:
     from pacman.render.Window import Window
@@ -16,22 +16,27 @@ class Screen:
         """Initialize Screen."""
         pygame.init()
         pygame.key.set_repeat(400, 40)
-
-        self.__screen_size = GameLoader.screen_size
-        self.__screen_name = 'PACMAN'
-        self.__screen = pygame.display.set_mode(
-            self.__screen_size
-        )
-        self.__clock = pygame.time.Clock()
-        pygame.display.set_caption(self.__screen_name)
-        self.__background = None
-        self.__clickables: list[Button] = []
-        self.__menu = self.__load_menu()
+        try:
+            self.__screen_size = RenderLoader.screen_size
+            self.__screen_name = 'PACMAN'
+            self.__screen = pygame.display.set_mode(
+                self.__screen_size
+            )
+            self.__clock = pygame.time.Clock()
+            pygame.display.set_caption(self.__screen_name)
+            self.__background = None
+            self.__clickables: list[Button] = []
+            self.__menu = self.__load_menu()
+        except Exception as e:
+            raise ValueError(f'Screen loading error: {e}')
 
     def clear(self) -> None:
         """Reset screen."""
         if self.__background:
-            self.__screen.blit(self.__background, (0, 0))
+            scaled = pygame.transform.scale(self.__background,
+                                            self.__screen_size)
+            pos_tuple = (0, 0)
+            self.screen.blit(scaled, pos_tuple)
         else:
             self.__screen.fill((0, 0, 0))
 
@@ -90,7 +95,7 @@ class Screen:
 
         # WINDOW MENU
         window_menu = Window(self, 'VERTICAL', (200, 200), (500, 500),
-                             display_default=True, padding=20)
+                             display_default=False, padding=20)
         title_ctn = Container(self, 'VERTICAL')
         title_ctn.add_content([{
             RenderText(self, "Menu", font_size=40): '20%'},
@@ -140,3 +145,15 @@ class Screen:
     @menu.setter
     def menu(self, value: Window) -> None:
         self.__menu = value
+
+    @property
+    def clickables(self) -> list[Button]:
+        return self.__clickables
+
+    @property
+    def background(self) -> Optional[pygame.Surface]:
+        return self.__background
+
+    @background.setter
+    def background(self, value: pygame.Surface) -> None:
+        self.__background = value

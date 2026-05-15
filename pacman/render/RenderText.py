@@ -14,6 +14,7 @@ class RenderText(RenderOBJ):
                  pos: Optional[tuple[int, int]] = None,
                  size: Optional[tuple[int, int]] = None,
                  bg_color: Optional[tuple[int, int, int]] = None,
+                 font_color: Optional[tuple[int, int, int]] = None,
                  font_size: Optional[int] = None
                  ) -> None:
         """Initialize the text object."""
@@ -26,12 +27,13 @@ class RenderText(RenderOBJ):
         self.__text = text
 
         self.__bg_color = bg_color
+        self.__font_color = font_color if font_color else (255, 255, 255)
 
     def render(self) -> None:
         """Render the text to the screen."""
         if self._pos and self._size:
-            text_surf = self.__font.render(self.__text, True, (255, 255, 255),
-                                           self.__bg_color)
+            text_surf = self.__font.render(self.__text, True,
+                                           self.__font_color, self.__bg_color)
             text_rect = text_surf.get_rect(center=(self._pos[0] + self._size[0]
                                                    // 2,
                                                    self._pos[1] + self._size[1]

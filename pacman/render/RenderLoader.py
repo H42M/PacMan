@@ -5,7 +5,7 @@ from typing import Optional
 from Errors import LoadingError
 
 
-class GameLoader:
+class RenderLoader:
     """Class Game Loader.
     Load textures and keep usefull info like cell width, wall thicknes, ..."""
 
