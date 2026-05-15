@@ -1,12 +1,12 @@
 from pacman.render.Entity import Entity
-from pacman.render.RenderLoader import GameLoader
+from pacman.render.RenderLoader import RenderLoader
 from pacman.render.RenderMaze import RenderMaze
 from pacman.render.RenderObj import RenderOBJ
 from pacman.render.Screen import Screen
 
 __all__ = [
     'Entity',
-    'GameLoader',
+    'RenderLoader',
     'RenderMaze',
     'RenderOBJ',
     'Screen',

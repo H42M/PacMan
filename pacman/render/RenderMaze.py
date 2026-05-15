@@ -1,5 +1,5 @@
 from pacman.render.Screen import Screen
-from pacman.render.RenderLoader import GameLoader
+from pacman.render.RenderLoader import RenderLoader
 from Errors import MazeError
 from pacman.render.RenderObj import RenderOBJ
 from pacman.mazegenerator import MazeGenerator
@@ -11,7 +11,7 @@ class RenderMaze(RenderOBJ):
     """Convert maze from MazeGenerator to something displayable."""
     def __init__(self, screen: Screen, size: tuple[int, int]) -> None:
         """Initialize RenderMaze"""
-        self.__maze = MazeGenerator(size=GameLoader.maze_size)
+        self.__maze = MazeGenerator(size=RenderLoader.maze_size)
         self.__maze.generate()
         self.__color = (255, 255, 255)
         print(self.__maze.maze)
@@ -23,9 +23,9 @@ class RenderMaze(RenderOBJ):
         if not self._size:
             raise MazeError('Cannot render maze (Size not defined)')
 
-        cell_w = ((self._size[0] - GameLoader.wall_thickness) //
+        cell_w = ((self._size[0] - RenderLoader.wall_thickness) //
                   self.__maze._width)
-        cell_h = ((self._size[1] - GameLoader.wall_thickness) //
+        cell_h = ((self._size[1] - RenderLoader.wall_thickness) //
                   self.__maze._height)
 
         for y, row in enumerate(self.__maze.maze):
@@ -39,15 +39,15 @@ class RenderMaze(RenderOBJ):
 
                 if 'N' in cell_decoded:
                     cell_surface = Surface((cell_w,
-                                            GameLoader.wall_thickness))
+                                            RenderLoader.wall_thickness))
                     cell_surface.fill(self.__color)
                     self._screen.screen.blit(cell_surface, cell_pos)
 
                 if 'S' in cell_decoded:
                     cell_y = (cell_pos[1] + cell_h -
-                              GameLoader.wall_thickness)
+                              RenderLoader.wall_thickness)
                     cell_surface = Surface((cell_w,
-                                            GameLoader.wall_thickness))
+                                            RenderLoader.wall_thickness))
                     cell_surface.fill(self.__color)
                     self._screen.screen.blit(
                         cell_surface,
@@ -55,8 +55,8 @@ class RenderMaze(RenderOBJ):
 
                 if 'E' in cell_decoded:
                     cell_x = (cell_pos[0] + cell_w -
-                              GameLoader.wall_thickness)
-                    cell_surface = Surface((GameLoader.wall_thickness,
+                              RenderLoader.wall_thickness)
+                    cell_surface = Surface((RenderLoader.wall_thickness,
                                             cell_h))
                     cell_surface.fill(self.__color)
                     self._screen.screen.blit(
@@ -64,7 +64,7 @@ class RenderMaze(RenderOBJ):
                         (cell_x, cell_pos[1]))
 
                 if 'W' in cell_decoded:
-                    cell_surface = Surface((GameLoader.wall_thickness,
+                    cell_surface = Surface((RenderLoader.wall_thickness,
                                             cell_h))
                     cell_surface.fill(self.__color)
                     self._screen.screen.blit(

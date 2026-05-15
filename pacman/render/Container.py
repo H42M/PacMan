@@ -2,6 +2,7 @@ from pacman.render.RenderObj import RenderOBJ
 from pacman.render.Screen import Screen
 
 from typing import Optional, Union
+import pygame
 
 
 class Container(RenderOBJ):
@@ -14,7 +15,9 @@ class Container(RenderOBJ):
                  pos: Optional[tuple[int, int]] = None,
                  size: Optional[tuple[int, int]] = None,
                  gap: int = 0,
-                 padding: int = 0
+                 padding: int = 0,
+                 bg_color: Optional[Union[tuple[int, int, int],
+                                          tuple[int, int, int, int]]] = None
                  ) -> None:
         """Initialize Container class"""
         super().__init__(screen, pos, size)
@@ -22,6 +25,8 @@ class Container(RenderOBJ):
         self.__gap = gap
         self.__padding = padding
         self.__content: dict[RenderOBJ, int] = {}
+        self._bg_color = bg_color
+        self._gap_in_bg = True
 
     def __is_valid_percentage(self, value: str) -> bool:
         if not isinstance(value, str) or not value.endswith('%'):
@@ -154,6 +159,24 @@ class Container(RenderOBJ):
 
     def render(self) -> None:
         """Display contained elements ont screen"""
+        if self._bg_color and self._pos and self._size:
+            if self.padding_in_bg:
+                rect_pos = self._pos
+                rect_size = self._size
+            else:
+                print(f'Gap not in BG {self.__gap}')
+                rect_pos = (
+                    self._pos[0] + self.padding,
+                    self._pos[1] + self.padding
+                )
+                rect_size = (
+                    self._size[0] - 2 * self.padding,
+                    self._size[1] - 2 * self.padding
+                )
+
+            temp_surface = pygame.Surface(rect_size, pygame.SRCALPHA)
+            temp_surface.fill(self._bg_color)
+            self._screen.screen.blit(temp_surface, rect_pos)
         for elm in self.__content:
             elm.render()
 
@@ -214,3 +237,11 @@ class Container(RenderOBJ):
     def padding(self, value: int) -> None:
         self.__padding = value
         self.__resize()
+
+    @property
+    def padding_in_bg(self) -> bool:
+        return self._gap_in_bg
+
+    @padding_in_bg.setter
+    def padding_in_bg(self, value: bool) -> None:
+        self._gap_in_bg = value
