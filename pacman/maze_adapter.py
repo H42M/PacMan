@@ -36,14 +36,28 @@ def translate_seed(seed: int | None) -> int:
 
 
 def generate_maze(level: LevelConfig) -> GeneratedMaze:
-    from mazegenerator.mazegenerator import MazeGenerator
+    try:
+        from mazegenerator.mazegenerator import MazeGenerator
+    except ImportError as e:
+        raise MazeGenerationError(
+            "Maze Generator package is not installed\nPlease run make install."
+        ) from e
 
-    maze = MazeGenerator(size=(level.width, level.height),
-                         perfect=False,
-                         seed=translate_seed(level.seed))
+    try:
+        maze = MazeGenerator(size=(level.width, level.height),
+                             perfect=False,
+                             seed=translate_seed(level.seed))
+    except Exception as e:
+        raise MazeGenerationError("Maze generation failed.") from e
+
     cells = tuple(tuple(Wall(cell) for cell in row) for row in maze.maze)
+    if not cells or not cells[0]:
+        raise MazeGenerationError("Maze is empty")
+    first_width = len(cells[0])
+    if any(len(row) != first_width for row in cells):
+        raise MazeGenerationError("Maze has inconsistent widths")
 
-    return GeneratedMaze(width=len(cells[0]),
+    return GeneratedMaze(width=first_width,
                          height=len(cells),
                          cells=cells,
                          entry=maze.maze_entry,
