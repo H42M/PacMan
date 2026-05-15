@@ -40,12 +40,14 @@ class MenuState(GameState):
         from pacman.render.Divider import Divider
         from pacman.render.interactives import Button
 
+        container = Container(self.__screen, 'VERTICAL',
+                              size=RenderLoader.screen_size,
+                              pos=(0, 0),
+                              padding=90)
+
         menu_ctn = Container(self.__screen, 'VERTICAL',
-                             size=RenderLoader.screen_size,
-                             pos=(0, 0),
-                             padding=100,
-                             bg_color=(0, 0, 0, 200))
-        menu_ctn.padding_in_bg = False
+                             padding=20,
+                             bg_color=(0, 0, 0, 230))
 
         title_ctn = Container(self.__screen, 'VERTICAL')
         title_ctn.add_content([{RenderText(self.__screen, 'PACMAN',
@@ -84,4 +86,5 @@ class MenuState(GameState):
 
         menu_ctn.add_content([{title_ctn: '20%'}, {btns_ctn: '70%'},
                               {footer_ctn: '10%'}])
-        return menu_ctn
+        container.add_content({menu_ctn: '90%'})
+        return container
