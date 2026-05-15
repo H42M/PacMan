@@ -1,9 +1,10 @@
 import pygame
 from typing import Optional
 from pacman.render.Screen import Screen
+from abc import ABC, abstractmethod
 
 
-class RenderOBJ:
+class RenderOBJ(ABC):
     """Set basics methods to all renderable objects."""
     def __init__(self, screen: Screen,
                  pos: Optional[tuple[int, int]] = None,
@@ -15,6 +16,7 @@ class RenderOBJ:
         self._pos: Optional[tuple[int, int]] = pos
         self._size: Optional[tuple[int, int]] = size
 
+    @abstractmethod
     def render(self) -> None:
         """Display objetc on screen."""
         pass
