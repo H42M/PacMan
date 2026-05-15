@@ -35,7 +35,7 @@ class RenderOBJ:
 
     @size.setter
     def size(self, value: Optional[tuple[int, int]]) -> None:
-        if value:
+        if value is not None:
             self._size = value
 
     @property
@@ -46,7 +46,7 @@ class RenderOBJ:
 
     @w.setter
     def w(self, value: Optional[int]) -> None:
-        if value:
+        if value is not None:
             if self._size:
                 self._size = (value, self._size[1])
             else:
@@ -54,13 +54,13 @@ class RenderOBJ:
 
     @property
     def h(self) -> Optional[int]:
-        if self._size:
+        if self._size is not None:
             return self._size[1]
         return None
 
     @h.setter
     def h(self, value: Optional[int]) -> None:
-        if value:
+        if value is not None:
             if self._size:
                 self._size = (self._size[0], value)
             else:
@@ -72,18 +72,18 @@ class RenderOBJ:
 
     @pos.setter
     def pos(self, value: Optional[tuple[int, int]]) -> None:
-        if value:
+        if value is not None:
             self._pos = value
 
     @property
     def x(self) -> Optional[int]:
-        if self._pos:
+        if self._pos is not None:
             return self._pos[0]
         return None
 
     @x.setter
     def x(self, value: Optional[int]) -> None:
-        if value:
+        if value is not None:
             if self._pos:
                 self._pos = (value, self._pos[1])
             else:
@@ -91,13 +91,13 @@ class RenderOBJ:
 
     @property
     def y(self) -> Optional[int]:
-        if self._pos:
+        if self._pos is not None:
             return self._pos[1]
         return None
 
     @y.setter
     def y(self, value: Optional[int]) -> None:
-        if value:
+        if value is not None:
             if self._pos:
                 self._pos = (self._pos[0], value)
             else:
