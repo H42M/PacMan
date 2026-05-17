@@ -1,4 +1,4 @@
-from pacman.render.interactives import Button
+from pacman.render.interactives.Button import Button
 from pacman.render.Screen import Screen
 from typing import Optional, Union, Callable, Any
 
@@ -25,11 +25,11 @@ class SelectButton(Button):
                                   size=arrow_size,
                                   callback=self.__right_option)
 
-    def __left_option(self):
+    def __left_option(self) -> None:
         self.__index = (self.__index - 1) % len(self.__options)
         self._text = self.__options[self.__index]
 
-    def __right_option(self):
+    def __right_option(self) -> None:
         self.__index = (self.__index + 1) % len(self.__options)
         self._text = self.__options[self.__index]
 

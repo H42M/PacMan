@@ -22,7 +22,7 @@ if __name__ == "__main__":
     RenderLoader.init((1000, 1000), (15, 15))
     RenderLoader.load_asset('pacman', 'assets/sprites/pacman.png')
     RenderLoader.load_asset('ghost-blue',
-                          'assets/sprites/ghost-blue.png')
+                            'assets/sprites/ghost-blue.png')
 
     screen = Screen()
 

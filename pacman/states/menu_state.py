@@ -18,7 +18,7 @@ class MenuState(GameState):
         self.__state_manager = state_manager
         self.__menu_ctn = self.__load_menu()
 
-    def set_state_manager(self, manager):
+    def set_state_manager(self, manager: StateManager) -> None:
         """Permet de définir le StateManager après la création"""
         self.__state_manager = manager
 
@@ -37,13 +37,13 @@ class MenuState(GameState):
     def update(self) -> None:
         pass
 
-    def render(self, screen):
+    def render(self, screen: Screen) -> None:
         self.__screen.clear()
         if self.__menu_ctn is not None:
             self.__menu_ctn.render()
         self.__screen.flip()
 
-    def __load_menu(self):
+    def __load_menu(self) -> Container:
         from pacman.render.RenderText import RenderText
         from pacman.render.Divider import Divider
         from pacman.render.interactives import Button
@@ -65,16 +65,16 @@ class MenuState(GameState):
                                ])
         # BUTTONS
 
-        def on_play():
+        def on_play() -> None:
             if self.__state_manager:
                 print('Starting game...')
 
-        def on_settings():
+        def on_settings() -> None:
             if self.__state_manager:
                 print('Opening settings...')
                 self.__state_manager.set_state('SETTINGS')
 
-        def on_quit():
+        def on_quit() -> None:
             import pygame
             pygame.quit()
             exit()

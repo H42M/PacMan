@@ -24,7 +24,7 @@ class Screen:
             )
             self.__clock = pygame.time.Clock()
             pygame.display.set_caption(self.__screen_name)
-            self.__background = None
+            self.__background: Optional[pygame.Surface] = None
             self.__clickables: list[Button] = []
             self.__menu = self.__load_menu()
         except Exception as e:
@@ -84,7 +84,7 @@ class Screen:
         if obj in self.__clickables:
             self.__clickables.remove(obj)
 
-    def reset_clickables(self):
+    def reset_clickables(self) -> None:
         self.__clickables = []
 
     def __load_menu(self) -> Window:
