@@ -13,7 +13,7 @@ class SettingsState(GameState):
         self.__screen = screen
         self.__menu_ctn = self.__load_settings()
 
-    def handle_events(self, events) -> bool:
+    def handle_events(self, events: list[pygame.event.Event]) -> bool:
         for event in events:
             if event.type == pygame.MOUSEMOTION:
                 for clickable in self.__screen.clickables:
@@ -27,7 +27,7 @@ class SettingsState(GameState):
     def update(self) -> None:
         return
 
-    def render(self, screen) -> None:
+    def render(self, screen: Screen) -> None:
         self.__screen.clear()
         self.__menu_ctn.render()
         self.__screen.flip()

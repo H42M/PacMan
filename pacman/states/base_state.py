@@ -17,7 +17,7 @@ class GameState(ABC):
         pass
 
     @abstractmethod
-    def handle_events(self, events) -> bool:
+    def handle_events(self, events: list[pygame.event.Event]) -> bool:
         for event in events:
             if event.type == pygame.QUIT:
                 return False
@@ -28,7 +28,7 @@ class GameState(ABC):
         pass
 
     @abstractmethod
-    def render(self, screen) -> None:
+    def render(self, screen: Screen) -> None:
         pass
 
 
@@ -52,13 +52,14 @@ class StateManager:
     def update(self) -> None:
         self.__current_state.update()
 
-    def render(self, screen) -> None:
+    def render(self, screen: Screen) -> None:
         self.__current_state.render(screen)
 
-    def set_state(self, state: str):
+    def set_state(self, state: str) -> GameState:
         from pacman.states.menu_state import MenuState
         from pacman.states.settingstate import SettingsState
-        
+
+        new_state: GameState
         self.__screen.reset_clickables()
         if state == self.MENU:
             new_state = MenuState(self.__screen, self)
@@ -71,9 +72,9 @@ class StateManager:
         return new_state
 
     @property
-    def current_state(self):
+    def current_state(self) -> GameState:
         return self.__current_state
 
     @current_state.setter
-    def current_state(self, value):
+    def current_state(self, value: GameState) -> None:
         self.__current_state = value
