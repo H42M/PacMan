@@ -2,15 +2,20 @@ from pacman.states.base_state import GameState
 from pacman.render.Container import Container
 from pacman.render.RenderLoader import RenderLoader
 from pacman.render.Screen import Screen
+from typing import Optional
+
+from pacman.states.base_state import StateManager
 
 
 import pygame
 
 
 class MenuState(GameState):
-    def __init__(self, screen: Screen) -> None:
+    def __init__(self, screen: Screen,
+                 state_manager: Optional[StateManager] = None
+                 ) -> None:
         self.__screen = screen
-        self.__state_manager = None
+        self.__state_manager = state_manager
         self.__menu_ctn = self.__load_menu()
 
     def set_state_manager(self, manager):
@@ -19,8 +24,6 @@ class MenuState(GameState):
 
     def handle_events(self, events: list[pygame.event.Event]) -> bool:
         for event in events:
-            if event.type == pygame.QUIT:
-                return False
             if event.type == pygame.MOUSEMOTION:
                 for clickable in self.__screen.clickables:
                     clickable.update_hover(pygame.mouse.get_pos())
@@ -29,7 +32,7 @@ class MenuState(GameState):
                     if clickable._is_hovered:
                         clickable.execute()
 
-        return True
+        return super().handle_events(events)
 
     def update(self) -> None:
         pass
@@ -51,7 +54,7 @@ class MenuState(GameState):
                               padding=90)
 
         menu_ctn = Container(self.__screen, 'VERTICAL',
-                             padding=20,
+                             padding=50,
                              bg_color=(0, 0, 0, 230))
 
         title_ctn = Container(self.__screen, 'VERTICAL')
@@ -69,6 +72,7 @@ class MenuState(GameState):
         def on_settings():
             if self.__state_manager:
                 print('Opening settings...')
+                self.__state_manager.set_state('SETTINGS')
 
         def on_quit():
             import pygame
