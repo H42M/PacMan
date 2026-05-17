@@ -107,7 +107,7 @@ class Container(RenderOBJ):
                             elm.__resize()
 
                         elm.h = available_height
-            if self.__way == 'VERTICAL':
+            elif self.__way == 'VERTICAL':
                 end_y = self._pos[1] + self.__padding
 
                 if self.__are_all_elm_0():
@@ -140,6 +140,9 @@ class Container(RenderOBJ):
                                  (elm.h if elm.h else 0))
                         if isinstance(elm, Container):
                             elm.__resize()
+            else:
+                raise ContainerError('Container way must be HORIZONTAL'
+                                     f' or VERTICAL: {self.__way}')
 
     def __process_gap(self) -> int:
         if self._size and self._pos:
@@ -245,3 +248,8 @@ class Container(RenderOBJ):
     @padding_in_bg.setter
     def padding_in_bg(self, value: bool) -> None:
         self._gap_in_bg = value
+
+
+class ContainerError(Exception):
+
+    pass

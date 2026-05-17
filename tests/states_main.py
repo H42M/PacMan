@@ -1,5 +1,4 @@
 from pacman.states.base_state import StateManager
-from pacman.states.menu_state import MenuState
 from pacman.render.Screen import Screen
 from pacman.render.RenderLoader import RenderLoader
 
@@ -13,10 +12,7 @@ if __name__ == '__main__':
 
     screen = Screen()
     screen.background = RenderLoader.assets['background']
-    menu = MenuState(screen)
-    manager = StateManager(menu)
-
-    menu.set_state_manager(manager)
+    manager = StateManager(screen, 'MENU')
 
     while manager.handle_events(pygame.event.get()):
         manager.update()

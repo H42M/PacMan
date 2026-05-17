@@ -84,6 +84,9 @@ class Screen:
         if obj in self.__clickables:
             self.__clickables.remove(obj)
 
+    def reset_clickables(self):
+        self.__clickables = []
+
     def __load_menu(self) -> Window:
         """Generate an exemple of menu if needed"""
         from pacman.render.Container import Container
