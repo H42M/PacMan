@@ -34,6 +34,7 @@ class SelectButton(Button):
         self._text = self.__options[self.__index]
 
     def render(self) -> None:
+        self._text = self.__options[self.__index]
         super().render()
         if self._pos and self._size:
             arrow_w = self.__left_btn.w or 30
@@ -47,6 +48,18 @@ class SelectButton(Button):
 
             self.__left_btn.render()
             self.__right_btn.render()
+
+    def set_index(self, index: Union[int, str]) -> None:
+        if isinstance(index, int):
+            if index > 0 and index < len(self.__options) - 1:
+                self.__index = index
+            else:
+                print(f'Invalid Option {index}')
+        else:
+            if index in self.__options:
+                self.__index = self.__options.index(index)
+            else:
+                print(f'Invalid Option {index}')
 
     @property
     def value(self) -> str:

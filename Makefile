@@ -1,6 +1,8 @@
 PYTHON = python3
 MAIN = pac-man.py
-MAIN_RENDER = render_main.py
+MAIN_RENDER = render_main
+MAIN_STATES = states_main
+TEST_MODULE = tests
 CONFIG = config/config.json
 DEPENDENCIES = requirements.txt
 
@@ -13,7 +15,11 @@ run:
 	$(PYTHON) $(MAIN) $(CONFIG)
 
 run-render:
-	$(PYTHON) $(MAIN_RENDER)
+	$(PYTHON) -m $(TEST_MODULE).$(MAIN_RENDER)
+	make clean
+
+run-states:
+	$(PYTHON) -m $(TEST_MODULE).$(MAIN_STATES)
 	make clean
 
 debug:

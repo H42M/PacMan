@@ -79,7 +79,7 @@ class MenuState(GameState):
             pygame.quit()
             exit()
 
-        btns_ctn = Container(self.__screen, 'VERTICAL', gap=50)
+        btns_ctn = Container(self.__screen, 'VERTICAL', gap=30)
         btns_ctn.add_content([
             {Button(self.__screen, 'PLAY', callback=on_play): '0%'},
             {Button(self.__screen, 'SETTINGS',
