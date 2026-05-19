@@ -28,7 +28,7 @@ class GameState(ABC):
         pass
 
     @abstractmethod
-    def render(self, screen: Screen) -> None:
+    def render(self) -> None:
         pass
 
 
@@ -52,8 +52,8 @@ class StateManager:
     def update(self) -> None:
         self.__current_state.update()
 
-    def render(self, screen: Screen) -> None:
-        self.__current_state.render(screen)
+    def render(self) -> None:
+        self.__current_state.render()
 
     def set_state(self, state: str) -> GameState:
         from pacman.states.menu_state import MenuState

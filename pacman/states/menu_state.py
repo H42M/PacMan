@@ -37,7 +37,7 @@ class MenuState(GameState):
     def update(self) -> None:
         pass
 
-    def render(self, screen: Screen) -> None:
+    def render(self) -> None:
         self.__screen.clear()
         if self.__menu_ctn is not None:
             self.__menu_ctn.render()

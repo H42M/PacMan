@@ -38,7 +38,7 @@ class SettingsState(GameState):
     def update(self) -> None:
         return
 
-    def render(self, screen: Screen) -> None:
+    def render(self) -> None:
         self.__screen.clear()
         self.__menu_ctn.render()
         self.__screen.flip()
