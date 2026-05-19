@@ -68,7 +68,8 @@ if __name__ == "__main__":
     ghost = Entity(screen, (300, 300), RenderLoader.cell_size)
     ghost.set_skin(RenderLoader.get_asset('ghost-blue'))
 
-    while screen.handle_events():
+    # while screen.handle_events():
+    while True:
         screen.clear()
         ghost.x = (ghost.x + 1 if ghost.x is not None and
                    ghost.x <= RenderLoader.screen_size[0] else 1)
