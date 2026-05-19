@@ -64,6 +64,7 @@ class StateManager:
     def set_state(self, state: str) -> GameState:
         from pacman.states.menu_state import MenuState
         from pacman.states.settingstate import SettingsState
+        from pacman.states.play_state import PlayState
 
         new_state: GameState
         self.__screen.reset_clickables()
@@ -71,6 +72,8 @@ class StateManager:
             new_state = MenuState(self.__screen, self)
         elif state.upper() == self.SETTINGS:
             new_state = SettingsState(self.__screen, self)
+        elif state.upper() == self.PLAYING:
+            new_state = PlayState(self.__screen, self)
         else:
             raise StateError(f'State {state} doesnt exist {self.MENU}')
 

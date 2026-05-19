@@ -59,6 +59,7 @@ class MenuState(GameState):
         def on_play() -> None:
             if self._state_manager:
                 print('Starting game...')
+                self._state_manager.set_state('PLAYING')
 
         def on_settings() -> None:
             if self._state_manager:
