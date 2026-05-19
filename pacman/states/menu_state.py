@@ -1,6 +1,6 @@
 from pacman.states.base_state import GameState
 from pacman.render.Container import Container
-from pacman.render.RenderLoader import RenderLoader
+from pacman.render.RenderConfig import RenderConfig
 from pacman.render.Screen import Screen
 from typing import Optional
 
@@ -40,7 +40,7 @@ class MenuState(GameState):
         from pacman.render.interactives import Button
 
         container = Container(self._screen, 'VERTICAL',
-                              size=RenderLoader.screen_size,
+                              size=RenderConfig.screen_size,
                               pos=(0, 0),
                               padding=90)
 

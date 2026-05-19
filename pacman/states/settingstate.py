@@ -42,7 +42,7 @@ class SettingsState(GameState):
         self.__infos = infos
 
     def __load_settings(self) -> Container:
-        from pacman.render import RenderLoader
+        from pacman.render import RenderConfig
         from pacman.render.RenderText import RenderText
         from pacman.render.Divider import Divider
         from pacman.render.interactives import SelectButton
@@ -76,7 +76,7 @@ class SettingsState(GameState):
 
         # Create settings UI
         container = Container(self._screen, 'VERTICAL',
-                              size=RenderLoader.screen_size,
+                              size=RenderConfig.screen_size,
                               pos=(0, 0),
                               padding=90)
         settings_ctn = Container(self._screen, 'VERTICAL',
