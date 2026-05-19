@@ -16,4 +16,4 @@ if __name__ == '__main__':
 
     while manager.handle_events(pygame.event.get()):
         manager.update()
-        manager.render(screen)
+        manager.render()

@@ -47,33 +47,6 @@ class Screen:
             self.__menu.render()
         pygame.display.flip()
 
-    def handle_events(self) -> bool:
-        """Manage players events like key pressed or mouse pressed."""
-        from pacman.render.interactives.Input import Input
-        mouse_pos = pygame.mouse.get_pos()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return False
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                for button in self.__clickables:
-                    if button.is_clicked(mouse_pos):
-                        button.execute()
-                    elif isinstance(button, Input):
-                        button.focus = False
-
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.__menu.switch_display()
-
-                for button in self.__clickables:
-                    if isinstance(button, Input):
-                        button.handle_key(event)
-
-        for button in self.__clickables:
-            button.update_hover(mouse_pos)
-        return True
-
     def record_clickable(self, obj: Button) -> None:
         """Add a clickable objet to the list"""
         if obj not in self.__clickables:
@@ -88,6 +61,7 @@ class Screen:
         self.__clickables = []
 
     def __load_menu(self) -> Window:
+        # TODO: Menu shouldnt be defined here
         """Generate an exemple of menu if needed"""
         from pacman.render.Container import Container
         from pacman.render.Window import Window

@@ -64,9 +64,9 @@ class Container(RenderOBJ):
                     self.__content[key] = int(value[:-1])
         if sum(size for _, size in self.__content.items()) > 100:
             raise ValueError("Sum of sizes is over 100% in container")
-        self.__resize()
+        self.resize()
 
-    def __resize(self) -> None:
+    def resize(self) -> None:
         """Set size and pos for each contained elements"""
         if self._size and self._pos:
             available_width = self._size[0] - 2 * self.__padding
@@ -88,7 +88,7 @@ class Container(RenderOBJ):
                         elm.h = available_height
                         end_x = elm.x + elm_size + self.__gap
                         if isinstance(elm, Container):
-                            elm.__resize()
+                            elm.resize()
                 else:
                     for i, (elm, size) in enumerate(self.__content.items()):
                         elm.y = self._pos[1] + self.__padding
@@ -104,7 +104,7 @@ class Container(RenderOBJ):
                         end_x = ((elm.x if elm.x else 0) +
                                  (elm.w if elm.w else 0))
                         if isinstance(elm, Container):
-                            elm.__resize()
+                            elm.resize()
 
                         elm.h = available_height
             elif self.__way == 'VERTICAL':
@@ -120,7 +120,7 @@ class Container(RenderOBJ):
                         elm.y = (self._pos[1] + self.__padding +
                                  ((self.__gap * (i + 1)) + (elm_size * i)))
                         if isinstance(elm, Container):
-                            elm.__resize()
+                            elm.resize()
                 else:
                     # Set all new size first
                     for i, (elm, size) in enumerate(self.__content.items()):
@@ -139,7 +139,7 @@ class Container(RenderOBJ):
                         end_y = ((elm.y if elm.y else 0) +
                                  (elm.h if elm.h else 0))
                         if isinstance(elm, Container):
-                            elm.__resize()
+                            elm.resize()
             else:
                 raise ContainerError('Container way must be HORIZONTAL'
                                      f' or VERTICAL: {self.__way}')
@@ -230,7 +230,7 @@ class Container(RenderOBJ):
     @gap.setter
     def gap(self, value: int) -> None:
         self.__gap = value
-        self.__resize()
+        self.resize()
 
     @property
     def padding(self) -> int:
@@ -239,7 +239,7 @@ class Container(RenderOBJ):
     @padding.setter
     def padding(self, value: int) -> None:
         self.__padding = value
-        self.__resize()
+        self.resize()
 
     @property
     def padding_in_bg(self) -> bool:

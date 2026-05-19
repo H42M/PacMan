@@ -10,17 +10,23 @@ class StateError(Exception):
 
 
 class GameState(ABC):
-    @abstractmethod
     def __init__(self, screen: Screen,
                  state_manager: Optional['StateManager'] = None
                  ) -> None:
-        pass
+        self._screen = screen
+        self._state_manager = state_manager
 
-    @abstractmethod
     def handle_events(self, events: list[pygame.event.Event]) -> bool:
         for event in events:
             if event.type == pygame.QUIT:
                 return False
+            if event.type == pygame.MOUSEMOTION:
+                for clickable in self._screen.clickables:
+                    clickable.update_hover(pygame.mouse.get_pos())
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for clickable in self._screen.clickables:
+                    if clickable.is_hovered:
+                        clickable.execute()
         return True
 
     @abstractmethod
@@ -61,7 +67,7 @@ class StateManager:
 
         new_state: GameState
         self.__screen.reset_clickables()
-        if state == self.MENU:
+        if state.upper() == self.MENU:
             new_state = MenuState(self.__screen, self)
         elif state.upper() == self.SETTINGS:
             new_state = SettingsState(self.__screen, self)

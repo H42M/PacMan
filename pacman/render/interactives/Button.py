@@ -236,3 +236,11 @@ class Button(RenderOBJ):
                 self._size = (self._size[0], value)
             else:
                 self._size = (0, value)
+
+    @property
+    def is_hovered(self) -> bool:
+        return self._is_hovered
+
+    @is_hovered.setter
+    def is_hovered(self, value: bool) -> None:
+        self._is_hovered = value

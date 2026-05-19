@@ -11,9 +11,7 @@ class SettingsState(GameState):
                  state_manager: Optional[StateManager] = None,
                  infos: Optional[dict[str, str]] = None
                  ) -> None:
-        self.__screen = screen
-        self.__state_manager = state_manager
-
+        super().__init__(screen, state_manager)
         if infos:
             self.__infos: dict[str, str] = infos
         else:
@@ -25,23 +23,16 @@ class SettingsState(GameState):
         self.__menu_ctn = self.__load_settings()
 
     def handle_events(self, events: list[pygame.event.Event]) -> bool:
-        for event in events:
-            if event.type == pygame.MOUSEMOTION:
-                for clickable in self.__screen.clickables:
-                    clickable.update_hover(pygame.mouse.get_pos())
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                for clickable in self.__screen.clickables:
-                    if clickable._is_hovered:
-                        clickable.execute()
         return super().handle_events(events)
 
     def update(self) -> None:
-        return
+        # return super().update()
+        pass
 
     def render(self) -> None:
-        self.__screen.clear()
+        self._screen.clear()
         self.__menu_ctn.render()
-        self.__screen.flip()
+        self._screen.flip()
 
     def load_infos(self, infos: dict[str, str]) -> None:
         for required in ['godmode', 'difficulty', 'screen_size']:
@@ -58,20 +49,20 @@ class SettingsState(GameState):
         from pacman.render.interactives import Button
 
         # Create and set needed buttons
-        godmod_btn = SelectButton(self.__screen, ['Disabled', 'Enabled'])
+        godmod_btn = SelectButton(self._screen, ['Disabled', 'Enabled'])
         godmod_btn.set_index(self.__infos['godmode'])
-        difficulty_btn = SelectButton(self.__screen,
+        difficulty_btn = SelectButton(self._screen,
                                       ['Easy', 'Normal', 'Hard'])
         difficulty_btn.set_index(self.__infos['difficulty'])
         sizes = [(i + 5) * 100 for i in range(5)]
         sizes_str = [(f'{size} x {size}') for size in sizes]
-        screen_size_btn = SelectButton(self.__screen, sizes_str)
+        screen_size_btn = SelectButton(self._screen, sizes_str)
         screen_size_btn.set_index(self.__infos['screen_size'])
 
         # Create save / quit buttons
         def on_quit() -> None:
-            if self.__state_manager:
-                self.__state_manager.set_state('MENU')
+            if self._state_manager:
+                self._state_manager.set_state('MENU')
 
         def on_save() -> None:
             self.__infos = {
@@ -80,41 +71,41 @@ class SettingsState(GameState):
                 'screen_size': screen_size_btn.text,
             }
             print(self.__infos)
-            if self.__state_manager:
-                self.__state_manager.set_state('MENU')
+            if self._state_manager:
+                self._state_manager.set_state('MENU')
 
         # Create settings UI
-        container = Container(self.__screen, 'VERTICAL',
+        container = Container(self._screen, 'VERTICAL',
                               size=RenderLoader.screen_size,
                               pos=(0, 0),
                               padding=90)
-        settings_ctn = Container(self.__screen, 'VERTICAL',
+        settings_ctn = Container(self._screen, 'VERTICAL',
                                  bg_color=(0, 0, 0, 200))
 
         # -- TITLE:
-        title_ctn = Container(self.__screen, 'VERTICAL')
+        title_ctn = Container(self._screen, 'VERTICAL')
         title_ctn.add_content([
-            {RenderText(self.__screen, 'SETTINGS', font_size=40): '0%'},
-            {Divider(self.__screen): '1%'}])
+            {RenderText(self._screen, 'SETTINGS', font_size=40): '0%'},
+            {Divider(self._screen): '1%'}])
 
         # -- BUTTONS:
-        btns_ctn = Container(self.__screen, 'VERTICAL')
+        btns_ctn = Container(self._screen, 'VERTICAL')
 
-        godmod_ctn = Container(self.__screen, 'HORIZONTAL')
+        godmod_ctn = Container(self._screen, 'HORIZONTAL')
         godmod_ctn.add_content([
-            {RenderText(self.__screen, 'God mode: '): '50%'},
+            {RenderText(self._screen, 'God mode: '): '50%'},
             {godmod_btn: '50%'},
         ])
 
-        difficulty_ctn = Container(self.__screen, 'HORIZONTAL')
+        difficulty_ctn = Container(self._screen, 'HORIZONTAL')
         difficulty_ctn.add_content([
-            {RenderText(self.__screen, 'Difficulty: '): '50%'},
+            {RenderText(self._screen, 'Difficulty: '): '50%'},
             {difficulty_btn: '50%'},
         ])
 
-        win_size_ctn = Container(self.__screen, 'HORIZONTAL')
+        win_size_ctn = Container(self._screen, 'HORIZONTAL')
         win_size_ctn.add_content([
-            {RenderText(self.__screen, 'Window Size: '): '50%'},
+            {RenderText(self._screen, 'Window Size: '): '50%'},
             {screen_size_btn: '50%'},
         ])
         btns_ctn.add_content([
@@ -124,10 +115,10 @@ class SettingsState(GameState):
             ])
 
         # -- FOOTER
-        footer_ctn = Container(self.__screen, 'HORIZONTAL')
+        footer_ctn = Container(self._screen, 'HORIZONTAL')
         footer_ctn.add_content([
-            {Button(self.__screen, 'SAVE CHANGES', callback=on_save): '45%'},
-            {Button(self.__screen, 'CANCEL', callback=on_quit): '45%'}
+            {Button(self._screen, 'SAVE CHANGES', callback=on_save): '45%'},
+            {Button(self._screen, 'CANCEL', callback=on_quit): '45%'}
         ])
 
         settings_ctn.add_content([{title_ctn: '20%'}, {btns_ctn: '60%'},
