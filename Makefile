@@ -13,6 +13,7 @@ install:
 
 run:
 	$(PYTHON) $(MAIN) $(CONFIG)
+	make clean
 
 run-render:
 	$(PYTHON) -m $(TEST_MODULE).$(MAIN_RENDER)
