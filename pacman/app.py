@@ -14,7 +14,7 @@ def run(config: GameConfig):
     print(f"Starting Pac-Man with config: {config}")
     try:
         RenderConfig.init(screen_size=(WINDOW_WIDTH, WINDOW_HEIGHT),
-                          maze_size=(18, 18))
+                          maze_size=(15, 15))
         RenderConfig.load_asset('background',
                                 'assets/sprites/pacman_maze_bg.jpg')
 
