@@ -5,7 +5,7 @@ from typing import Optional
 import pygame
 
 
-class Entity(RenderOBJ):
+class RenderEntity(RenderOBJ):
     """Entity class.
     Used to display entities like pacman or ghosts.
     Can be rotated if needed.

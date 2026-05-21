@@ -3,7 +3,7 @@ from pacman.render.RenderConfig import RenderConfig
 from pacman.render.Screen import Screen
 from pacman.render.RenderMaze import RenderMaze
 from pacman.render.interactives import Button, ToggleButton
-from pacman.render.Entity import Entity
+from pacman.render.Entity import RenderEntity
 from pacman.render.Container import Container
 from pacman.render.RenderText import RenderText
 
@@ -63,9 +63,9 @@ if __name__ == "__main__":
     print(f'maze Y : {maze.y}, MAZE.H: {maze.h},'
           f' ctn_h y: {ctn_h.y}, ctn_h h: {ctn_h.h}')
 
-    pacman = Entity(screen, (100, 100), RenderConfig.cell_size)
+    pacman = RenderEntity(screen, (100, 100), RenderConfig.cell_size)
     pacman.set_skin(RenderConfig.get_asset('pacman'))
-    ghost = Entity(screen, (300, 300), RenderConfig.cell_size)
+    ghost = RenderEntity(screen, (300, 300), RenderConfig.cell_size)
     ghost.set_skin(RenderConfig.get_asset('ghost-blue'))
 
     # while screen.handle_events():
