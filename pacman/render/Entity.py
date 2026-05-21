@@ -1,5 +1,6 @@
 from pacman.render.RenderObj import RenderOBJ
 from pacman.render.Screen import Screen
+from pacman.entities.Character import Character
 
 from typing import Optional
 import pygame
@@ -11,13 +12,12 @@ class RenderEntity(RenderOBJ):
     Can be rotated if needed.
     Initial direction must be east"""
     def __init__(self, screen: Screen,
-                 pos: Optional[tuple[int, int]] = None,
-                 size: Optional[tuple[int, int]] = None
+                 character: Character
                  ) -> None:
         """Initialize Entity class."""
         self.__saved_texture: Optional[pygame.Surface] = None
         self.__current_rotation: str = 'E'
-        super().__init__(screen, pos, size)
+        super().__init__(screen)
 
     def set_skin(self, skin_texture: Optional[pygame.Surface]
                  ) -> None:

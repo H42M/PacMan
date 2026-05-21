@@ -4,7 +4,8 @@ from pacman.render.Screen import Screen
 from pacman.render.RenderConfig import RenderConfig
 from pacman.states.base_state import GameState, StateManager
 from typing import Optional
-from pacman.render.RenderMaze import RenderMaze
+from pacman.game.GameWorld import GameWorld
+from pacman.render.RenderWorld import RenderWorld
 from pacman.render.Container import Container
 from pacman.render.Window import Window
 import pygame
@@ -17,7 +18,8 @@ class PlayState(GameState):
         super().__init__(screen, state_manager)
 
         # TODO: Define real maze size with GameConfig
-        self.__maze = RenderMaze(screen, (300, 300))
+        self.__world = GameWorld()
+        self.__render_world = RenderWorld(self._screen, self.__world)
         self.__game_ctn = self.__load_game_ctn()
         self.__menu_ctn = self.__load_menu()
         self.__menu_displayed = False
@@ -44,7 +46,7 @@ class PlayState(GameState):
                                  (0, 0), padding=20,
                                  size=RenderConfig.screen_size)
         game_ctn = Container(self._screen, 'VERTICAL', bg_color=(0, 0, 0, 230))
-        game_ctn.add_content({self.__maze: '90%'})
+        game_ctn.add_content({self.__render_world: '90%'})
 
         game_win_ctn.add_content({game_ctn: '0%'})
         return game_win_ctn
