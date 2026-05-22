@@ -6,13 +6,18 @@ from typing import Optional
 import pygame
 
 
+class RenderEntityError(Exception):
+
+    pass
+
+
 class RenderEntity(RenderOBJ):
     """Entity class.
     Used to display entities like pacman or ghosts.
     Can be rotated if needed.
     Initial direction must be east"""
     def __init__(self, screen: Screen,
-                 character: Character
+                 character: Character,
                  ) -> None:
         """Initialize Entity class."""
         self.__saved_texture: Optional[pygame.Surface] = None
@@ -24,6 +29,8 @@ class RenderEntity(RenderOBJ):
         """Set creature skin."""
         if skin_texture:
             self.__saved_texture = skin_texture
+        else:
+            raise RenderEntityError('No skin provided')
 
     def set_rotation(self, rotation: str) -> None:
         """Set creature rotation"""
