@@ -1,6 +1,11 @@
 from pacman.mazegenerator import MazeGenerator
 
 
+class MazeError(Exception):
+
+    pass
+
+
 class Cell:
     def __init__(self) -> None:
         self.__n = False
@@ -52,12 +57,14 @@ class Maze:
 
     def __generate_maze_obj(self) -> list[list[Cell]]:
         """Display render on screen."""
+        print(f'Generating Maze: \n{self.__gen_maze.maze}')
         if not self.__gen_maze or not self.__gen_maze.maze:
-            return []
+            print('NO MAZE')
+            raise MazeError('No generated maze provided')
 
-        maze = []
+        maze: list[list[Cell]] = []
         for y, row in enumerate(self.__gen_maze.maze):
-            row = []
+            maze_row: list[Cell] = []
             for x, cell in enumerate(row):
                 cell_decoded = self.__decode_cell(cell)
                 cell_obj = Cell()
@@ -69,8 +76,8 @@ class Maze:
                     cell_obj.e = True
                 if 'W' in cell_decoded:
                     cell_obj.w = True
-                row.append(cell)
-            maze.append(row)
+                maze_row.append(cell_obj)
+            maze.append(maze_row)
         return maze
 
     def __decode_cell(self, value: int) -> list[str]:

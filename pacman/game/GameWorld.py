@@ -5,6 +5,7 @@ from pacman.entities.Player import Player
 class GameWorld:
     def __init__(self) -> None:
         self.__maze = Maze((18, 18))
+        print(f'MAAAAAZE: {self.__maze}')
         self.__player = Player()
         self.__ghosts = None
 

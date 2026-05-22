@@ -16,14 +16,17 @@ class RenderMaze(RenderOBJ):
     def render(self) -> None:
         """Display render on screen."""
         if self.pos and self.size:
+            # print(f'Maze rendered: {self.size}, {self.pos}')
             screen = self._screen.screen
             cell_size = (self.size[0] // self.__maze.w,
-                         self.size[1] / self.__maze.h)
+                         self.size[1] // self.__maze.h)
             w = cell_size[0]
             h = cell_size[1]
+            # print(f'cell size: {cell_size}')
 
             for y, row in enumerate(self.__maze.maze):
                 for x, cell in enumerate(row):
+                    print(type(cell), cell)
                     cell_x = self.pos[0] + (x * cell_size[0])
                     cell_y = self.pos[1] + (y * cell_size[1])
 
@@ -35,21 +38,25 @@ class RenderMaze(RenderOBJ):
                             color,
                             (cell_x, cell_y, w, t)
                         )
+                        print('Cell N')
                     if cell.s:
                         pygame.draw.rect(
                             screen,
                             color,
                             (cell_x, cell_y + h - t, w, t)
                         )
+                        print('Cell S')
                     if cell.e:
                         pygame.draw.rect(
                             screen,
                             color,
                             (cell_x + w - t, cell_y, t, h)
                         )
+                        print('Cell E')
                     if cell.w:
                         pygame.draw.rect(
                             screen,
                             color,
                             (cell_x, cell_y, t, h)
                         )
+                        print('Cell W')
