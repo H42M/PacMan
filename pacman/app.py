@@ -1,5 +1,6 @@
 """Main pygame application loop for Pac-Man."""
 
+import os
 import pygame
 from pacman.constants import FPS, WINDOW_HEIGHT, WINDOW_TITLE, WINDOW_WIDTH
 from pacman.game_config import GameConfig
@@ -14,6 +15,7 @@ def run(config: GameConfig) -> int:
         generate_maze(config.levels[0])
 
         # pygame initialization
+        os.environ["SDL_VIDEO_WINDOW_POS"] = "100,100"
         pygame.init()
         screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption(WINDOW_TITLE)
