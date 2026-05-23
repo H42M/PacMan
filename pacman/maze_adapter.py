@@ -38,17 +38,17 @@ def translate_seed(seed: int | None) -> int:
 def generate_maze(level: LevelConfig) -> GeneratedMaze:
     try:
         from mazegenerator.mazegenerator import MazeGenerator
-    except ImportError as e:
+    except ImportError as error:
         raise MazeGenerationError(
-            "Maze Generator package is not installed\nPlease run make install."
-        ) from e
+            "Maze generator package is not installed\nPlease run make install."
+        ) from error
 
     try:
         maze = MazeGenerator(size=(level.width, level.height),
                              perfect=False,
                              seed=translate_seed(level.seed))
-    except Exception as e:
-        raise MazeGenerationError("Maze generation failed.") from e
+    except Exception as error:
+        raise MazeGenerationError("Maze generation failed.") from error
 
     cells = tuple(tuple(Wall(cell) for cell in row) for row in maze.maze)
     if not cells or not cells[0]:

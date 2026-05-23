@@ -3,12 +3,16 @@
 import pygame
 from pacman.constants import FPS, WINDOW_HEIGHT, WINDOW_TITLE, WINDOW_WIDTH
 from pacman.game_config import GameConfig
+from pacman.maze_adapter import generate_maze, MazeGenerationError
 
 
 def run(config: GameConfig) -> int:
     """Run the Pac-Man application."""
     print(f"Starting Pac-Man with config: {config}")
     try:
+        # maze generation
+        generate_maze(config.levels[0])
+
         # pygame initialization
         pygame.init()
         screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -28,8 +32,13 @@ def run(config: GameConfig) -> int:
             screen.fill("black")
             pygame.display.flip()
             clock.tick(FPS)
+
+    # error handling
     except pygame.error as e:
         print(e)
+        return 1
+    except MazeGenerationError as error:
+        print(error)
         return 1
     finally:
         pygame.quit()
