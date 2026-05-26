@@ -17,16 +17,21 @@ class GameState(ABC):
         self._state_manager = state_manager
 
     def handle_events(self, events: list[pygame.event.Event]) -> bool:
+        from pacman.render.interactives.Input import Input
         for event in events:
             if event.type == pygame.QUIT:
                 return False
-            if event.type == pygame.MOUSEMOTION:
-                for clickable in self._screen.clickables:
+            for clickable in self._screen.clickables:
+                if event.type == pygame.MOUSEMOTION:
                     clickable.update_hover(pygame.mouse.get_pos())
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                for clickable in self._screen.clickables:
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
                     if clickable.is_hovered:
                         clickable.execute()
+
+                if event.type == pygame.KEYDOWN:
+                    if isinstance(clickable, Input):
+                        clickable.handle_key(event)
         return True
 
     @abstractmethod
@@ -64,6 +69,7 @@ class StateManager:
     def set_state(self, state: str) -> GameState:
         from pacman.states.menu_state import MenuState
         from pacman.states.settingstate import SettingsState
+        from pacman.states.play_state import PlayState
 
         new_state: GameState
         self.__screen.reset_clickables()
@@ -71,6 +77,8 @@ class StateManager:
             new_state = MenuState(self.__screen, self)
         elif state.upper() == self.SETTINGS:
             new_state = SettingsState(self.__screen, self)
+        elif state.upper() == self.PLAYING:
+            new_state = PlayState(self.__screen, self)
         else:
             raise StateError(f'State {state} doesnt exist {self.MENU}')
 

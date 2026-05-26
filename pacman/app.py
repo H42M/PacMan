@@ -9,12 +9,12 @@ from pacman.render.Screen import Screen
 from pacman.render.RenderConfig import RenderConfig
 
 
-def run(config: GameConfig):
+def run(config: GameConfig) -> int:
     # TODO: init gameloader with Gameconfig data
     print(f"Starting Pac-Man with config: {config}")
     try:
         RenderConfig.init(screen_size=(WINDOW_WIDTH, WINDOW_HEIGHT),
-                          maze_size=(20, 20))
+                          maze_size=(15, 15))
         RenderConfig.load_asset('background',
                                 'assets/sprites/pacman_maze_bg.jpg')
 

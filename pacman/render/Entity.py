@@ -1,35 +1,42 @@
 from pacman.render.RenderObj import RenderOBJ
 from pacman.render.Screen import Screen
+from pacman.entities.Character import Character
 
 from typing import Optional
 import pygame
 
 
-class Entity(RenderOBJ):
+class RenderEntityError(Exception):
+
+    pass
+
+
+class RenderEntity(RenderOBJ):
     """Entity class.
     Used to display entities like pacman or ghosts.
     Can be rotated if needed.
     Initial direction must be east"""
     def __init__(self, screen: Screen,
-                 pos: Optional[tuple[int, int]] = None,
-                 size: Optional[tuple[int, int]] = None
+                 character: Character,
                  ) -> None:
         """Initialize Entity class."""
         self.__saved_texture: Optional[pygame.Surface] = None
         self.__current_rotation: str = 'E'
-        super().__init__(screen, pos, size)
+        super().__init__(screen)
 
     def set_skin(self, skin_texture: Optional[pygame.Surface]
                  ) -> None:
         """Set creature skin."""
         if skin_texture:
             self.__saved_texture = skin_texture
+        else:
+            raise RenderEntityError('No skin provided')
 
     def set_rotation(self, rotation: str) -> None:
         """Set creature rotation"""
-        if rotation not in ['N', 'S', 'E', 'W']:
+        if rotation.upper() not in ['N', 'S', 'E', 'W']:
             raise ValueError(f'Invalid rotation provided: {rotation}')
-        self.__current_rotation = rotation
+        self.__current_rotation = rotation.upper()
 
     def render(self) -> None:
         """Display the creature on screen based on his direction"""
