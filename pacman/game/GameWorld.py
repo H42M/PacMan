@@ -17,7 +17,7 @@ class GameWorld:
         return self.__maze
 
     @maze.setter
-    def _maze(self, value) -> None:
+    def maze(self, value: Maze) -> None:
         self.__maze = value
 
     @property
@@ -25,7 +25,7 @@ class GameWorld:
         return self.__player
 
     @player.setter
-    def _player(self, value) -> None:
+    def player(self, value: Player) -> None:
         self.__player = value
 
     @property
@@ -33,5 +33,5 @@ class GameWorld:
         return self.__ghosts
 
     @ghosts.setter
-    def _ghosts(self, value) -> None:
+    def ghosts(self, value: list[Ghost]) -> None:
         self.__ghosts = value

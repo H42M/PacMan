@@ -14,35 +14,35 @@ class Cell:
         self.__w = False
 
     @property
-    def n(self):
+    def n(self) -> bool:
         return self.__n
 
     @n.setter
-    def n(self, value):
+    def n(self, value: bool) -> None:
         self.__n = value
 
     @property
-    def s(self):
+    def s(self) -> bool:
         return self.__s
 
     @s.setter
-    def s(self, value):
+    def s(self, value: bool) -> None:
         self.__s = value
 
     @property
-    def e(self):
+    def e(self) -> bool:
         return self.__e
 
     @e.setter
-    def e(self, value):
+    def e(self, value: bool) -> None:
         self.__e = value
 
     @property
-    def w(self):
+    def w(self) -> bool:
         return self.__w
 
     @w.setter
-    def w(self, value):
+    def w(self, value: bool) -> None:
         self.__w = value
 
 
@@ -111,7 +111,7 @@ class Maze:
     def h(self) -> int:
         return self.__size[1]
 
-    def get_cell_wall(self, pos: tuple[int, int], wall: str):
+    def get_cell_wall(self, pos: tuple[int, int], wall: str) -> bool:
         cell = self.__maze[pos[1]][pos[0]]
         if wall.upper() == 'N':
             return cell.n
@@ -121,3 +121,4 @@ class Maze:
             return cell.e
         if wall.upper() == 'W':
             return cell.w
+        return False

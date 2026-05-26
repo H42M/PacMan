@@ -105,7 +105,7 @@ class PlayState(GameState):
             {Input(self._screen, placeholder="Ex: player_1"): '60%'},
             ])
 
-        def on_quit():
+        def on_quit() -> None:
             if self._state_manager:
                 self._state_manager.set_state('MENU')
 

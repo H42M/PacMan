@@ -9,12 +9,12 @@ class Player(Character):
         self.__move_speed = 0.05
         self.__dir_str = 'e'
 
-    def start_moving(self, new_pos: tuple[int, int]):
+    def start_moving(self, new_pos: tuple[int, int]) -> None:
         self.__prev_pos = self.pos
         self.pos = new_pos
         self.__move_progress = 0.0
 
-    def tick(self):
+    def tick(self) -> None:
         if self.__move_progress < 1.0:
             self.__move_progress = min(
                 1.0, self.__move_progress + self.__move_speed)

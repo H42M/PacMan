@@ -9,7 +9,7 @@ from pacman.render.Screen import Screen
 from pacman.render.RenderConfig import RenderConfig
 
 
-def run(config: GameConfig):
+def run(config: GameConfig) -> int:
     # TODO: init gameloader with Gameconfig data
     print(f"Starting Pac-Man with config: {config}")
     try:
