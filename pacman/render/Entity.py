@@ -34,9 +34,9 @@ class RenderEntity(RenderOBJ):
 
     def set_rotation(self, rotation: str) -> None:
         """Set creature rotation"""
-        if rotation not in ['N', 'S', 'E', 'W']:
+        if rotation.upper() not in ['N', 'S', 'E', 'W']:
             raise ValueError(f'Invalid rotation provided: {rotation}')
-        self.__current_rotation = rotation
+        self.__current_rotation = rotation.upper()
 
     def render(self) -> None:
         """Display the creature on screen based on his direction"""

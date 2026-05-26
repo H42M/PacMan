@@ -110,3 +110,14 @@ class Maze:
     @property
     def h(self) -> int:
         return self.__size[1]
+
+    def get_cell_wall(self, pos: tuple[int, int], wall: str):
+        cell = self.__maze[pos[1]][pos[0]]
+        if wall.upper() == 'N':
+            return cell.n
+        if wall.upper() == 'S':
+            return cell.s
+        if wall.upper() == 'E':
+            return cell.e
+        if wall.upper() == 'W':
+            return cell.w

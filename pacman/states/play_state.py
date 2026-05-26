@@ -33,13 +33,42 @@ class PlayState(GameState):
     def handle_events(self, events: list[Event]) -> bool:
         for event in events:
             if event.type == pygame.KEYDOWN:
+                from pacman.entities.Player import Player
                 if event.key == pygame.K_ESCAPE:
                     self.__menu_ctn.switch_display()
                     print(f'Display Menu {self.__menu_displayed}')
+
+                if event.key == pygame.K_w:
+                    self.__world.player.dir = Player.UP
+                if event.key == pygame.K_s:
+                    self.__world.player.dir = Player.DOWN
+                if event.key == pygame.K_a:
+                    self.__world.player.dir = Player.LEFT
+                if event.key == pygame.K_d:
+                    self.__world.player.dir = Player.RIGHT
         return super().handle_events(events)
 
     def update(self) -> None:
-        pass
+        from pacman.entities.Player import Player
+        player = self.__world.player
+        maze = self.__world.maze
+
+        player.tick()
+
+        if player.dir != Player.NONE and not player.is_moving:
+            moves = {
+                Player.UP:    (0, -1, 'n'),
+                Player.RIGHT: (1,  0, 'e'),
+                Player.DOWN:  (0,  1, 's'),
+                Player.LEFT:  (-1, 0, 'w'),
+            }
+            dx, dy, wall = moves[player.dir]
+            nx, ny = player.pos[0] + dx, player.pos[1] + dy
+
+            player.dir_str = wall
+            if 0 <= nx < maze.w and 0 <= ny < maze.h:
+                if not maze.get_cell_wall(player.pos, wall):
+                    player.start_moving((nx, ny))
 
     def __load_game_ctn(self) -> Container:
         game_win_ctn = Container(self._screen, 'VERTICAL',

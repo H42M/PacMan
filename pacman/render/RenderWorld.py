@@ -27,18 +27,22 @@ class RenderWorld(RenderOBJ):
     def render(self) -> None:
         self.__render_maze.render()
 
-        cell_x = self.__render_maze.cell_size[0]
-        cell_y = self.__render_maze.cell_size[1]
+        cell_w, cell_h = self.__render_maze.cell_size
+        player_size = (int(cell_w * 0.6), int(cell_h * 0.6))
+        self.__render_player.size = player_size
 
-        self.__render_player.size = (
-            int(cell_x * 0.6),
-            int(cell_y * 0.6)
-        )
+        player = self.__world.player
+        prog = player.progress
 
-        self.__render_player.pos = (
-            self.__render_maze.grid_to_screen(
-                self.__world.player.pos, self.__render_player.size)
-        )
+        px_prev = self.__render_maze.grid_to_screen(player.prev_pos,
+                                                    player_size)
+        px_next = self.__render_maze.grid_to_screen(player.pos, player_size)
+
+        px = int(px_prev[0] + (px_next[0] - px_prev[0]) * prog)
+        py = int(px_prev[1] + (px_next[1] - px_prev[1]) * prog)
+
+        self.__render_player.pos = (px, py)
+        self.__render_player.set_rotation(player.dir_str)
         self.__render_player.render()
 
     @property
