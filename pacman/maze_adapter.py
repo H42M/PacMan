@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 from enum import IntFlag
+from typing import TypeAlias
+
 from pacman.game_config import LevelConfig
+
+CellPosition: TypeAlias = tuple[int, int]
 
 
 class MazeGenerationError(Exception):
@@ -24,8 +28,8 @@ class GeneratedMaze:
     width: int
     height: int
     cells: tuple[tuple[Wall, ...], ...]
-    entry: tuple[int, int]
-    exit: tuple[int, int]
+    entry: CellPosition
+    exit: CellPosition
 
 
 def translate_seed(seed: int | None) -> int:

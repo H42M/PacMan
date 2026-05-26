@@ -2,17 +2,20 @@
 
 import os
 import pygame
+
 from pacman.constants import FPS, WINDOW_HEIGHT, WINDOW_TITLE, WINDOW_WIDTH
 from pacman.game_config import GameConfig
-from pacman.maze_adapter import generate_maze, MazeGenerationError
+from pacman.maze_adapter import MazeGenerationError
+from pacman.level import build_level
 
 
 def run(config: GameConfig) -> int:
     """Run the Pac-Man application."""
     print(f"Starting Pac-Man with config: {config}")
     try:
-        # maze generation
-        generate_maze(config.levels[0])
+        # level building and maze generation
+        level = build_level(config, 0)
+        print(level)
 
         # pygame initialization
         os.environ["SDL_VIDEO_WINDOW_POS"] = "100,100"
