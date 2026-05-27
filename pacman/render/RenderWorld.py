@@ -31,7 +31,8 @@ class RenderWorld(RenderOBJ):
             self.__render_ghosts.append(RenderEntity(self._screen, ghost))
             self.__render_ghosts[-1].set_skin(RenderConfig.get_asset('ghost'))
 
-    def __render_player_func(self, player_size: tuple[int, int]):
+    def __render_player_func(self, player_size: tuple[int, int]
+                             ) -> None:
         self.__render_player.size = player_size
 
         player = self.__world.player
@@ -47,7 +48,7 @@ class RenderWorld(RenderOBJ):
         self.__render_player.pos = (px, py)
         self.__render_player.set_rotation(player.dir_str)
 
-    def __render_ghosts_func(self, ghost_size: tuple[int, int]):
+    def __render_ghosts_func(self, ghost_size: tuple[int, int]) -> None:
         for (ghost, render_ghost) in zip(self.__world.ghosts,
                                          self.__render_ghosts):
             # ghost.pos = (i + 1, i + 1)
@@ -66,7 +67,7 @@ class RenderWorld(RenderOBJ):
 
         self.__render_player.render()
 
-    def __load_assets(self):
+    def __load_assets(self) -> None:
         try:
             if not RenderConfig.get_asset('player'):
                 RenderConfig.load_asset('player', 'assets/sprites/pacman.png')
