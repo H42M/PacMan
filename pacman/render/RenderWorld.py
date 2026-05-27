@@ -1,7 +1,7 @@
 from pacman.render.RenderObj import RenderOBJ
 from pacman.render.Screen import Screen
 from pacman.render.RenderMaze import RenderMaze
-from pacman.render.Entity import RenderEntity
+from pacman.render.RenderEntity import RenderEntity
 
 from pacman.game.GameWorld import GameWorld
 from pacman.render.RenderConfig import RenderConfig
