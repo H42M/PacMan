@@ -68,7 +68,7 @@ class StateManager:
 
     def set_state(self, state: str) -> GameState:
         from pacman.states.menu_state import MenuState
-        from pacman.states.settingstate import SettingsState
+        from pacman.states.setting_state import SettingsState
         from pacman.states.play_state import PlayState
 
         new_state: GameState

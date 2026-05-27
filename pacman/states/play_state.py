@@ -8,6 +8,7 @@ from pacman.game.GameWorld import GameWorld
 from pacman.render.RenderWorld import RenderWorld
 from pacman.render.Container import Container
 from pacman.render.Window import Window
+from pacman.render.RenderText import RenderText
 import pygame
 
 
@@ -71,12 +72,27 @@ class PlayState(GameState):
 
     def __load_game_ctn(self) -> Container:
         game_win_ctn = Container(self._screen, 'VERTICAL',
-                                 (0, 0), padding=20,
-                                 size=RenderConfig.screen_size)
-        game_ctn = Container(self._screen, 'VERTICAL', bg_color=(0, 0, 0, 230))
-        game_ctn.add_content({self.__render_world: '90%'})
+                                 (0, 0),
+                                 size=RenderConfig.screen_size,
+                                 bg_color=(0, 0, 0),
+                                 gap=30)
+        # TODO: Custom player Score
+        info_ctn = Container(self._screen, 'HORIZONTAL')
+        left_info_ctn = Container(self._screen, 'VERTICAL', gap=10)
+        left_info_ctn.add_content([
+            {RenderText(self._screen, 'Score: 1'): '40%'},
+            {RenderText(self._screen, 'Level: 1'): '40%'}])
+        right_info_ctn = Container(self._screen, 'VERTICAL', gap=10)
+        right_info_ctn.add_content([
+            {RenderText(self._screen, 'Lives: 3'): '40%'},
+            {RenderText(self._screen, 'Time left: 300'): '40%'}
+        ])
+        info_ctn.add_content([{left_info_ctn: '0%'}, {right_info_ctn: '0%'}])
 
-        game_win_ctn.add_content({game_ctn: '0%'})
+        game_ctn = Container(self._screen, 'VERTICAL', bg_color=(0, 0, 0, 230))
+        game_ctn.add_content({self.__render_world: '0%'})
+
+        game_win_ctn.add_content([{info_ctn: '5%'}, {game_ctn: '85%'}])
         return game_win_ctn
 
     def __load_menu(self) -> Window:

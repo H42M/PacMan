@@ -10,7 +10,7 @@ class RenderMaze(RenderOBJ):
         """Initialize RenderMaze"""
         self.__maze = maze
         self.__color = (255, 255, 255)
-        self.__wall_thickness = 5
+        self.__wall_thickness = 3
         self.__cell_size: tuple[int, int] = (0, 0)
         super().__init__(screen)
 

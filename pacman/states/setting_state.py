@@ -15,10 +15,11 @@ class SettingsState(GameState):
         if infos:
             self.__infos: dict[str, str] = infos
         else:
+            from pacman.constants import WINDOW_HEIGHT, WINDOW_WIDTH
             self.__infos = {
                 'godmode': 'Disabled',
                 'difficulty': 'Normal',
-                'screen_size': '800 x 800'
+                'screen_size': f'{WINDOW_WIDTH} x {WINDOW_HEIGHT}'
             }
         self.__menu_ctn = self.__load_settings()
 
@@ -80,7 +81,7 @@ class SettingsState(GameState):
                               pos=(0, 0),
                               padding=90)
         settings_ctn = Container(self._screen, 'VERTICAL',
-                                 bg_color=(0, 0, 0, 200))
+                                 bg_color=(0, 0, 0, RenderConfig.menu_opacity))
 
         # -- TITLE:
         title_ctn = Container(self._screen, 'VERTICAL')

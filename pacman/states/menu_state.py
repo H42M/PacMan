@@ -17,10 +17,6 @@ class MenuState(GameState):
         super().__init__(screen, state_manager)
         self.__menu_ctn = self.__load_menu()
 
-    def set_state_manager(self, manager: StateManager) -> None:
-        """Permet de définir le StateManager après la création"""
-        self._state_manager = manager
-
     def handle_events(self, events: list[pygame.event.Event]) -> bool:
         return super().handle_events(events)
 
@@ -42,11 +38,11 @@ class MenuState(GameState):
         container = Container(self._screen, 'VERTICAL',
                               size=RenderConfig.screen_size,
                               pos=(0, 0),
-                              padding=90)
+                              padding=130)
 
         menu_ctn = Container(self._screen, 'VERTICAL',
                              padding=50,
-                             bg_color=(0, 0, 0, 230))
+                             bg_color=(0, 0, 0, RenderConfig.menu_opacity))
 
         title_ctn = Container(self._screen, 'VERTICAL')
         title_ctn.add_content([{RenderText(self._screen, 'PACMAN',
