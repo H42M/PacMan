@@ -9,6 +9,11 @@ from pacman.render.RenderConfig import RenderConfig
 from typing import Optional
 
 
+class AssetsError(Exception):
+
+    pass
+
+
 class RenderWorld(RenderOBJ):
     def __init__(self, screen: Screen,
                  world: GameWorld,
@@ -18,17 +23,15 @@ class RenderWorld(RenderOBJ):
         super().__init__(screen, pos, size)
         self.__world = world
         self.__render_maze = RenderMaze(screen, world.maze)
+        self.__load_assets()
         self.__render_player = RenderEntity(screen, world.player)
-        # TODO: Meilleur moyen de load la sprite de pacman
-        if not RenderConfig.get_asset('player'):
-            RenderConfig.load_asset('player', 'assets/sprites/pacman.png')
         self.__render_player.set_skin(RenderConfig.get_asset('player'))
+        self.__render_ghosts: list[RenderEntity] = []
+        for ghost in self.__world.ghosts:
+            self.__render_ghosts.append(RenderEntity(self._screen, ghost))
+            self.__render_ghosts[-1].set_skin(RenderConfig.get_asset('ghost'))
 
-    def render(self) -> None:
-        self.__render_maze.render()
-
-        cell_w, cell_h = self.__render_maze.cell_size
-        player_size = (int(cell_w * 0.6), int(cell_h * 0.6))
+    def __render_player_func(self, player_size: tuple[int, int]):
         self.__render_player.size = player_size
 
         player = self.__world.player
@@ -43,7 +46,39 @@ class RenderWorld(RenderOBJ):
 
         self.__render_player.pos = (px, py)
         self.__render_player.set_rotation(player.dir_str)
+
+    def __render_ghosts_func(self, ghost_size: tuple[int, int]):
+        for (ghost, render_ghost) in zip(self.__world.ghosts,
+                                         self.__render_ghosts):
+            # ghost.pos = (i + 1, i + 1)
+            render_ghost.size = ghost_size
+            render_ghost.pos = self.__render_maze.grid_to_screen(ghost.pos,
+                                                                 ghost_size)
+            render_ghost.render()
+
+    def render(self) -> None:
+        cell_w, cell_h = self.__render_maze.cell_size
+        entities_size = (int(cell_w * 0.6), int(cell_h * 0.6))
+
+        self.__render_maze.render()
+        self.__render_player_func(entities_size)
+        self.__render_ghosts_func(entities_size)
+
         self.__render_player.render()
+
+    def __load_assets(self):
+        try:
+            if not RenderConfig.get_asset('player'):
+                RenderConfig.load_asset('player', 'assets/sprites/pacman.png')
+        except Exception:
+            raise AssetsError('Render World unable to load player asset')
+
+        try:
+            if not RenderConfig.get_asset('ghost'):
+                RenderConfig.load_asset('ghost',
+                                        'assets/sprites/ghost-blue.png')
+        except Exception:
+            raise AssetsError('Render World unable to load ghost asset')
 
     @property
     def size(self) -> Optional[tuple[int, int]]:

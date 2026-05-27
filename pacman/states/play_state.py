@@ -22,7 +22,6 @@ class PlayState(GameState):
         self.__render_world = RenderWorld(self._screen, self.__world)
         self.__game_ctn = self.__load_game_ctn()
         self.__menu_ctn = self.__load_menu()
-        self.__menu_displayed = False
 
     def render(self) -> None:
         self._screen.clear()
@@ -36,7 +35,6 @@ class PlayState(GameState):
                 from pacman.entities.Player import Player
                 if event.key == pygame.K_ESCAPE:
                     self.__menu_ctn.switch_display()
-                    print(f'Display Menu {self.__menu_displayed}')
 
                 if event.key == pygame.K_w:
                     self.__world.player.dir = Player.UP
@@ -50,25 +48,26 @@ class PlayState(GameState):
 
     def update(self) -> None:
         from pacman.entities.Player import Player
-        player = self.__world.player
-        maze = self.__world.maze
+        if not self.__menu_ctn.display:
+            player = self.__world.player
+            maze = self.__world.maze
 
-        player.tick()
+            player.tick()
 
-        if player.dir != Player.NONE and not player.is_moving:
-            moves = {
-                Player.UP:    (0, -1, 'n'),
-                Player.RIGHT: (1,  0, 'e'),
-                Player.DOWN:  (0,  1, 's'),
-                Player.LEFT:  (-1, 0, 'w'),
-            }
-            dx, dy, wall = moves[player.dir]
-            nx, ny = player.pos[0] + dx, player.pos[1] + dy
+            if player.dir != Player.NONE and not player.is_moving:
+                moves = {
+                    Player.UP:    (0, -1, 'n'),
+                    Player.RIGHT: (1,  0, 'e'),
+                    Player.DOWN:  (0,  1, 's'),
+                    Player.LEFT:  (-1, 0, 'w'),
+                }
+                dx, dy, wall = moves[player.dir]
+                nx, ny = player.pos[0] + dx, player.pos[1] + dy
 
-            player.dir_str = wall
-            if 0 <= nx < maze.w and 0 <= ny < maze.h:
-                if not maze.get_cell_wall(player.pos, wall):
-                    player.start_moving((nx, ny))
+                player.dir_str = wall
+                if 0 <= nx < maze.w and 0 <= ny < maze.h:
+                    if not maze.get_cell_wall(player.pos, wall):
+                        player.start_moving((nx, ny))
 
     def __load_game_ctn(self) -> Container:
         game_win_ctn = Container(self._screen, 'VERTICAL',
@@ -91,8 +90,12 @@ class PlayState(GameState):
         from pacman.render.interactives.Input import Input
 
         # WINDOW MENU
-        window_menu = Window(self._screen, 'VERTICAL', (200, 200), (500, 500),
-                             display_default=True, padding=20)
+        menu_size = 500
+        menu_pos = ((RenderConfig.screen_size[0] - menu_size) // 2,
+                    (RenderConfig.screen_size[1] - menu_size) // 2)
+        window_menu = Window(self._screen, 'VERTICAL', menu_pos,
+                             (menu_size, menu_size), display_default=True,
+                             padding=20)
         title_ctn = Container(self._screen, 'VERTICAL')
         title_ctn.add_content([{
             RenderText(self._screen, "Menu", font_size=40): '20%'},
