@@ -20,7 +20,7 @@ class Level:
 
     def is_inside(self, position: CellPosition) -> bool:
         x, y = position
-        return 0 <= x < self.maze.width and 0 <= y <= self.maze.height
+        return 0 <= x < self.maze.width and 0 <= y < self.maze.height
 
     def walls_at(self, position: CellPosition) -> Wall:
         x, y = position
@@ -33,8 +33,7 @@ def get_center_position(maze: GeneratedMaze) -> CellPosition:
     return (maze.width // 2, maze.height // 2)
 
 
-def get_corner_positions(
-                            maze: GeneratedMaze) -> tuple[CellPosition, ...]:
+def get_corner_positions(maze: GeneratedMaze) -> tuple[CellPosition, ...]:
     return (
         (maze.width - maze.width + 1, maze.height - maze.height + 1),
         (maze.width - maze.width + 1, maze.height - 1),
@@ -44,13 +43,12 @@ def get_corner_positions(
 
 
 def build_level(config: GameConfig, level_index: int) -> Level:
-    try:
-        level_config = config.levels[level_index]
-        maze = generate_maze(level_config)
-        center_pos = get_center_position(maze)
-        corner_pos = get_corner_positions(maze)
-    except (ValueError, IndexError) as error:
-        raise ValueError from error
+    if level_index < 0 or level_index >= len(config.levels):
+        raise ValueError(f"Level {level_index} not in config.")
+    level_config = config.levels[level_index]
+    maze = generate_maze(level_config)
+    center_pos = get_center_position(maze)
+    corner_pos = get_corner_positions(maze)
 
     return Level(
         number=level_index + 1,

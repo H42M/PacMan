@@ -39,11 +39,23 @@ def run(config: GameConfig) -> int:
             clock.tick(FPS)
 
     # error handling
-    except pygame.error as e:
-        print(e)
+    except pygame.error as error:
+        print()
+        print("Error:")
+        print(error)
+        print()
         return 1
     except MazeGenerationError as error:
+        print()
+        print("Error:")
         print(error)
+        print()
+        return 1
+    except ValueError as error:
+        print()
+        print("Error:")
+        print(error)
+        print()
         return 1
     finally:
         pygame.quit()
