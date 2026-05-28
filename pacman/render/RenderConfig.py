@@ -17,6 +17,34 @@ class RenderConfig:
     menu_opacity: int
 
     @classmethod
+    def load_pacman_frames(cls):
+        sheet_row = 14
+        sheet_col = 15
+        sheet_path = 'assets/sprites/pacman-spritesheet.png'
+
+        if os.path.isfile(sheet_path):
+            try:
+                sheet = pygame.image.load(sheet_path).convert_alpha()
+                w = sheet.get_width() // sheet_row
+                h = sheet.get_height() // sheet_col
+
+                pacman_sheets = {}
+                for i, dir in enumerate('ewns'):
+                    frames = [
+                        sheet.subsurface(pygame.Rect(0, i * h, w, h)),
+                        sheet.subsurface(pygame.Rect(w, i * h, w, h)),
+                    ]
+                    pacman_sheets[dir] = {
+                            'nb_frames': 2,
+                            'frames': frames
+                    }
+
+            except Exception as e:
+                raise LoadingError(f'Impossible to load {sheet_path}: {e}')
+        else:
+            raise LoadingError(f'File : {sheet_path} doesnt exist')
+
+    @classmethod
     def init(cls, screen_size: tuple[int, int],
              maze_size: tuple[int, int]) -> None:
 

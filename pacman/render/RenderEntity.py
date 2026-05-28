@@ -1,54 +1,81 @@
+import pygame
+from typing import Optional
+
 from pacman.render.RenderObj import RenderOBJ
 from pacman.render.Screen import Screen
+from pacman.render.Animator import Animator
 from pacman.entities.Character import Character
-
-from typing import Optional
-import pygame
 
 
 class RenderEntityError(Exception):
-
     pass
 
 
 class RenderEntity(RenderOBJ):
-    """Entity class.
-    Used to display entities like pacman or ghosts.
-    Can be rotated if needed.
-    Initial direction must be east"""
-    def __init__(self, screen: Screen,
-                 character: Character,
-                 ) -> None:
-        """Initialize Entity class."""
-        self.__saved_texture: Optional[pygame.Surface] = None
-        self.__current_rotation: str = 'E'
-        super().__init__(screen)
 
-    def set_skin(self, skin_texture: Optional[pygame.Surface]
-                 ) -> None:
-        """Set creature skin."""
-        if skin_texture:
-            self.__saved_texture = skin_texture
+    def __init__(self, screen: Screen, character: Character) -> None:
+        super().__init__(screen)
+        self.__static: Optional[pygame.Surface] = None
+        self.__animator: Optional[Animator] = None
+        self.__dir_animators: Optional[dict[str, Animator]] = None
+        self.__rotation: str = 'E'
+
+    # ------------------------------------------------------------------ setup
+
+    def set_skin(self, texture: Optional[pygame.Surface]) -> None:
+        if texture:
+            self.__static = texture
         else:
             raise RenderEntityError('No skin provided')
 
-    def set_rotation(self, rotation: str) -> None:
-        """Set creature rotation"""
-        if rotation.upper() not in ['N', 'S', 'E', 'W']:
-            raise ValueError(f'Invalid rotation provided: {rotation}')
-        self.__current_rotation = rotation.upper()
+    def set_animator(self, animator: Animator) -> None:
+        self.__animator = animator
+
+    def set_dir_animators(self, animators: dict[str, Animator]) -> None:
+        self.__dir_animators = animators
+
+    def set_rotation(self, direction: str) -> None:
+        d = direction.upper()
+        if d not in ('N', 'S', 'E', 'W'):
+            raise ValueError(f'Invalid rotation: {direction!r}')
+        self.__rotation = d
+
+    def set_progress(self, progress: float) -> None:
+        if self.__animator:
+            self.__animator.set_frame_by_progress(progress)
+
+    def tick_animator(self) -> None:
+        if self.__dir_animators:
+            anim = self.__dir_animators.get(self.__rotation)
+            if anim:
+                anim.tick()
 
     def render(self) -> None:
-        """Display the creature on screen based on his direction"""
-        if self.__saved_texture and self._pos and self._size:
-            angle_registry = {
-                'S': 270,
-                'E': 0,
-                'N': 90,
-                'W': 180
-            }
-            rotated = pygame.transform.rotate(
-                self.__saved_texture, angle_registry[self.__current_rotation])
+        if not (self._pos and self._size):
+            return
+
+        texture = self.__resolve_texture()
+        if texture is None:
+            return
+
+        if self.__dir_animators:
+            # Fantôme : frame déjà orientée, pas de rotation
+            scaled = pygame.transform.scale(texture, self._size)
+        else:
+            # Pacman (ou skin statique) : rotation selon direction
+            angles = {'E': 0, 'W': 180, 'N': 90, 'S': 270}
+            angle = angles.get(self.__rotation, 0)
+            rotated = pygame.transform.rotate(texture, angle)
             scaled = pygame.transform.scale(rotated, self._size)
-            pos_tuple = (int(self._pos[0]), int(self._pos[1]))
-            self._screen.screen.blit(scaled, pos_tuple)
+
+        self._screen.screen.blit(scaled, (int(self._pos[0]),
+                                          int(self._pos[1])))
+
+    def __resolve_texture(self) -> Optional[pygame.Surface]:
+        """Retourne la frame à afficher selon le mode actif."""
+        if self.__dir_animators:
+            anim = self.__dir_animators.get(self.__rotation)
+            return anim.current_frame if anim else None
+        if self.__animator:
+            return self.__animator.current_frame
+        return self.__static
