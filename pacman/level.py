@@ -1,9 +1,10 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 
-from pacman.config_loader import GameConfig
+from pacman.game_config import GameConfig
 from pacman.maze_adapter import generate_maze, GeneratedMaze
 from pacman.maze_adapter import CellPosition
+from pacman.maze_adapter import Wall
 
 
 @dataclass(frozen=True, slots=True)
@@ -16,6 +17,16 @@ class Level:
     player_spawn: CellPosition
     ghost_spawns: tuple[CellPosition, ...]
     super_pacgum_positions: tuple[CellPosition, ...]
+
+    def is_inside(self, position: CellPosition) -> bool:
+        x, y = position
+        return 0 <= x < self.maze.width and 0 <= y <= self.maze.height
+
+    def walls_at(self, position: CellPosition) -> Wall:
+        x, y = position
+        if not self.is_inside(position):
+            raise ValueError("Cell position is not inside maze.")
+        return self.maze.cells[y][x]
 
 
 def get_center_position(maze: GeneratedMaze) -> CellPosition:
