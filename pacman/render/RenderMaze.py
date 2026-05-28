@@ -1,13 +1,17 @@
-from pacman.render.Screen import Screen
-from pacman.render.RenderObj import RenderOBJ
-from pacman.game.Maze import Maze
+"""Maze renderer based on the internal GeneratedMaze model."""
+
 import pygame
+
+from pacman.maze_adapter import GeneratedMaze, Wall
+from pacman.render.RenderObj import RenderOBJ
+from pacman.render.Screen import Screen
 
 
 class RenderMaze(RenderOBJ):
-    """Convert maze from MazeGenerator to something displayable."""
-    def __init__(self, screen: Screen, maze: Maze) -> None:
-        """Initialize RenderMaze"""
+    """Render a generated maze on the pygame screen."""
+
+    def __init__(self, screen: Screen, maze: GeneratedMaze) -> None:
+        """Initialize the maze renderer."""
         self.__maze = maze
         self.__color = (255, 255, 255)
         self.__wall_thickness = 5
@@ -15,67 +19,82 @@ class RenderMaze(RenderOBJ):
         super().__init__(screen)
 
     def render(self) -> None:
-        """Display render on screen."""
-        if self.pos and self.size:
-            # print(f'Maze rendered: {self.size}, {self.pos}')
-            screen = self._screen.screen
-            cell_size = (self.size[0] // self.__maze.w,
-                         self.size[1] // self.__maze.h)
-            self.__cell_size = cell_size
-            w = cell_size[0]
-            h = cell_size[1]
-            # print(f'cell size: {cell_size}')
+        """Draw maze walls."""
+        if self.pos is None or self.size is None:
+            return
 
-            for y, row in enumerate(self.__maze.maze):
-                for x, cell in enumerate(row):
-                    cell_x = self.pos[0] + (x * cell_size[0])
-                    cell_y = self.pos[1] + (y * cell_size[1])
+        screen = self._screen.screen
+        cell_size = (
+            self.size[0] // self.__maze.width,
+            self.size[1] // self.__maze.height,
+        )
+        self.__cell_size = cell_size
+        cell_width, cell_height = cell_size
+        thickness = self.__wall_thickness
 
-                    t = self.__wall_thickness
-                    color = self.__color
-                    if cell.n:
-                        pygame.draw.rect(
-                            screen,
-                            color,
-                            (cell_x, cell_y, w, t)
-                        )
-                    if cell.s:
-                        pygame.draw.rect(
-                            screen,
-                            color,
-                            (cell_x, cell_y + h - t, w, t)
-                        )
-                    if cell.e:
-                        pygame.draw.rect(
-                            screen,
-                            color,
-                            (cell_x + w - t, cell_y, t, h)
-                        )
-                    if cell.w:
-                        pygame.draw.rect(
-                            screen,
-                            color,
-                            (cell_x, cell_y, t, h)
-                        )
+        for y, row in enumerate(self.__maze.cells):
+            for x, cell in enumerate(row):
+                cell_x = self.pos[0] + (x * cell_width)
+                cell_y = self.pos[1] + (y * cell_height)
 
-    def grid_to_screen(self, grid_pos: tuple[int, int],
-                       obj_size: tuple[int, int]) -> tuple[int, int]:
+                if cell & Wall.NORTH:
+                    pygame.draw.rect(
+                        screen,
+                        self.__color,
+                        (cell_x, cell_y, cell_width, thickness),
+                    )
+                if cell & Wall.SOUTH:
+                    pygame.draw.rect(
+                        screen,
+                        self.__color,
+                        (
+                            cell_x,
+                            cell_y + cell_height - thickness,
+                            cell_width,
+                            thickness,
+                        ),
+                    )
+                if cell & Wall.EAST:
+                    pygame.draw.rect(
+                        screen,
+                        self.__color,
+                        (
+                            cell_x + cell_width - thickness,
+                            cell_y,
+                            thickness,
+                            cell_height,
+                        ),
+                    )
+                if cell & Wall.WEST:
+                    pygame.draw.rect(
+                        screen,
+                        self.__color,
+                        (cell_x, cell_y, thickness, cell_height),
+                    )
 
-        if self.pos:
-            cell_w, cell_h = self.cell_size
-            x = (
-                self.pos[0]
-                + (grid_pos[0] * cell_w)
-                + ((cell_w - obj_size[0]) // 2)
-            )
-            y = (
-                self.pos[1]
-                + (grid_pos[1] * cell_h)
-                + ((cell_h - obj_size[1]) // 2)
-            )
-            return (x, y)
-        return (0, 0)
+    def grid_to_screen(
+        self,
+        grid_pos: tuple[int, int],
+        obj_size: tuple[int, int],
+    ) -> tuple[int, int]:
+        """Convert a maze cell position to a centered screen position."""
+        if self.pos is None:
+            return (0, 0)
+
+        cell_width, cell_height = self.cell_size
+        x = (
+            self.pos[0]
+            + (grid_pos[0] * cell_width)
+            + ((cell_width - obj_size[0]) // 2)
+        )
+        y = (
+            self.pos[1]
+            + (grid_pos[1] * cell_height)
+            + ((cell_height - obj_size[1]) // 2)
+        )
+        return (x, y)
 
     @property
     def cell_size(self) -> tuple[int, int]:
+        """Return the last computed cell size."""
         return self.__cell_size

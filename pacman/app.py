@@ -1,32 +1,46 @@
 """Main pygame application loop for Pac-Man."""
 
+import os
 import pygame
-from pacman.constants import WINDOW_HEIGHT, WINDOW_WIDTH
+from pacman.constants import FPS, WINDOW_HEIGHT, WINDOW_TITLE, WINDOW_WIDTH
 from pacman.game_config import GameConfig
-
-from pacman.states.base_state import StateManager
-from pacman.render.Screen import Screen
-from pacman.render.RenderConfig import RenderConfig
+from pacman.maze_adapter import generate_maze, MazeGenerationError
 
 
 def run(config: GameConfig) -> int:
-    # TODO: init gameloader with Gameconfig data
+    """Run the Pac-Man application."""
     print(f"Starting Pac-Man with config: {config}")
     try:
-        RenderConfig.init(screen_size=(WINDOW_WIDTH, WINDOW_HEIGHT),
-                          maze_size=(15, 15))
-        RenderConfig.load_asset('background',
-                                'assets/sprites/pacman_maze_bg.jpg')
+        # maze generation
+        generate_maze(config.levels[0])
 
-        screen = Screen()
-        screen.background = RenderConfig.assets['background']
-        manager = StateManager(screen, 'MENU')
+        # pygame initialization
+        os.environ["SDL_VIDEO_WINDOW_POS"] = "100,100"
+        pygame.init()
+        screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+        pygame.display.set_caption(WINDOW_TITLE)
+        clock = pygame.time.Clock()
+        is_running: bool = True
 
-        while manager.handle_events(pygame.event.get()):
-            manager.update()
-            manager.render()
+        # game loop
+        while is_running:
+            # events management
+            events = pygame.event.get()
+            for event in events:
+                if event.type == pygame.QUIT:
+                    is_running = False
+
+            # frame display
+            screen.fill("black")
+            pygame.display.flip()
+            clock.tick(FPS)
+
+    # error handling
     except pygame.error as e:
         print(e)
+        return 1
+    except MazeGenerationError as error:
+        print(error)
         return 1
     finally:
         pygame.quit()
