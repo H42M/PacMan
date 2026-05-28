@@ -2,9 +2,6 @@ VENV = .venv
 PYTHON = $(VENV)/bin/python3
 PIP = $(PYTHON) -m pip
 MAIN = pac-man.py
-MAIN_RENDER = render_main
-MAIN_STATES = states_main
-TEST_MODULE = tests
 CONFIG = config/config.json
 DEPENDENCIES = requirements.txt
 
@@ -19,17 +16,8 @@ install: $(PYTHON)
 
 run: $(PYTHON)
 	$(PYTHON) $(MAIN) $(CONFIG)
-	make clean
 
-run-render:
-	$(PYTHON) -m $(TEST_MODULE).$(MAIN_RENDER)
-	make clean
-
-run-states:
-	$(PYTHON) -m $(TEST_MODULE).$(MAIN_STATES)
-	make clean
-
-debug:$(PYTHON)
+debug: $(PYTHON)
 	$(PYTHON) -m pdb $(MAIN) $(CONFIG)
 
 clean:
