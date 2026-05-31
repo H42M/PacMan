@@ -8,6 +8,7 @@ from pacman.game_config import GameConfig
 from pacman.maze_adapter import MazeGenerationError
 from pacman.level import build_level
 from pacman.game_state import GameState
+from pacman.player import Direction
 
 
 def run(config: GameConfig) -> int:
@@ -20,6 +21,15 @@ def run(config: GameConfig) -> int:
         game = GameState.from_level(level)
         print()
         print(game)
+        print()
+        print(f"Player at {game.player.position}")
+        print(level.walls_at(game.player.position))
+        print("Trying to move up ...")
+        print(game.try_move(Direction.UP))
+        print(f"Player at {game.player.position}")
+        print("Trying to move left ...")
+        print(game.try_move(Direction.LEFT))
+        print(f"Player at {game.player.position}")
 
         # pygame initialization
         os.environ["SDL_VIDEO_WINDOW_POS"] = "100,100"
