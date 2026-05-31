@@ -8,7 +8,7 @@ from pacman.game_config import GameConfig
 from pacman.maze_adapter import MazeGenerationError
 from pacman.level import build_level
 from pacman.game_state import GameState
-from pacman.player import Direction
+from pacman.input import direction_from_key
 
 
 def run(config: GameConfig) -> int:
@@ -22,14 +22,6 @@ def run(config: GameConfig) -> int:
         print()
         print(game)
         print()
-        print(f"Player at {game.player.position}")
-        print(level.walls_at(game.player.position))
-        print("Trying to move up ...")
-        print(game.try_move(Direction.UP))
-        print(f"Player at {game.player.position}")
-        print("Trying to move left ...")
-        print(game.try_move(Direction.LEFT))
-        print(f"Player at {game.player.position}")
 
         # pygame initialization
         os.environ["SDL_VIDEO_WINDOW_POS"] = "100,100"
@@ -46,6 +38,16 @@ def run(config: GameConfig) -> int:
             for event in events:
                 if event.type == pygame.QUIT:
                     is_running = False
+                if event.type == pygame.KEYDOWN:
+                    key_pressed = event.key
+                    direction = direction_from_key(key_pressed)
+                    if direction:
+                        print(
+                            "Attempting to move "
+                            f"{direction.value}..."
+                        )
+                        print(f"Moved: {game.try_move(direction)}")
+                        print(f"Player at {game.player.position}")
 
             # frame display
             screen.fill("black")
