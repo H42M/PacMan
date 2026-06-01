@@ -17,5 +17,5 @@ class Ghost(Character):
         super().__init__(pos)
         self.__chase_algo = chase_algo_cls()
 
-    def move(self) -> None:
-        self.pos = self.__chase_algo.get_next_pos()
+    def move(self, player_pos: tuple[int, int]) -> None:
+        self.pos = self.__chase_algo.get_next_pos(player_pos)

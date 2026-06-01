@@ -6,5 +6,5 @@ class ChaseAI(ABC):
         pass
 
     @abstractmethod
-    def get_next_pos(self) -> tuple[int, int]:
+    def get_next_pos(self, player_pos: tuple[int, int]) -> tuple[int, int]:
         pass
