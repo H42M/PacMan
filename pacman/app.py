@@ -49,12 +49,7 @@ def run(config: GameConfig) -> int:
                     key_pressed = event.key
                     direction = direction_from_key(key_pressed)
                     if direction:
-                        print(
-                            "Attempting to move "
-                            f"{direction.value}..."
-                        )
-                        print(f"Moved: {game.try_move(direction)}")
-                        print(f"Player at {game.player.position}")
+                        game.try_move(direction)
 
             # frame display
             screen.clear()
