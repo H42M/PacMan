@@ -14,13 +14,6 @@ class AssetsError(Exception):
 
 
 class RenderWorld(RenderOBJ):
-
-    _PAC_FRAMES = [
-        (10,  11,  88,  121),   # bouche fermée
-        (139, 11,  236, 121),   # mi-ouverte
-        (267, 11,  372, 121),   # grande ouverte
-    ]
-
     _GHOST_FRAME_X = [5, 135, 263, 391, 519, 647, 775, 903]
     _GHOST_FRAME_W = 114
     _GHOST_DIR_ORDER = ['E', 'E', 'W', 'W', 'N', 'N', 'S', 'S']
@@ -52,7 +45,15 @@ class RenderWorld(RenderOBJ):
             raise AssetsError(f'Cannot load spritesheet: {e}')
 
     def __setup_player(self, sheet: SpriteSheet) -> RenderEntity:
-        frames = [sheet.crop_rect(r) for r in self._PAC_FRAMES]
+        # frames = [sheet.crop_rect(r) for r in self._PAC_FRAMES]
+        frames = []
+        for i in range(4):
+            w = sheet.size[0] // 14
+            h = sheet.size[1] // 15
+            x = i * w
+            y = 0
+            frames.append(sheet.crop_rect((x, y, w, h)))
+
         entity = RenderEntity(self._screen, self.__world.player)
         entity.set_animator(Animator(frames))
         return entity

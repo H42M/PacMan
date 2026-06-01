@@ -17,3 +17,7 @@ class SpriteSheet:
     def crop_rect(self, rect: tuple[int, int, int, int]) -> pygame.Surface:
         x, y, w, h = rect
         return self.crop(x, y, w, h)
+
+    @property
+    def size(self) -> tuple[int, int]:
+        return self.__sheet.get_size()
