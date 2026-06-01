@@ -13,8 +13,8 @@ class RenderMaze(RenderOBJ):
     def __init__(self, screen: Screen, maze: GeneratedMaze) -> None:
         """Initialize the maze renderer."""
         self.__maze = maze
-        self.__color = (255, 255, 255)
-        self.__wall_thickness = 5
+        self.__color = (30, 60, 220)
+        self.__wall_thickness = 4
         self.__cell_size: tuple[int, int] = (0, 0)
         super().__init__(screen)
 
