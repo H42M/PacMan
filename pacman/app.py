@@ -3,12 +3,16 @@
 import os
 import pygame
 
-from pacman.constants import FPS, WINDOW_HEIGHT, WINDOW_TITLE, WINDOW_WIDTH
+from pacman.constants import WINDOW_HEIGHT, WINDOW_TITLE, WINDOW_WIDTH
 from pacman.game_config import GameConfig
 from pacman.maze_adapter import MazeGenerationError
 from pacman.level import build_level
 from pacman.game_state import GameState
 from pacman.input import direction_from_key
+
+from pacman.render.RenderConfig import RenderConfig
+from pacman.render.RenderGameplay import RenderGameplay
+from pacman.render.Screen import Screen
 
 
 def run(config: GameConfig) -> int:
@@ -25,10 +29,13 @@ def run(config: GameConfig) -> int:
 
         # pygame initialization
         os.environ["SDL_VIDEO_WINDOW_POS"] = "100,100"
-        pygame.init()
-        screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+        RenderConfig.init(
+            (WINDOW_WIDTH, WINDOW_HEIGHT),
+            (game.level.maze.width, game.level.maze.height),
+        )
+        screen = Screen()
         pygame.display.set_caption(WINDOW_TITLE)
-        clock = pygame.time.Clock()
+        renderer = RenderGameplay(screen, game)
         is_running: bool = True
 
         # game loop
@@ -50,9 +57,9 @@ def run(config: GameConfig) -> int:
                         print(f"Player at {game.player.position}")
 
             # frame display
-            screen.fill("black")
-            pygame.display.flip()
-            clock.tick(FPS)
+            screen.clear()
+            renderer.render()
+            screen.flip()
 
     # error handling
     except pygame.error as error:
