@@ -8,6 +8,7 @@ class Character:
     def __init__(self, pos: tuple[int, int] = (0, 0)) -> None:
         self.__pos = pos
         self.__dir = self.NONE
+        self._dir_str = 'e'
 
     @property
     def pos(self) -> tuple[int, int]:
@@ -24,3 +25,11 @@ class Character:
     @dir.setter
     def dir(self, value: int) -> None:
         self.__dir = value
+
+    @property
+    def dir_str(self) -> str:
+        return self._dir_str
+
+    @dir_str.setter
+    def dir_str(self, value: str) -> None:
+        self._dir_str = value

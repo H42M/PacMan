@@ -59,10 +59,8 @@ class RenderEntity(RenderOBJ):
             return
 
         if self.__dir_animators:
-            # Fantôme : frame déjà orientée, pas de rotation
             scaled = pygame.transform.scale(texture, self._size)
         else:
-            # Pacman (ou skin statique) : rotation selon direction
             angles = {'E': 0, 'W': 180, 'N': 90, 'S': 270}
             angle = angles.get(self.__rotation, 0)
             rotated = pygame.transform.rotate(texture, angle)
@@ -72,7 +70,6 @@ class RenderEntity(RenderOBJ):
                                           int(self._pos[1])))
 
     def __resolve_texture(self) -> Optional[pygame.Surface]:
-        """Retourne la frame à afficher selon le mode actif."""
         if self.__dir_animators:
             anim = self.__dir_animators.get(self.__rotation)
             return anim.current_frame if anim else None

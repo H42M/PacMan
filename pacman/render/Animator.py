@@ -2,9 +2,12 @@ import pygame
 
 
 class Animator:
-    def __init__(self, frames: list[pygame.Surface]) -> None:
+    def __init__(self, frames: list[pygame.Surface], tick_rate: int = 1
+                 ) -> None:
         self.__frames = frames
         self.__index: int = 0
+        self.__tick_rate = tick_rate
+        self.__tick_count = 0
 
     def set_frame_by_progress(self, progress: float) -> None:
         n = len(self.__frames)
@@ -12,7 +15,10 @@ class Animator:
         self.__index = int(t * (n - 1))
 
     def tick(self, step: int = 1) -> None:
-        self.__index = (self.__index + step) % len(self.__frames)
+        if self.__tick_count >= self.__tick_rate:
+            self.__index = (self.__index + step) % len(self.__frames)
+        self.__tick_count = (self.__tick_count + 1) % self.__tick_rate + 1
+        print(self.__tick_count)
 
     @property
     def current_frame(self) -> pygame.Surface:

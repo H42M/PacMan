@@ -14,17 +14,6 @@ class AssetsError(Exception):
 
 
 class RenderWorld(RenderOBJ):
-    _GHOST_FRAME_X = [5, 135, 263, 391, 519, 647, 775, 903]
-    _GHOST_FRAME_W = 114
-    _GHOST_DIR_ORDER = ['E', 'E', 'W', 'W', 'N', 'N', 'S', 'S']
-
-    _GHOST_ROWS = {
-        'red':    (395, 504),
-        'pink':   (519, 632),
-        'cyan':   (647, 760),
-        'orange': (774, 896),
-    }
-
     def __init__(self, screen: Screen,
                  world: GameWorld,
                  pos: Optional[tuple[int, int]] = None,
@@ -35,6 +24,12 @@ class RenderWorld(RenderOBJ):
         self.__render_maze = RenderMaze(screen, world.maze)
 
         sheet = self.__load_sheet('assets/sprites/pacman-spritesheet.png')
+
+        self._SHEET_NB_SPRITES_H = 14
+        self._SHEET_NB_SPRITES_V = 15
+        self._SHEET_SPRITE_W = sheet.size[0] // self._SHEET_NB_SPRITES_H
+        self._SHEET_SPRITE_H = sheet.size[1] // self._SHEET_NB_SPRITES_V
+
         self.__render_player = self.__setup_player(sheet)
         self.__render_ghosts = self.__setup_ghosts(sheet)
 
@@ -48,8 +43,8 @@ class RenderWorld(RenderOBJ):
         # frames = [sheet.crop_rect(r) for r in self._PAC_FRAMES]
         frames = []
         for i in range(4):
-            w = sheet.size[0] // 14
-            h = sheet.size[1] // 15
+            w = self._SHEET_SPRITE_W
+            h = self._SHEET_SPRITE_H
             x = i * w
             y = 0
             frames.append(sheet.crop_rect((x, y, w, h)))
@@ -60,27 +55,24 @@ class RenderWorld(RenderOBJ):
 
     def __setup_ghosts(self, sheet: SpriteSheet) -> list[RenderEntity]:
         entities: list[RenderEntity] = []
-        ghost_colors = list(self._GHOST_ROWS.keys())
-
-        for i, ghost in enumerate(self.__world.ghosts):
-            # Associer une couleur selon l'index (cycle si plus de 4 fantômes)
-            color = ghost_colors[i % len(ghost_colors)]
-            gy0, gy1 = self._GHOST_ROWS[color]
-
-            # Grouper les frames par direction
-            dir_frames: dict[str, list] = {'E': [], 'W': [], 'N': [], 'S': []}
-            for j, gx in enumerate(self._GHOST_FRAME_X):
-                d = self._GHOST_DIR_ORDER[j]
-                dir_frames[d].append(
-                    sheet.crop_rect((gx, gy0, gx + self._GHOST_FRAME_W, gy1))
-                )
+        # Ghost loop
+        for ghost_i, ghost in enumerate(self.__world.ghosts):
+            # Direction loop
+            animators = {}
+            for dir_i, dir in enumerate('EWNS'):
+                frames = []
+                # Frame loop
+                for frame_i in range(2):
+                    w = self._SHEET_SPRITE_W
+                    h = self._SHEET_SPRITE_H
+                    x = (frame_i * w) + (dir_i * w * 2)
+                    y = h * (4 + ghost_i)
+                    frames.append(sheet.crop_rect((x, y, w, h)))
+                animators[dir] = Animator(frames, tick_rate=8)
 
             entity = RenderEntity(self._screen, ghost)
-            entity.set_dir_animators(
-                {d: Animator(frames) for d, frames in dir_frames.items()}
-            )
+            entity.set_dir_animators(animators)
             entities.append(entity)
-
         return entities
 
     # -------------------------------------------------------------- render
@@ -91,7 +83,7 @@ class RenderWorld(RenderOBJ):
 
         self.__render_maze.render()
         self.__render_player_func(entities_size)
-        # self.__render_ghosts_func(entities_size)
+        self.__render_ghosts_func(entities_size)
 
     def __render_player_func(self, size: tuple[int, int]) -> None:
         player = self.__world.player
@@ -109,13 +101,13 @@ class RenderWorld(RenderOBJ):
         self.__render_player.set_progress(prog)
         self.__render_player.render()
 
-    # def __render_ghosts_func(self, size: tuple[int, int]) -> None:
-    #     for ghost, entity in zip(self.__world.ghosts, self.__render_ghosts):
-    #         entity.size = size
-    #         entity.pos = self.__render_maze.grid_to_screen(ghost.pos, size)
-    #         entity.set_rotation(ghost.dir_str)
-    #         entity.tick_animator()
-    #         entity.render()
+    def __render_ghosts_func(self, size: tuple[int, int]) -> None:
+        for ghost, entity in zip(self.__world.ghosts, self.__render_ghosts):
+            entity.size = size
+            entity.pos = self.__render_maze.grid_to_screen(ghost.pos, size)
+            entity.set_rotation(ghost.dir_str)
+            entity.tick_animator()
+            entity.render()
 
     @property
     def size(self) -> Optional[tuple[int, int]]:
