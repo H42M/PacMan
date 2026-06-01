@@ -18,7 +18,6 @@ class Animator:
         if self.__tick_count >= self.__tick_rate:
             self.__index = (self.__index + step) % len(self.__frames)
         self.__tick_count = (self.__tick_count + 1) % self.__tick_rate + 1
-        print(self.__tick_count)
 
     @property
     def current_frame(self) -> pygame.Surface:

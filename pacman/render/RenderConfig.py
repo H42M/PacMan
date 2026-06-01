@@ -17,7 +17,7 @@ class RenderConfig:
     menu_opacity: int
 
     @classmethod
-    def load_pacman_frames(cls):
+    def load_pacman_frames(cls) -> None:
         sheet_row = 14
         sheet_col = 15
         sheet_path = 'assets/sprites/pacman-spritesheet.png'
