@@ -13,6 +13,7 @@ class AmbushChase(ChaseAI):
 
         self._chase_history.append(ghost_pos)
         av_dir = self._get_av_dir(ghost_pos, maze)
+        difficulty = 'HARD'
 
         px, py = player.pos
         d = player.dir_str.upper()
@@ -28,4 +29,11 @@ class AmbushChase(ChaseAI):
         else:
             target = player.pos
 
-        return self._get_best_dir(ghost_pos, target, av_dir)
+        if difficulty == 'EASY':
+            return self._get_best_dir(ghost_pos, target, av_dir)
+        else:
+            from pacman.game.ai.algo.A_Star import A_Star
+
+            astar = A_Star()
+            soluce = astar.solve(ghost_pos, target, maze)
+            return soluce[1] if len(soluce) > 1 else ghost_pos
