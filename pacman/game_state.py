@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from pacman.level import Level
 from pacman.player import PlayerState, Direction
 from pacman.maze_adapter import Wall, CellPosition
+from pacman.game_config import GameConfig
 
 
 @dataclass(slots=True)
@@ -13,9 +14,11 @@ class GameState:
     score: int
     pacgums: set[CellPosition] = field(repr=False)
     super_pacgums: set[CellPosition] = field(repr=False)
+    points_per_pacgum: int
+    points_per_super_pacgum: int
 
     @classmethod
-    def from_level(cls, level: Level) -> GameState:
+    def from_level(cls, config: GameConfig, level: Level) -> GameState:
         reserved_cells: set[CellPosition] = {level.player_spawn,
                                              *level.ghost_spawns,
                                              *level.super_pacgum_positions}
@@ -27,7 +30,9 @@ class GameState:
         }
         return cls(level=level, player=PlayerState(level.player_spawn),
                    score=0, pacgums=pacgums,
-                   super_pacgums=set(level.super_pacgum_positions))
+                   super_pacgums=set(level.super_pacgum_positions),
+                   points_per_pacgum=config.points_per_pacgum,
+                   points_per_super_pacgum=config.points_per_super_pacgum,)
 
     def try_move(self, direction: Direction) -> bool:
         if direction == Direction.UP:
@@ -62,5 +67,7 @@ class GameState:
             return
         if position in self.pacgums:
             self.pacgums.remove(position)
+            self.score += self.points_per_pacgum
         elif position in self.super_pacgums:
             self.super_pacgums.remove(position)
+            self.score += self.points_per_super_pacgum

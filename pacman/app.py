@@ -22,7 +22,7 @@ def run(config: GameConfig) -> int:
     try:
         # level building and maze generation
         level = build_level(config, 0)
-        game = GameState.from_level(level)
+        game = GameState.from_level(config, level)
         print()
         print(game)
         print()
@@ -50,6 +50,8 @@ def run(config: GameConfig) -> int:
                     direction = direction_from_key(key_pressed)
                     if direction:
                         game.try_move(direction)
+                        pygame.display.set_caption(
+                            f"Pac-Man - Score: {game.score}")
 
             # frame display
             screen.clear()
