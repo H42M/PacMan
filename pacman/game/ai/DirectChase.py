@@ -1,5 +1,6 @@
 from pacman.game.ai.ChaseAI import ChaseAI
 from pacman.game.Maze import Maze
+from pacman.entities.Player import Player
 
 
 class DirectChase(ChaseAI):
@@ -8,9 +9,10 @@ class DirectChase(ChaseAI):
         super().__init__()
 
     def get_next_pos(self, ghost_pos: tuple[int, int],
-                     player_pos: tuple[int, int], maze: Maze
+                     player: Player, maze: Maze
                      ) -> tuple[int, int]:
         self._chase_history.append(ghost_pos)
+        player_pos = player.pos
         if ghost_pos == player_pos:
             return ghost_pos
 

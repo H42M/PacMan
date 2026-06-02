@@ -71,7 +71,7 @@ class PlayState(GameState):
                         player.start_moving((nx, ny))
             # Ghost Move
             for ghost in self.__world.ghosts:
-                ghost.move(player.pos, self.__world.maze)
+                ghost.move(player, self.__world.maze)
 
     def __load_game_ctn(self) -> Container:
         game_win_ctn = Container(self._screen, 'VERTICAL',

@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABC
 from pacman.game.Maze import Maze
 from collections import deque
+from pacman.entities.Player import Player
 
 
 class ChaseAI(ABC):
@@ -9,6 +10,6 @@ class ChaseAI(ABC):
 
     @abstractmethod
     def get_next_pos(self, ghost_pos: tuple[int, int],
-                     player_pos: tuple[int, int], maze: Maze
+                     player: Player, maze: Maze
                      ) -> tuple[int, int]:
         pass
