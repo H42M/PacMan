@@ -1,6 +1,7 @@
 from pacman.game.ai.ChaseAI import ChaseAI
 from pacman.game.Maze import Maze
 from pacman.entities.Player import Player
+from pacman.game.ai.algo.A_Star import A_Star
 
 
 class DirectChase(ChaseAI):
@@ -15,8 +16,14 @@ class DirectChase(ChaseAI):
 
         if ghost_pos == player.pos:
             return ghost_pos
+        difficulty = 'HARD'
+        # difficulty = 'EASY'
 
-        av_dir = self._get_av_dir(ghost_pos, maze)
-        best_pos = self._get_best_dir(ghost_pos, player.pos, av_dir)
+        if difficulty == 'EASY':
+            av_dir = self._get_av_dir(ghost_pos, maze)
+            best_pos = self._get_best_dir(ghost_pos, player.pos, av_dir)
+        else:
+            astar = A_Star()
+            best_pos = astar.solve(ghost_pos, player.pos, maze)[1]
 
         return best_pos
