@@ -3,17 +3,24 @@ from dataclasses import dataclass
 
 from pacman.level import Level
 from pacman.player import PlayerState, Direction
-from pacman.maze_adapter import Wall
+from pacman.maze_adapter import Wall, CellPosition
 
 
 @dataclass(slots=True)
 class GameState:
     level: Level
     player: PlayerState
+    score: int
+    pacgums: set[CellPosition]
+    super_pacgums: set[CellPosition]
 
     @classmethod
     def from_level(cls, level: Level) -> GameState:
-        return cls(level=level, player=PlayerState(level.player_spawn))
+        reserved_cells = {level.player_spawn, *level.super_pacgum_positions}
+        pacgums = set(level.maze.cells) - reserved_cells
+        return cls(level=level, player=PlayerState(level.player_spawn),
+                   score=0, pacgums= pacgums,
+                   super_pacgums=set(level.super_pacgum_positions))
 
     def try_move(self, direction: Direction) -> bool:
         if direction == Direction.UP:
