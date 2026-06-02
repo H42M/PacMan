@@ -9,7 +9,7 @@ class GameWorld:
         self.__player = Player()
         self.__ghosts = [
             Ghost((13, 13)),
-            Ghost((12, 13))
+            Ghost((12, 13), Ghost.AMBUSH_CHASE)
         ]
 
     @property

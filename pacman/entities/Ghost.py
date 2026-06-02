@@ -1,6 +1,4 @@
 from pacman.entities.Character import Character
-from typing import TYPE_CHECKING
-
 from pacman.entities.Player import Player
 from pacman.game.Maze import Maze
 from pacman.game.ai import ChaseAI, VectorChase, AmbushChase, DirectChase, \
