@@ -54,7 +54,7 @@ class PlayState(GameState):
             maze = self.__world.maze
 
             player.tick()
-
+            # Player Move
             if player.dir != Player.NONE and not player.is_moving:
                 moves = {
                     Player.UP:    (0, -1, 'n'),
@@ -69,6 +69,9 @@ class PlayState(GameState):
                 if 0 <= nx < maze.w and 0 <= ny < maze.h:
                     if not maze.get_cell_wall(player.pos, wall):
                         player.start_moving((nx, ny))
+            # Ghost Move
+            for ghost in self.__world.ghosts:
+                ghost.move(player.pos, self.__world.maze)
 
     def __load_game_ctn(self) -> Container:
         game_win_ctn = Container(self._screen, 'VERTICAL',
