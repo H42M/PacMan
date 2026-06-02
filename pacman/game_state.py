@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from pacman.level import Level
 from pacman.player import PlayerState, Direction
@@ -11,15 +11,22 @@ class GameState:
     level: Level
     player: PlayerState
     score: int
-    pacgums: set[CellPosition]
-    super_pacgums: set[CellPosition]
+    pacgums: set[CellPosition] = field(repr=False)
+    super_pacgums: set[CellPosition] = field(repr=False)
 
     @classmethod
     def from_level(cls, level: Level) -> GameState:
-        reserved_cells = {level.player_spawn, *level.super_pacgum_positions}
-        pacgums = set(level.maze.cells) - reserved_cells
+        reserved_cells: set[CellPosition] = {level.player_spawn,
+                                             *level.ghost_spawns,
+                                             *level.super_pacgum_positions}
+        pacgums: set[CellPosition] = {
+            (x, y)
+            for y, row in enumerate(level.maze.cells)
+            for x in range(len(row))
+            if (x, y) not in reserved_cells
+        }
         return cls(level=level, player=PlayerState(level.player_spawn),
-                   score=0, pacgums= pacgums,
+                   score=0, pacgums=pacgums,
                    super_pacgums=set(level.super_pacgum_positions))
 
     def try_move(self, direction: Direction) -> bool:
@@ -45,6 +52,15 @@ class GameState:
         blocked = self.level.walls_at(self.player.position) & blocking_wall
         if (self.level.is_inside(new_position) and not blocked):
             self.player.position = new_position
+            self.collect_at(new_position)
             return True
         else:
             return False
+
+    def collect_at(self, position: CellPosition) -> None:
+        if not self.level.is_inside(position):
+            return
+        if position in self.pacgums:
+            self.pacgums.remove(position)
+        elif position in self.super_pacgums:
+            self.super_pacgums.remove(position)
