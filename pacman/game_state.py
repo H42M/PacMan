@@ -19,9 +19,12 @@ class GameState:
 
     @classmethod
     def from_level(cls, config: GameConfig, level: Level) -> GameState:
-        reserved_cells: set[CellPosition] = {level.player_spawn,
-                                             *level.ghost_spawns,
-                                             *level.super_pacgum_positions}
+        reserved_cells: set[CellPosition] = {
+            level.player_spawn,
+            *level.ghost_spawns,
+            *level.super_pacgum_positions,
+            *level.maze.solid_positions,
+        }
         pacgums: set[CellPosition] = {
             (x, y)
             for y, row in enumerate(level.maze.cells)
@@ -71,3 +74,6 @@ class GameState:
         elif position in self.super_pacgums:
             self.super_pacgums.remove(position)
             self.score += self.points_per_super_pacgum
+
+    def has_collected_all_pacgums(self) -> bool:
+        return not self.pacgums and not self.super_pacgums

@@ -7,6 +7,15 @@ from pacman.game_config import LevelConfig
 CellPosition: TypeAlias = tuple[int, int]
 
 
+FT_PATTERN: tuple[tuple[int, ...], ...] = (
+    (1, 0, 0, 0, 1, 1, 1),
+    (1, 0, 0, 0, 0, 0, 1),
+    (1, 1, 1, 0, 1, 1, 1),
+    (0, 0, 1, 0, 1, 0, 0),
+    (0, 0, 1, 0, 1, 1, 1),
+)
+
+
 class MazeGenerationError(Exception):
     """Raised when maze generation fails."""
 
@@ -30,6 +39,7 @@ class GeneratedMaze:
     cells: tuple[tuple[Wall, ...], ...]
     entry: CellPosition
     exit: CellPosition
+    solid_positions: tuple[CellPosition, ...]
 
 
 def translate_seed(seed: int | None) -> int:
@@ -60,9 +70,34 @@ def generate_maze(level: LevelConfig) -> GeneratedMaze:
     first_width = len(cells[0])
     if any(len(row) != first_width for row in cells):
         raise MazeGenerationError("Maze has inconsistent widths")
+    width = first_width
+    height = len(cells)
+    solid_positions = get_generator_solid_positions(width, height)
 
-    return GeneratedMaze(width=first_width,
-                         height=len(cells),
-                         cells=cells,
-                         entry=maze.maze_entry,
-                         exit=maze.maze_exit)
+    return GeneratedMaze(
+        width=width,
+        height=height,
+        cells=cells,
+        entry=maze.maze_entry,
+        exit=maze.maze_exit,
+        solid_positions=solid_positions,
+    )
+
+
+def get_generator_solid_positions(
+        width: int, height: int) -> tuple[CellPosition, ...]:
+    pattern_height = len(FT_PATTERN)
+    pattern_width = len(FT_PATTERN[0])
+
+    if pattern_height * 2 > height or pattern_width * 2 > width:
+        return ()
+
+    offset_y = (height - pattern_height) // 2
+    offset_x = (width - pattern_width) // 2
+
+    return tuple(
+        (offset_x + x, offset_y + y)
+        for y, row in enumerate(FT_PATTERN)
+        for x, value in enumerate(row)
+        if value == 1
+    )

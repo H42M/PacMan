@@ -37,6 +37,7 @@ def run(config: GameConfig) -> int:
         pygame.display.set_caption(WINDOW_TITLE)
         renderer = RenderGameplay(screen, game)
         is_running: bool = True
+        level_complete = False
 
         # game loop
         while is_running:
@@ -49,9 +50,11 @@ def run(config: GameConfig) -> int:
                     key_pressed = event.key
                     direction = direction_from_key(key_pressed)
                     if direction:
-                        game.try_move(direction)
-                        pygame.display.set_caption(
-                            f"Pac-Man - Score: {game.score}")
+                        moved = game.try_move(direction)
+                        if moved and not level_complete:
+                            if game.has_collected_all_pacgums():
+                                print("Congratulations, you won!")
+                                level_complete = True
 
             # frame display
             screen.clear()

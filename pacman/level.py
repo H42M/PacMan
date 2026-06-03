@@ -35,9 +35,9 @@ def get_center_position(maze: GeneratedMaze) -> CellPosition:
 
 def get_corner_positions(maze: GeneratedMaze) -> tuple[CellPosition, ...]:
     return (
-        (maze.width - maze.width + 1, maze.height - maze.height + 1),
-        (maze.width - maze.width + 1, maze.height - 1),
-        (maze.width - 1, maze.height - maze.height + 1),
+        (maze.width - maze.width, maze.height - maze.height),
+        (maze.width - maze.width, maze.height - 1),
+        (maze.width - 1, maze.height - maze.height),
         (maze.width - 1, maze.height - 1)
     )
 
