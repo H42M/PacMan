@@ -14,6 +14,7 @@ class RenderConfig:
     cell_size: tuple[int, int]
     wall_thickness: int
     assets: dict[str, pygame.Surface]
+    menu_opacity: int
 
     @classmethod
     def init(cls, screen_size: tuple[int, int],
@@ -26,6 +27,7 @@ class RenderConfig:
                          screen_size[1] // maze_size[1])
         cls.wall_thickness = 3
         cls.assets = {}
+        cls.menu_opacity = 200
 
     @classmethod
     def load_asset(cls, key: str, path: str) -> None:

@@ -1,0 +1,198 @@
+from typing import Optional
+
+import pygame
+from pygame.event import Event
+
+from pacman.game_state import GameState as GameplayState
+from pacman.input import direction_from_key
+from pacman.render.Container import Container
+from pacman.render.RenderConfig import RenderConfig
+from pacman.render.RenderGameplay import RenderGameplay
+from pacman.render.Screen import Screen
+from pacman.render.Window import Window
+from pacman.states.base_state import ScreenState, StateManager
+
+
+class PlayState(ScreenState):
+    """UI screen for gameplay.
+
+    This screen may observe Hugo's gameplay GameState, but it does not own
+    gameplay rules.
+    """
+
+    def __init__(
+        self,
+        screen: Screen,
+        state_manager: Optional[StateManager] = None,
+        game: Optional[GameplayState] = None
+    ) -> None:
+        super().__init__(screen, state_manager)
+        self.__game = game
+        self.__renderer = RenderGameplay(screen, game) if game else None
+        self.__placeholder_ctn = self.__load_placeholder()
+        self.__pause_menu = self.__load_pause_menu()
+
+    def handle_events(self, events: list[Event]) -> bool:
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.__pause_menu.switch_display()
+                    if self.__pause_menu.display:
+                        self.__pause_menu.resize()
+
+                elif not self.__pause_menu.display and self.__game:
+                    direction = direction_from_key(event.key)
+                    if direction:
+                        self.__game.try_move(direction)
+
+        return super().handle_events(events)
+
+    def update(self) -> None:
+        pass
+
+    def render(self) -> None:
+        self._screen.clear()
+
+        if self.__renderer:
+            self.__renderer.render()
+            self.__render_hud()
+        else:
+            self.__placeholder_ctn.render()
+
+        self.__pause_menu.render()
+        self._screen.flip()
+
+    def __render_hud(self) -> None:
+        if not self.__game:
+            return
+
+        font = pygame.font.Font(None, 28)
+        texts = [
+            f'Score: {self.__game.score}',
+            f'Level: {self.__game.level.number}',
+            'Lives: TODO',
+            'Time: TODO',
+        ]
+
+        x = 20
+        for text in texts:
+            surface = font.render(text, True, (255, 255, 255))
+            self._screen.screen.blit(surface, (x, 15))
+            x += surface.get_width() + 30
+
+    def __load_placeholder(self) -> Container:
+        from pacman.render.RenderText import RenderText
+
+        container = Container(
+            self._screen,
+            'VERTICAL',
+            size=RenderConfig.screen_size,
+            pos=(0, 0),
+            padding=120,
+            bg_color=(0, 0, 0)
+        )
+        container.add_content({
+            RenderText(
+                self._screen,
+                'PlayState preserved for future gameflow integration',
+                font_size=30
+            ): '0%'
+        })
+        return container
+
+    def __load_pause_menu(self) -> Window:
+        from pacman.render.Divider import Divider
+        from pacman.render.RenderText import RenderText
+        from pacman.render.interactives import Button, SelectButton
+
+        menu_size = 500
+        menu_pos = (
+            (RenderConfig.screen_size[0] - menu_size) // 2,
+            (RenderConfig.screen_size[1] - menu_size) // 2
+        )
+
+        window_menu = Window(
+            self._screen,
+            'VERTICAL',
+            menu_pos,
+            (menu_size, menu_size),
+            display_default=False,
+            padding=20
+        )
+
+        title_ctn = Container(self._screen, 'VERTICAL')
+        title_ctn.add_content([
+            {RenderText(self._screen, 'PAUSE', font_size=40): '20%'},
+            {Divider(self._screen): '1%'}
+        ])
+
+        normal_area_ctn = Container(self._screen, 'VERTICAL')
+        cheats_area_ctn = Container(
+            self._screen,
+            'VERTICAL',
+            display=False,
+            gap=10
+        )
+
+        def show_cheats_menu() -> None:
+            normal_area_ctn.display = False
+            cheats_area_ctn.display = True
+            window_menu.resize()
+
+        def resume_game() -> None:
+            window_menu.display = False
+
+        def return_to_menu() -> None:
+            if self._state_manager:
+                self._state_manager.set_state(StateManager.MENU)
+
+        normal_area_ctn.add_content([
+            {Button(self._screen, 'Resume', callback=resume_game): '30%'},
+            {Button(self._screen, 'Cheats Menu',
+                    callback=show_cheats_menu): '30%'},
+            {Button(self._screen, 'Return to Menu',
+                    callback=return_to_menu): '30%'},
+        ])
+
+        godmode_ctn = Container(self._screen, 'HORIZONTAL')
+        godmode_ctn.add_content([
+            {RenderText(self._screen, 'God mode'): '40%'},
+            {SelectButton(self._screen, ['Disabled', 'Enabled']): '40%'},
+        ])
+
+        noclip_ctn = Container(self._screen, 'HORIZONTAL')
+        noclip_ctn.add_content([
+            {RenderText(self._screen, 'No Clip'): '40%'},
+            {SelectButton(self._screen, ['Disabled', 'Enabled']): '40%'},
+        ])
+
+        frightened_ctn = Container(self._screen, 'HORIZONTAL')
+        frightened_ctn.add_content([
+            {RenderText(self._screen, 'Frightened Ghosts'): '40%'},
+            {SelectButton(self._screen, ['Disabled', 'Enabled']): '40%'},
+        ])
+
+        def show_normal_menu() -> None:
+            cheats_area_ctn.display = False
+            normal_area_ctn.display = True
+            window_menu.resize()
+
+        cheats_area_ctn.add_content([
+            {godmode_ctn: '0%'},
+            {noclip_ctn: '0%'},
+            {frightened_ctn: '0%'},
+            {Button(self._screen, 'Back', callback=show_normal_menu): '0%'},
+        ])
+
+        body_ctn = Container(self._screen, 'VERTICAL', padding=3, gap=10)
+        body_ctn.add_content([
+            {normal_area_ctn: '60%'},
+            {cheats_area_ctn: '60%'},
+        ])
+
+        window_menu.add_content([
+            {title_ctn: '30%'},
+            {body_ctn: '70%'},
+        ])
+
+        return window_menu
