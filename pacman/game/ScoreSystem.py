@@ -22,7 +22,8 @@ class ScoreSystem:
         self.__ghost_streak += 1
 
     def write_score(self, player_name: str) -> None:
-        json_path = 'data/scores.json'
+        # TODO: recupererer score path de config_loader
+        json_path = 'data/highscores.json'
         if os.path.isfile(json_path):
             with open(json_path, 'r') as f:
                 data = json.load(f)
