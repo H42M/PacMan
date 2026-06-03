@@ -3,6 +3,7 @@ from pacman.entities.Player import Player
 from pacman.game.Maze import Maze
 from pacman.game.ai import ChaseAI, VectorChase, AmbushChase, DirectChase, \
     ShyChase
+from typing import Optional
 
 
 class Ghost(Character):
@@ -13,12 +14,14 @@ class Ghost(Character):
 
     def __init__(
         self,
-        pos: tuple[int, int] = (0, 0),
-        chase_algo_cls: type["ChaseAI"] = DirectChase
+        pos: tuple[int, int],
+        chase_algo: "ChaseAI",
+        vector_ghost: Optional['Ghost'] = None
     ) -> None:
         super().__init__(pos)
-        self.__chase_algo = chase_algo_cls()
-        self.__move_speed = 20
+
+        self.__chase_algo = chase_algo
+        self.__move_speed = 30
         self.__move_count = 0
 
     def move(self, player: Player, maze: Maze) -> None:

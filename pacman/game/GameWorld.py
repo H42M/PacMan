@@ -1,16 +1,20 @@
 from pacman.game.Maze import Maze
 from pacman.entities.Player import Player
 from pacman.entities.Ghost import Ghost
+from pacman.game.ai import VectorChase, ShyChase, AmbushChase, DirectChase
 
 
 class GameWorld:
     def __init__(self) -> None:
         self.__maze = Maze((14, 14))
         self.__player = Player()
-        self.__ghosts = [
-            Ghost((13, 13)),
-            Ghost((12, 13), Ghost.AMBUSH_CHASE)
-        ]
+
+        blinky = Ghost((13, 13), DirectChase())
+        pinky = Ghost((12, 13), AmbushChase())
+        clyde = Ghost((11, 13), ShyChase())
+        inky = Ghost((10, 13), VectorChase(blinky))
+
+        self.__ghosts = [blinky, pinky, clyde, inky]
 
     @property
     def maze(self) -> Maze:
