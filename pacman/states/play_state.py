@@ -120,7 +120,7 @@ class PlayState(GameState):
             RenderText(self._screen, "Menu", font_size=40): '20%'},
             {Divider(self._screen): "1%"}])
 
-        def display_cheats_menu():
+        def display_cheats_menu() -> None:
             normal_area_ctn.display = False
             cheats_area_ctn.display = True
             window_menu.resize()
