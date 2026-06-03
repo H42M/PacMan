@@ -3,16 +3,20 @@
 import os
 import pygame
 
-from pacman.constants import WINDOW_HEIGHT, WINDOW_TITLE, WINDOW_WIDTH
+from pacman.constants import WINDOW_HEIGHT, WINDOW_WIDTH
 from pacman.game_config import GameConfig
 from pacman.maze_adapter import MazeGenerationError
 from pacman.level import build_level
 from pacman.game_state import GameState
-from pacman.input import direction_from_key
+
 
 from pacman.render.RenderConfig import RenderConfig
-from pacman.render.RenderGameplay import RenderGameplay
 from pacman.render.Screen import Screen
+
+from pacman.states.base_state import StateManager
+from pacman.states.menu_state import MenuState
+from pacman.states.play_state import PlayState
+from pacman.states.setting_state import SettingsState
 
 
 def run(config: GameConfig) -> int:
@@ -34,32 +38,37 @@ def run(config: GameConfig) -> int:
             (game.level.maze.width, game.level.maze.height),
         )
         screen = Screen()
-        pygame.display.set_caption(WINDOW_TITLE)
-        renderer = RenderGameplay(screen, game)
-        is_running: bool = True
-        level_complete = False
+        state_manager = StateManager(
+            screen,
+            StateManager.MENU,
+            {
+                StateManager.MENU: (
+                    lambda screen, manager: MenuState(screen, manager)
+                ),
+                StateManager.SETTINGS: (
+                    lambda screen, manager: SettingsState(screen, manager)
+                ),
+                StateManager.PLAYING: (
+                    lambda screen, manager: PlayState(screen, manager, game)
+                ),
+            }
+        )
 
         # game loop
+        is_running = True
         while is_running:
-            # events management
             events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.QUIT:
-                    is_running = False
-                if event.type == pygame.KEYDOWN:
-                    key_pressed = event.key
-                    direction = direction_from_key(key_pressed)
-                    if direction:
-                        moved = game.try_move(direction)
-                        if moved and not level_complete:
-                            if game.has_collected_all_pacgums():
-                                print("Congratulations, you won!")
-                                level_complete = True
 
-            # frame display
-            screen.clear()
-            renderer.render()
-            screen.flip()
+            try:
+                is_running = state_manager.handle_events(events)
+            except SystemExit:
+                is_running = False
+
+            if not is_running:
+                break
+
+            state_manager.update()
+            state_manager.render()
 
     # error handling
     except pygame.error as error:

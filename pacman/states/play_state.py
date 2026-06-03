@@ -34,6 +34,9 @@ class PlayState(ScreenState):
 
     def handle_events(self, events: list[Event]) -> bool:
         for event in events:
+            if event.type == pygame.QUIT:
+                return False
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.__pause_menu.switch_display()
@@ -43,9 +46,14 @@ class PlayState(ScreenState):
                 elif not self.__pause_menu.display and self.__game:
                     direction = direction_from_key(event.key)
                     if direction:
-                        self.__game.try_move(direction)
+                        moved = self.__game.try_move(direction)
+                        if moved and self.__game.has_collected_all_pacgums():
+                            print("Congratulations, you won!")
 
-        return super().handle_events(events)
+        if self.__pause_menu.display:
+            return super().handle_events(events)
+
+        return True
 
     def update(self) -> None:
         pass
