@@ -26,15 +26,15 @@ class VectorChase(ChaseAI):
         dx, dy = map_dir[player.dir_str.lower()]
 
         target1 = (
-            player.pos[0] + dx * 2,
-            player.pos[1] + dy * 2
+            player.pos[0] + (dx * 2),
+            player.pos[1] + (dy * 2)
         )
 
         bx, by = self.__vector_ghost.pos
 
         target = (
-            2 * target1[0] - bx,
-            2 * target1[1] - by
+            max(0, min(maze.w - 1, 2 * target1[0] - bx)),
+            max(0, min(maze.h - 1, 2 * target1[1] - by))
         )
 
         astar = A_Star()
