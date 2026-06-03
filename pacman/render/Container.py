@@ -17,10 +17,12 @@ class Container(RenderOBJ):
                  gap: int = 0,
                  padding: int = 0,
                  bg_color: Optional[Union[tuple[int, int, int],
-                                          tuple[int, int, int, int]]] = None
+                                          tuple[int, int, int, int]]] = None,
+                 display: bool = True
                  ) -> None:
         """Initialize Container class"""
         super().__init__(screen, pos, size)
+        self.__display = display
         self.__way = way
         self.__gap = gap
         self.__padding = padding
@@ -248,6 +250,14 @@ class Container(RenderOBJ):
     @padding_in_bg.setter
     def padding_in_bg(self, value: bool) -> None:
         self._gap_in_bg = value
+
+    @property
+    def display(self) -> bool:
+        return self.__display
+
+    @display.setter
+    def display(self, value: bool) -> None:
+        self.__display = value
 
 
 class ContainerError(Exception):

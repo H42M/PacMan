@@ -92,9 +92,9 @@ class SettingsState(GameState):
         # -- BUTTONS:
         btns_ctn = Container(self._screen, 'VERTICAL')
 
-        godmod_ctn = Container(self._screen, 'HORIZONTAL')
-        godmod_ctn.add_content([
-            {RenderText(self._screen, 'God mode: '): '50%'},
+        cheats_ctn = Container(self._screen, 'HORIZONTAL')
+        cheats_ctn.add_content([
+            {RenderText(self._screen, 'Cheat Menu: '): '50%'},
             {godmod_btn: '50%'},
         ])
 
@@ -110,7 +110,7 @@ class SettingsState(GameState):
             {screen_size_btn: '50%'},
         ])
         btns_ctn.add_content([
-                {godmod_ctn: '20%'},
+                {cheats_ctn: '20%'},
                 {difficulty_ctn: '20%'},
                 {win_size_ctn: '20%'}
             ])

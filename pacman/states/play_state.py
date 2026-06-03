@@ -106,7 +106,6 @@ class PlayState(GameState):
         from pacman.render.RenderText import RenderText
         from pacman.render.interactives.Button import Button
         from pacman.render.Divider import Divider
-        from pacman.render.interactives.Input import Input
 
         # WINDOW MENU
         menu_size = 500
@@ -123,19 +122,13 @@ class PlayState(GameState):
         # INPUT CONTAINER
         input_ctn = Container(self._screen, 'HORIZONTAL', )
         input_ctn.add_content([
-            {RenderText(self._screen, 'Player name'): '40%'},
-            {Input(self._screen, placeholder="Ex: player_1"): '60%'},
+            {Button(self._screen, 'Cheats Menu'
+                    ): '0%'}
             ])
 
         def on_quit() -> None:
             if self._state_manager:
                 self._state_manager.set_state('MENU')
-
-        save_quit_ctn = Container(self._screen, 'HORIZONTAL', gap=20)
-        save_quit_ctn.add_content([
-            {Button(self._screen, 'Save changes'): '0%'},
-            {Button(self._screen, 'Quit', callback=on_quit): '0%'},
-        ])
 
         sett_area_ctn = Container(self._screen, 'VERTICAL')
         sett_area_ctn.add_content([
@@ -143,6 +136,11 @@ class PlayState(GameState):
             {Button(self._screen, 'Restart'): '30%'}
             ])
 
+        save_quit_ctn = Container(self._screen, 'HORIZONTAL', gap=20)
+        save_quit_ctn.add_content([
+            {Button(self._screen, 'Save changes'): '0%'},
+            {Button(self._screen, 'Quit', callback=on_quit): '0%'},
+        ])
         # BTNS CONTAINER
         btn_ctn = Container(self._screen, 'VERTICAL', padding=3, gap=10)
         btn_ctn.add_content([
