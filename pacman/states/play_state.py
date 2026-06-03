@@ -105,6 +105,7 @@ class PlayState(GameState):
         from pacman.render.Window import Window
         from pacman.render.RenderText import RenderText
         from pacman.render.interactives.Button import Button
+        from pacman.render.interactives.SelectButton import SelectButton
         from pacman.render.Divider import Divider
 
         # WINDOW MENU
@@ -119,23 +120,46 @@ class PlayState(GameState):
             RenderText(self._screen, "Menu", font_size=40): '20%'},
             {Divider(self._screen): "1%"}])
 
-        # INPUT CONTAINER
-        input_ctn = Container(self._screen, 'HORIZONTAL', )
-        input_ctn.add_content([
-            {Button(self._screen, 'Cheats Menu'
-                    ): '0%'}
+        def display_cheats_menu():
+            normal_area_ctn.display = False
+            cheats_area_ctn.display = True
+            window_menu.resize()
+
+        # Normal CONTAINER
+        normal_area_ctn = Container(self._screen, 'VERTICAL')
+        normal_area_ctn.add_content([
+            {Button(self._screen, 'Cheats Menu',
+                    callback=display_cheats_menu): '30%'},
+            {Button(self._screen, 'Restart'): '30%'}
             ])
+
+        # Cheats CONTAINER
+        god_input_ctn = Container(self._screen, 'HORIZONTAL')
+        god_input_ctn.add_content([
+            {RenderText(self._screen, 'God mod'): '40%'},
+            {SelectButton(self._screen, ['Enabled', 'Disabled']): '40%'}
+        ])
+        noclip_ctn = Container(self._screen, 'HORIZONTAL')
+        noclip_ctn.add_content([
+            {RenderText(self._screen, 'No Clip'): '40%'},
+            {SelectButton(self._screen, ['Enabled', 'Disabled']): '40%'}
+        ])
+        frightened_ctn = Container(self._screen, 'HORIZONTAL')
+        frightened_ctn.add_content([
+            {RenderText(self._screen, 'Frightened Ghosts'): '40%'},
+            {SelectButton(self._screen, ['Enabled', 'Disabled']): '40%'}
+        ])
+        cheats_area_ctn = Container(self._screen, 'VERTICAL', display=False,
+                                    gap=10)
+        cheats_area_ctn.add_content([
+            {god_input_ctn: '0%'},
+            {noclip_ctn: '0%'},
+            {frightened_ctn: '0%'},
+        ])
 
         def on_quit() -> None:
             if self._state_manager:
                 self._state_manager.set_state('MENU')
-
-        sett_area_ctn = Container(self._screen, 'VERTICAL')
-        sett_area_ctn.add_content([
-            {input_ctn: '30%'},
-            {Button(self._screen, 'Restart'): '30%'}
-            ])
-
         save_quit_ctn = Container(self._screen, 'HORIZONTAL', gap=20)
         save_quit_ctn.add_content([
             {Button(self._screen, 'Save changes'): '0%'},
@@ -144,7 +168,8 @@ class PlayState(GameState):
         # BTNS CONTAINER
         btn_ctn = Container(self._screen, 'VERTICAL', padding=3, gap=10)
         btn_ctn.add_content([
-            {sett_area_ctn: '60%'},
+            {normal_area_ctn: '60%'},
+            {cheats_area_ctn: '60%'},
             {Divider(self._screen): '1%'},
             {save_quit_ctn: '30%'}
             ])
