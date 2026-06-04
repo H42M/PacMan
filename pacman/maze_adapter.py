@@ -41,6 +41,25 @@ class GeneratedMaze:
     exit: CellPosition
     solid_positions: tuple[CellPosition, ...]
 
+    def get_cell_wall(self, cell: tuple[int, int], direction: str) -> bool:
+        x, y = cell
+        wall = self.cells[y][x]
+
+        dir_map = {
+            'N': Wall.NORTH,
+            'E': Wall.EAST,
+            'S': Wall.SOUTH,
+            'W': Wall.WEST,
+        }
+
+        try:
+            return bool(wall & dir_map[direction.upper()])
+        except KeyError:
+            raise ValueError(
+                f"Invalid direction '{direction}'. "
+                "Expected N, E, S or W."
+            )
+
 
 def translate_seed(seed: int | None) -> int:
     """Convert PacMan seed values to the assigned package seed convention."""
