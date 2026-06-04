@@ -21,6 +21,7 @@ class RenderGameplay:
     def render(self) -> None:
         self.maze_renderer.render()
         self._render_pacgums()
+        self._render_ghosts()
         self._render_player()
 
     def _render_player(self) -> None:
@@ -33,6 +34,22 @@ class RenderGameplay:
                      self.game.player.position,
                      (player_size, player_size),)
         self.screen.screen.blit(player_surface, player_pos)
+
+    def _render_ghosts(self) -> None:
+        surface = self.screen.screen
+        cell_width, cell_height = self.maze_renderer.cell_size
+        ghost_size = min(cell_width, cell_height) - 8
+
+        for ghost in self.game.ghosts:
+            ghost_pos = self.maze_renderer.grid_to_screen(
+                ghost.position,
+                (ghost_size, ghost_size),
+            )
+            center = (
+                ghost_pos[0] + ghost_size // 2,
+                ghost_pos[1] + ghost_size // 2,
+            )
+            pygame.draw.circle(surface, ghost.color, center, ghost_size // 2)
 
     def _render_pacgums(self) -> None:
         surface = self.screen.screen
