@@ -5,6 +5,7 @@ from pacman.level import Level
 from pacman.player import PlayerState, Direction
 from pacman.maze_adapter import Wall, CellPosition
 from pacman.game_config import GameConfig
+from pacman.ghost import GhostState
 
 
 @dataclass(slots=True)
@@ -16,6 +17,8 @@ class GameState:
     super_pacgums: set[CellPosition] = field(repr=False)
     points_per_pacgum: int
     points_per_super_pacgum: int
+
+    ghosts: list[GhostState]
 
     @classmethod
     def from_level(cls, config: GameConfig, level: Level) -> GameState:
@@ -31,11 +34,26 @@ class GameState:
             for x in range(len(row))
             if (x, y) not in reserved_cells
         }
+
+        ghost_names: list[str] = ["Blinky", "Pinky", "Inky", "Clyde"]
+        ghost_positions = level.ghost_spawns
+        ghost_colors = [
+            (255, 0, 0),      # Blinky - red
+            (255, 184, 255),  # Pinky - pink
+            (0, 255, 255),    # Inky - cyan
+            (255, 184, 82),   # Clyde - orange
+        ]
+        ghosts = [
+            GhostState(name, position, position, color)
+            for name, position, color
+            in zip(ghost_names, ghost_positions, ghost_colors, strict=True)
+        ]
         return cls(level=level, player=PlayerState(level.player_spawn),
                    score=0, pacgums=pacgums,
                    super_pacgums=set(level.super_pacgum_positions),
                    points_per_pacgum=config.points_per_pacgum,
-                   points_per_super_pacgum=config.points_per_super_pacgum,)
+                   points_per_super_pacgum=config.points_per_super_pacgum,
+                   ghosts=ghosts)
 
     def try_move(self, direction: Direction) -> bool:
         if direction == Direction.UP:
