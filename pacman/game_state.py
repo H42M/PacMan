@@ -55,7 +55,11 @@ class GameState:
                    points_per_super_pacgum=config.points_per_super_pacgum,
                    ghosts=ghosts)
 
-    def try_move(self, direction: Direction) -> bool:
+    def _get_target_position(
+        self,
+        position: CellPosition,
+        direction: Direction,
+    ) -> CellPosition | None:
         if direction == Direction.UP:
             movement = (0, -1)
             blocking_wall = Wall.NORTH
@@ -71,17 +75,44 @@ class GameState:
         else:
             raise ValueError("Direction is incorrect.")
 
-        x, y = self.player.position
+        x, y = position
         dx, dy = movement
-        new_position = (x + dx, y + dy)
+        target = (x + dx, y + dy)
 
-        blocked = self.level.walls_at(self.player.position) & blocking_wall
-        if (self.level.is_inside(new_position) and not blocked):
-            self.player.position = new_position
-            self.collect_at(new_position)
-            return True
+        if target in self.level.maze.solid_positions:
+            return None
+        blocked = self.level.walls_at(position) & blocking_wall
+        if self.level.is_inside(target) and not blocked:
+            return target
         else:
+            return None
+
+    def try_move(self, direction: Direction) -> bool:
+        target = self._get_target_position(self.player.position, direction)
+        if target is None:
             return False
+        self.player.position = target
+        self.collect_at(target)
+        return True
+
+    def move_ghosts(self) -> None:
+        for ghost in self.ghosts:
+            best_target: CellPosition | None = None
+            best_direction: Direction | None = None
+            best_distance: int | None = None
+            for direction in Direction:
+                target = self._get_target_position(ghost.position, direction)
+                if target is not None:
+                    dx = target[0] - self.player.position[0]
+                    dy = target[1] - self.player.position[1]
+                    distance = dx * dx + dy * dy
+                    if best_distance is None or distance < best_distance:
+                        best_distance = distance
+                        best_direction = direction
+                        best_target = target
+            if best_target is not None:
+                ghost.direction = best_direction
+                ghost.position = best_target
 
     def collect_at(self, position: CellPosition) -> None:
         if not self.level.is_inside(position):

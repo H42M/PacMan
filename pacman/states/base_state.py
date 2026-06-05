@@ -20,11 +20,7 @@ class KeyboardInput(Protocol):
 
 
 class ScreenState(ABC):
-    """Base class for UI/application screens.
-
-    This is intentionally not named GameState because Hugo's
-    pacman.game_state.GameState owns actual gameplay state.
-    """
+    """Base class for UI/application screens."""
 
     def __init__(
         self,

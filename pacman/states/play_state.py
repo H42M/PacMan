@@ -14,11 +14,7 @@ from pacman.states.base_state import ScreenState, StateManager
 
 
 class PlayState(ScreenState):
-    """UI screen for gameplay.
-
-    This screen may observe Hugo's gameplay GameState, but it does not own
-    gameplay rules.
-    """
+    """UI screen for gameplay."""
 
     def __init__(
         self,
@@ -31,6 +27,8 @@ class PlayState(ScreenState):
         self.__renderer = RenderGameplay(screen, game) if game else None
         self.__placeholder_ctn = self.__load_placeholder()
         self.__pause_menu = self.__load_pause_menu()
+        self.__last_ghost_move_ms = pygame.time.get_ticks()
+        self.__ghost_move_delay_ms = 500
 
     def handle_events(self, events: list[Event]) -> bool:
         for event in events:
@@ -56,7 +54,17 @@ class PlayState(ScreenState):
         return True
 
     def update(self) -> None:
-        pass
+        if self.__game is None:
+            return
+        if self.__pause_menu.display:
+            return
+
+        now = pygame.time.get_ticks()
+        elapsed = now - self.__last_ghost_move_ms
+
+        if elapsed >= self.__ghost_move_delay_ms:
+            self.__game.move_ghosts()
+            self.__last_ghost_move_ms = now
 
     def render(self) -> None:
         self._screen.clear()
