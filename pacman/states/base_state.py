@@ -81,6 +81,7 @@ class StateManager:
     MENU = 'MENU'
     SETTINGS = 'SETTINGS'
     PLAYING = 'PLAYING'
+    GAMEOVER = 'GAMEOVER'
 
     def __init__(
         self,
