@@ -17,7 +17,6 @@ class GameState:
     super_pacgums: set[CellPosition] = field(repr=False)
     points_per_pacgum: int
     points_per_super_pacgum: int
-
     ghosts: list[GhostState]
 
     @classmethod
