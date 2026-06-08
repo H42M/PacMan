@@ -98,7 +98,7 @@ class PlayState(ScreenState):
         texts = [
             f'Score: {self.__game.score}',
             f'Level: {self.__game.level.number}',
-            'Lives: TODO',
+            f'Lives: {self.__game.lives}',
             'Time: TODO',
         ]
 

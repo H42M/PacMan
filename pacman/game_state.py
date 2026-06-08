@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from enum import Enum
 
 from pacman.level import Level
 from pacman.player import PlayerState, Direction
@@ -8,9 +9,17 @@ from pacman.game_config import GameConfig
 from pacman.ghost import GhostState
 
 
+class GameOutcome(str, Enum):
+    PLAYING = "PLAYING"
+    LEVEL_CLEARED = "LEVEL_CLEARED"
+    GAME_OVER = "GAME_OVER"
+
+
 @dataclass(slots=True)
 class GameState:
     level: Level
+    lives: int
+    outcome: GameOutcome
     player: PlayerState
     score: int
     pacgums: set[CellPosition] = field(repr=False)
@@ -47,7 +56,10 @@ class GameState:
             for name, position, color
             in zip(ghost_names, ghost_positions, ghost_colors, strict=True)
         ]
-        return cls(level=level, player=PlayerState(level.player_spawn),
+        return cls(level=level,
+                   lives=config.lives,
+                   outcome=GameOutcome.PLAYING,
+                   player=PlayerState(level.player_spawn),
                    score=0, pacgums=pacgums,
                    super_pacgums=set(level.super_pacgum_positions),
                    points_per_pacgum=config.points_per_pacgum,
