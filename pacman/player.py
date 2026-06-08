@@ -14,3 +14,5 @@ class Direction(str, Enum):
 @dataclass(slots=True)
 class PlayerState:
     position: CellPosition
+    current_direction: Direction | None = None
+    queued_direction: Direction | None = None
