@@ -31,7 +31,7 @@ class GameOverState(ScreenState):
 
         def save():
             self.__player_name = input_name.value
-            print(self.__player_name)
+
         input_name_ctn = Container(self._screen, 'HORIZONTAL')
         input_name = Input(self._screen, 'ex: player_2',
                            base_color=RenderConfig.RED,
