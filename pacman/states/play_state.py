@@ -3,7 +3,7 @@ from typing import Optional
 import pygame
 from pygame.event import Event
 
-from pacman.game_state import GameState as GameplayState
+from pacman.game_state import GameState as GameplayState, GameOutcome
 from pacman.input import direction_from_key
 from pacman.render.Container import Container
 from pacman.render.RenderConfig import RenderConfig
@@ -28,24 +28,27 @@ class PlayState(ScreenState):
         self.__placeholder_ctn = self.__load_placeholder()
         self.__pause_menu = self.__load_pause_menu()
         self.__last_player_move_ms = pygame.time.get_ticks()
-        self.__player_move_delay_ms = 150
+        self.__player_move_delay_ms = 200
         self.__last_ghost_move_ms = pygame.time.get_ticks()
         self.__ghost_move_delay_ms = 500
-        self.__game_over = False
 
     def handle_events(self, events: list[Event]) -> bool:
-
         for event in events:
             if event.type == pygame.QUIT:
                 return False
 
             if event.type == pygame.KEYDOWN:
+                if (event.key == pygame.K_F1 and self.__game
+                        and self.__game.outcome is GameOutcome.PLAYING):
+                    self.__game.debug_collect_all_pacgums()
+
                 if event.key == pygame.K_ESCAPE:
                     self.__pause_menu.switch_display()
                     if self.__pause_menu.display:
                         self.__pause_menu.resize()
 
-                elif not self.__pause_menu.display and self.__game:
+                elif (not self.__pause_menu.display and self.__game and
+                        self.__game.outcome is GameOutcome.PLAYING):
                     direction = direction_from_key(event.key)
                     if direction:
                         self.__game.queue_player_direction(direction)
@@ -60,23 +63,36 @@ class PlayState(ScreenState):
             return
         if self.__pause_menu.display:
             return
+        if self.__game.outcome is not GameOutcome.PLAYING:
+            return
 
         now = pygame.time.get_ticks()
         player_elapsed = now - self.__last_player_move_ms
         ghost_elapsed = now - self.__last_ghost_move_ms
 
         if player_elapsed >= self.__player_move_delay_ms:
+            lives_before = self.__game.lives
+
             self.__game.advance_player()
+            self.__game.handle_player_ghost_collision()
             self.__last_player_move_ms = now
-            if (
-                not self.__game_over and
-                self.__game.has_collected_all_pacgums()
-            ):
+
+            if self.__game.outcome is not GameOutcome.PLAYING:
+                return
+            if self.__game.lives < lives_before:
+                self.__last_ghost_move_ms = now
+                return
+            if self.__game.has_collected_all_pacgums():
                 print("Congratulations, you won!")
-                self.__game_over = True
+                self.__game.outcome = GameOutcome.LEVEL_CLEARED
+                return
+
         if ghost_elapsed >= self.__ghost_move_delay_ms:
             self.__game.move_ghosts()
+            self.__game.handle_player_ghost_collision()
             self.__last_ghost_move_ms = now
+            if self.__game.outcome is not GameOutcome.PLAYING:
+                return
 
     def render(self) -> None:
         self._screen.clear()

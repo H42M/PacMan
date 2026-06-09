@@ -119,6 +119,16 @@ class GameState:
                 self.player.position = target
                 self.collect_at(target)
 
+    def collect_at(self, position: CellPosition) -> None:
+        if not self.level.is_inside(position):
+            return
+        if position in self.pacgums:
+            self.pacgums.remove(position)
+            self.score += self.points_per_pacgum
+        elif position in self.super_pacgums:
+            self.super_pacgums.remove(position)
+            self.score += self.points_per_super_pacgum
+
     def move_ghosts(self) -> None:
         for ghost in self.ghosts:
             best_target: CellPosition | None = None
@@ -138,15 +148,29 @@ class GameState:
                 ghost.direction = best_direction
                 ghost.position = best_target
 
-    def collect_at(self, position: CellPosition) -> None:
-        if not self.level.is_inside(position):
+    def respawn_entities(self) -> None:
+        self.player.position = self.level.player_spawn
+        self.player.current_direction = None
+        self.player.queued_direction = None
+
+        for ghost in self.ghosts:
+            ghost.position = ghost.spawn_position
+            ghost.direction = None
+
+    def handle_player_ghost_collision(self) -> None:
+        if self.outcome is not GameOutcome.PLAYING:
             return
-        if position in self.pacgums:
-            self.pacgums.remove(position)
-            self.score += self.points_per_pacgum
-        elif position in self.super_pacgums:
-            self.super_pacgums.remove(position)
-            self.score += self.points_per_super_pacgum
+        if any(self.player.position == ghost.position
+               for ghost in self.ghosts):
+            self.lives -= 1
+            if self.lives <= 0:
+                self.outcome = GameOutcome.GAME_OVER
+            else:
+                self.respawn_entities()
 
     def has_collected_all_pacgums(self) -> bool:
         return not self.pacgums and not self.super_pacgums
+
+    def debug_collect_all_pacgums(self) -> None:
+        self.pacgums.clear()
+        self.super_pacgums.clear()
