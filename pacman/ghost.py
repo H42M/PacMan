@@ -8,6 +8,8 @@ from pacman.player import Direction
 
 class GhostMode(str, Enum):
     NORMAL = "NORMAL"
+    FRIGHTENED = "FRIGHTENED"
+    DEAD = "DEAD"
 
 
 GhostColor: TypeAlias = tuple[int, int, int]
@@ -21,3 +23,4 @@ class GhostState:
     color: GhostColor
     mode: GhostMode = GhostMode.NORMAL
     direction: Direction | None = None
+    respawn_timer: int = 0
