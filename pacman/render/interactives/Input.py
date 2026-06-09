@@ -78,3 +78,10 @@ class Input(Button):
     @focus_color.setter
     def focus_color(self, value: tuple[int, int, int]) -> None:
         self.__focus_color = value
+
+    @property
+    def value(self) -> str:
+        return self.__value
+
+    def get_value(self) -> str:
+        return self.__value

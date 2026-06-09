@@ -32,3 +32,7 @@ class ToggleButton(Button):
         else:
             self._color = self.__color_off
         super().render()
+
+    def execute(self) -> None:
+        if self._color == self.__color_on:
+            return super().execute()
