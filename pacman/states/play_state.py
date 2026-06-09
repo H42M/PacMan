@@ -31,6 +31,8 @@ class PlayState(ScreenState):
         self.__player_move_delay_ms = 200
         self.__last_ghost_move_ms = pygame.time.get_ticks()
         self.__ghost_move_delay_ms = 500
+        self.__last_timer_tick_ms = pygame.time.get_ticks()
+        self.__countdown_timer_delay_ms = 1000
 
     def handle_events(self, events: list[Event]) -> bool:
         for event in events:
@@ -67,8 +69,13 @@ class PlayState(ScreenState):
             return
 
         now = pygame.time.get_ticks()
+        level_timer_elapsed = now - self.__last_timer_tick_ms
         player_elapsed = now - self.__last_player_move_ms
         ghost_elapsed = now - self.__last_ghost_move_ms
+
+        if level_timer_elapsed >= self.__countdown_timer_delay_ms:
+            self.__game.timer_tick()
+            self.__last_timer_tick_ms = now
 
         if player_elapsed >= self.__player_move_delay_ms:
             lives_before = self.__game.lives
@@ -115,7 +122,7 @@ class PlayState(ScreenState):
             f'Score: {self.__game.score}',
             f'Level: {self.__game.level.number}',
             f'Lives: {self.__game.lives}',
-            'Time: TODO',
+            f'Time: {self.__game.remaining_time}',
         ]
 
         x = 20

@@ -19,6 +19,7 @@ class GameOutcome(str, Enum):
 class GameState:
     level: Level
     lives: int
+    remaining_time: int
     outcome: GameOutcome
     player: PlayerState
     score: int
@@ -58,6 +59,7 @@ class GameState:
         ]
         return cls(level=level,
                    lives=config.lives,
+                   remaining_time=level.max_time,
                    outcome=GameOutcome.PLAYING,
                    player=PlayerState(level.player_spawn),
                    score=0, pacgums=pacgums,
@@ -65,6 +67,13 @@ class GameState:
                    points_per_pacgum=config.points_per_pacgum,
                    points_per_super_pacgum=config.points_per_super_pacgum,
                    ghosts=ghosts)
+
+    def timer_tick(self) -> None:
+        if self.outcome is GameOutcome.PLAYING:
+            self.remaining_time -= 1
+            if self.remaining_time <= 0:
+                self.remaining_time = 0
+                self.outcome = GameOutcome.GAME_OVER
 
     def _get_target_position(
         self,
