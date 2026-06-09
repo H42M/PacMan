@@ -25,18 +25,19 @@ def run(config: GameConfig) -> int:
     print(f"Starting Pac-Man with config: {config}")
     try:
         # level building and maze generation
-        level = build_level(config, 0)
-        game = GameState.from_level(config, level)
-        print()
-        print(game)
-        print()
+        def create_play_state(screen: Screen,
+                              manager: StateManager) -> PlayState:
+            level = build_level(config, 0)
+            game = GameState.from_level(config, level)
+            return PlayState(screen, manager, game)
 
         # pygame initialization
         os.environ["SDL_VIDEO_WINDOW_POS"] = "100,100"
         RenderConfig.init(
             (WINDOW_WIDTH, WINDOW_HEIGHT),
-            (game.level.maze.width, game.level.maze.height),
-        )
+            (config.levels[0].width, config.levels[0].height),
+        )  # TODO: revisit when levels can use different maze dimensions.
+
         screen = Screen()
         state_manager = StateManager(
             screen,
@@ -49,7 +50,7 @@ def run(config: GameConfig) -> int:
                     lambda screen, manager: SettingsState(screen, manager)
                 ),
                 StateManager.PLAYING: (
-                    lambda screen, manager: PlayState(screen, manager, game)
+                    lambda screen, manager: create_play_state(screen, manager)
                 ),
             }
         )
