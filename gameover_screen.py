@@ -62,7 +62,6 @@ if __name__ == '__main__':
         is_running = True
         while is_running:
             events = pygame.event.get()
-
             try:
                 is_running = state_manager.handle_events(events)
             except SystemExit:
@@ -75,5 +74,5 @@ if __name__ == '__main__':
             state_manager.render()
 
     # error handling
-    except Exception:
-        pass
+    except Exception as e:
+        print(f'Error: {e}')

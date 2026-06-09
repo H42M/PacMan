@@ -21,14 +21,42 @@ class GameOverState(ScreenState):
         from pacman.render.RenderConfig import RenderConfig
         from pacman.render.Container import Container
         from pacman.render.RenderText import RenderText
+        from pacman.render.interactives import Input
+        from pacman.render.interactives import Button
 
-        game_over_ctn = Container(self._screen, 'VERTICAL',
-                                  size=RenderConfig.screen_size)
-        game_over_ctn.add_content(
+        input_name_ctn = Container(self._screen, 'HORIZONTAL')
+        input_name_ctn.add_content([
+            {RenderText(self._screen, 'Submit player name: '): '20%'},
+            {Input(self._screen, 'ex: player_2', base_color=(100, 100, 100),
+                   focus_color=(255, 0, 0)): '50%'},
+            {Button(self._screen, 'Save', color=(100, 205, 100)): '20%'}
+
+        ])
+        score = 1201
+        game_over_header = Container(self._screen, 'VERTICAL', gap=5)
+        game_over_header.add_content([
             {RenderText(self._screen,
-                        'You Win' if self.__win_or_loose == self.LOOSE_SCREEN
-                        else 'Game OVer'): '0%'}
-        )
+                        'You Win' if self.__win_or_loose == self.WIN_SCREEN
+                        else 'Game Over',
+                        font_size=70): '40%'},
+            {RenderText(self._screen, f'Your Score: {score}'): '0%'}
+        ])
+        game_over_ctn = Container(self._screen, 'VERTICAL',
+                                  size=RenderConfig.screen_size,
+                                  pos=(0, 0),
+                                  padding=30,
+                                  gap=30)
+
+        def on_menu():
+            if self._state_manager:
+                self._state_manager.set_state(StateManager.MENU)
+        gap = Container(self._screen, 'VERTICAL')
+        game_over_ctn.add_content([
+            {gap: '10%'},
+            {game_over_header: '20%'},
+            {input_name_ctn: '10%'},
+            {Button(self._screen, 'Back to Menu', callback=on_menu): '10%'},
+        ])
         return game_over_ctn
 
     def render(self) -> None:
