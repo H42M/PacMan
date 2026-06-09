@@ -17,7 +17,6 @@ class GameState:
     super_pacgums: set[CellPosition] = field(repr=False)
     points_per_pacgum: int
     points_per_super_pacgum: int
-
     ghosts: list[GhostState]
 
     @classmethod
@@ -87,13 +86,26 @@ class GameState:
         else:
             return None
 
-    def try_move(self, direction: Direction) -> bool:
-        target = self._get_target_position(self.player.position, direction)
-        if target is None:
-            return False
-        self.player.position = target
-        self.collect_at(target)
-        return True
+    def queue_player_direction(self, direction: Direction) -> None:
+        self.player.queued_direction = direction
+
+    def advance_player(self) -> None:
+        if self.player.queued_direction is not None:
+            target = self._get_target_position(self.player.position,
+                                               self.player.queued_direction)
+            if target is not None:
+                self.player.current_direction = self.player.queued_direction
+                self.player.queued_direction = None
+                self.player.position = target
+                self.collect_at(target)
+                return
+        if self.player.current_direction is not None:
+            target = self._get_target_position(
+                self.player.position,
+                self.player.current_direction)
+            if target is not None:
+                self.player.position = target
+                self.collect_at(target)
 
     def move_ghosts(self) -> None:
         for ghost in self.ghosts:

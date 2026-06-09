@@ -27,10 +27,14 @@ class PlayState(ScreenState):
         self.__renderer = RenderGameplay(screen, game) if game else None
         self.__placeholder_ctn = self.__load_placeholder()
         self.__pause_menu = self.__load_pause_menu()
+        self.__last_player_move_ms = pygame.time.get_ticks()
+        self.__player_move_delay_ms = 150
         self.__last_ghost_move_ms = pygame.time.get_ticks()
         self.__ghost_move_delay_ms = 500
+        self.__game_over = False
 
     def handle_events(self, events: list[Event]) -> bool:
+
         for event in events:
             if event.type == pygame.QUIT:
                 return False
@@ -44,9 +48,7 @@ class PlayState(ScreenState):
                 elif not self.__pause_menu.display and self.__game:
                     direction = direction_from_key(event.key)
                     if direction:
-                        moved = self.__game.try_move(direction)
-                        if moved and self.__game.has_collected_all_pacgums():
-                            print("Congratulations, you won!")
+                        self.__game.queue_player_direction(direction)
 
         if self.__pause_menu.display:
             return super().handle_events(events)
@@ -60,9 +62,19 @@ class PlayState(ScreenState):
             return
 
         now = pygame.time.get_ticks()
-        elapsed = now - self.__last_ghost_move_ms
+        player_elapsed = now - self.__last_player_move_ms
+        ghost_elapsed = now - self.__last_ghost_move_ms
 
-        if elapsed >= self.__ghost_move_delay_ms:
+        if player_elapsed >= self.__player_move_delay_ms:
+            self.__game.advance_player()
+            self.__last_player_move_ms = now
+            if (
+                not self.__game_over and
+                self.__game.has_collected_all_pacgums()
+            ):
+                print("Congratulations, you won!")
+                self.__game_over = True
+        if ghost_elapsed >= self.__ghost_move_delay_ms:
             self.__game.move_ghosts()
             self.__last_ghost_move_ms = now
 
