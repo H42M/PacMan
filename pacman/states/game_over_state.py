@@ -42,22 +42,23 @@ class GameOverState(ScreenState):
             {RenderText(self._screen, f'Your Score: {score}'): '0%'}
         ])
         game_over_ctn = Container(self._screen, 'VERTICAL',
-                                  size=RenderConfig.screen_size,
-                                  pos=(0, 0),
                                   padding=30,
                                   gap=30)
 
         def on_menu():
             if self._state_manager:
                 self._state_manager.set_state(StateManager.MENU)
-        gap = Container(self._screen, 'VERTICAL')
+
         game_over_ctn.add_content([
-            {gap: '10%'},
-            {game_over_header: '20%'},
-            {input_name_ctn: '10%'},
-            {Button(self._screen, 'Back to Menu', callback=on_menu): '10%'},
+            {game_over_header: '25%'},
+            {input_name_ctn: '25%'},
+            {Button(self._screen, 'Back to Menu', callback=on_menu): '25%'},
         ])
-        return game_over_ctn
+        window_ctn = Container(self._screen, 'VERTICAL',
+                               size=RenderConfig.screen_size,
+                               pos=(0, 0),)
+        window_ctn.add_content({game_over_ctn: '60%'})
+        return window_ctn
 
     def render(self) -> None:
         self._screen.clear()
