@@ -64,6 +64,10 @@ class PlayState(ScreenState):
         if self.__game is None:
             return
         if self.__pause_menu.display:
+            now = pygame.time.get_ticks()
+            self.__last_timer_tick_ms = now
+            self.__last_player_move_ms = now
+            self.__last_ghost_move_ms = now
             return
         if self.__game.outcome is not GameOutcome.PLAYING:
             return
