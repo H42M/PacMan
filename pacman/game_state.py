@@ -28,8 +28,8 @@ class GameState:
     points_per_pacgum: int
     points_per_super_pacgum: int
     ghosts: list[GhostState]
-    frightened_timer: int
-    ghost_respawn_timer: int
+    frightened_timer_ms: int
+    ghost_respawn_timer_ms: int
     points_per_ghost: int
 
     @classmethod
@@ -70,8 +70,8 @@ class GameState:
                    points_per_pacgum=config.points_per_pacgum,
                    points_per_super_pacgum=config.points_per_super_pacgum,
                    ghosts=ghosts,
-                   frightened_timer=0,
-                   ghost_respawn_timer=10000,
+                   frightened_timer_ms=0,
+                   ghost_respawn_timer_ms=10000,
                    points_per_ghost=config.points_per_ghost)
 
     def timer_tick(self) -> None:
@@ -80,6 +80,25 @@ class GameState:
             if self.remaining_time <= 0:
                 self.remaining_time = 0
                 self.outcome = GameOutcome.GAME_OVER
+
+    def tick_ghost_timers(self, elapsed_ms: int) -> None:
+        if self.frightened_timer_ms > 0:
+            self.frightened_timer_ms -= elapsed_ms
+            if self.frightened_timer_ms <= 0:
+                self.frightened_timer_ms = 0
+                for ghost in self.ghosts:
+                    if ghost.mode is GhostMode.FRIGHTENED:
+                        ghost.mode = GhostMode.NORMAL
+        for ghost in self.ghosts:
+            if ghost.mode is GhostMode.DEAD:
+                ghost.respawn_timer_ms -= elapsed_ms
+                if ghost.respawn_timer_ms <= 0:
+                    ghost.respawn_timer_ms = 0
+                    ghost.position = ghost.spawn_position
+                    ghost.direction = None
+                    ghost.mode = (GhostMode.FRIGHTENED
+                                  if self.frightened_timer_ms > 0
+                                  else GhostMode.NORMAL)
 
     def _get_target_position(
         self,
@@ -135,7 +154,7 @@ class GameState:
                 self.collect_at(target)
 
     def activate_frightened_mode(self) -> None:
-        self.frightened_timer = 10000
+        self.frightened_timer_ms = 10000
         for ghost in self.ghosts:
             if ghost.mode is not GhostMode.DEAD:
                 ghost.mode = GhostMode.FRIGHTENED
@@ -182,13 +201,13 @@ class GameState:
         self.player.position = self.level.player_spawn
         self.player.current_direction = None
         self.player.queued_direction = None
-        self.frightened_timer = 0
+        self.frightened_timer_ms = 0
 
         for ghost in self.ghosts:
             ghost.position = ghost.spawn_position
             ghost.direction = None
             ghost.mode = GhostMode.NORMAL
-            ghost.respawn_timer = 0
+            ghost.respawn_timer_ms = 0
 
     def handle_player_ghost_collision(self) -> None:
         if self.outcome is not GameOutcome.PLAYING:
@@ -206,7 +225,7 @@ class GameState:
                     self.player.position == ghost.position):
                 self.score += self.points_per_ghost
                 ghost.mode = GhostMode.DEAD
-                ghost.respawn_timer = self.ghost_respawn_timer
+                ghost.respawn_timer_ms = self.ghost_respawn_timer_ms
                 ghost.direction = None
 
     def has_collected_all_pacgums(self) -> bool:

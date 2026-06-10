@@ -23,4 +23,4 @@ class GhostState:
     color: GhostColor
     mode: GhostMode = GhostMode.NORMAL
     direction: Direction | None = None
-    respawn_timer: int = 0
+    respawn_timer_ms: int = 0
