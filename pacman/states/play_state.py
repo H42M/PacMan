@@ -3,7 +3,7 @@ from typing import Optional
 import pygame
 from pygame.event import Event
 
-from pacman.game_state import GameState as GameplayState
+from pacman.game_state import GameState as GameplayState, GameOutcome
 from pacman.input import direction_from_key
 from pacman.render.Container import Container
 from pacman.render.RenderConfig import RenderConfig
@@ -24,28 +24,35 @@ class PlayState(ScreenState):
     ) -> None:
         super().__init__(screen, state_manager)
         self.__game = game
-        self.__renderer = RenderGameplay(screen, game) if game else None
+        self.__render_gameplay = (RenderGameplay(screen, game)
+                                  if game else None)
+        self.__renderer = self.__load_game()
         self.__placeholder_ctn = self.__load_placeholder()
         self.__pause_menu = self.__load_pause_menu()
         self.__last_player_move_ms = pygame.time.get_ticks()
-        self.__player_move_delay_ms = 150
+        self.__player_move_delay_ms = 200
         self.__last_ghost_move_ms = pygame.time.get_ticks()
         self.__ghost_move_delay_ms = 500
-        self.__game_over = False
+        self.__last_timer_tick_ms = pygame.time.get_ticks()
+        self.__countdown_timer_delay_ms = 1000
 
     def handle_events(self, events: list[Event]) -> bool:
-
         for event in events:
             if event.type == pygame.QUIT:
                 return False
 
             if event.type == pygame.KEYDOWN:
+                if (event.key == pygame.K_F1 and self.__game
+                        and self.__game.outcome is GameOutcome.PLAYING):
+                    self.__game.debug_collect_all_pacgums()
+
                 if event.key == pygame.K_ESCAPE:
                     self.__pause_menu.switch_display()
                     if self.__pause_menu.display:
                         self.__pause_menu.resize()
 
-                elif not self.__pause_menu.display and self.__game:
+                elif (not self.__pause_menu.display and self.__game and
+                        self.__game.outcome is GameOutcome.PLAYING):
                     direction = direction_from_key(event.key)
                     if direction:
                         self.__game.queue_player_direction(direction)
@@ -59,54 +66,80 @@ class PlayState(ScreenState):
         if self.__game is None:
             return
         if self.__pause_menu.display:
+            now = pygame.time.get_ticks()
+            self.__last_timer_tick_ms = now
+            self.__last_player_move_ms = now
+            self.__last_ghost_move_ms = now
+            return
+        if self.__game.outcome is not GameOutcome.PLAYING:
             return
 
         now = pygame.time.get_ticks()
+        level_timer_elapsed = now - self.__last_timer_tick_ms
         player_elapsed = now - self.__last_player_move_ms
         ghost_elapsed = now - self.__last_ghost_move_ms
 
+        if level_timer_elapsed >= self.__countdown_timer_delay_ms:
+            self.__game.timer_tick()
+            self.__last_timer_tick_ms = now
+
         if player_elapsed >= self.__player_move_delay_ms:
+            lives_before = self.__game.lives
+
             self.__game.advance_player()
+            self.__game.handle_player_ghost_collision()
             self.__last_player_move_ms = now
-            if (
-                not self.__game_over and
-                self.__game.has_collected_all_pacgums()
-            ):
+
+            if self.__game.outcome is not GameOutcome.PLAYING:
+                return
+            if self.__game.lives < lives_before:
+                self.__last_ghost_move_ms = now
+                return
+            if self.__game.has_collected_all_pacgums():
                 print("Congratulations, you won!")
-                self.__game_over = True
+                self.__game.outcome = GameOutcome.LEVEL_CLEARED
+                return
+
         if ghost_elapsed >= self.__ghost_move_delay_ms:
             self.__game.move_ghosts()
+            self.__game.handle_player_ghost_collision()
             self.__last_ghost_move_ms = now
+            if self.__game.outcome is not GameOutcome.PLAYING:
+                return
 
     def render(self) -> None:
         self._screen.clear()
-
+        self.__renderer = self.__load_game()
         if self.__renderer:
             self.__renderer.render()
-            self.__render_hud()
         else:
             self.__placeholder_ctn.render()
 
         self.__pause_menu.render()
         self._screen.flip()
 
-    def __render_hud(self) -> None:
-        if not self.__game:
-            return
+    def __load_game(self) -> Container:
+        from pacman.render.RenderText import RenderText
 
-        font = pygame.font.Font(None, 28)
-        texts = [
-            f'Score: {self.__game.score}',
-            f'Level: {self.__game.level.number}',
-            'Lives: TODO',
-            'Time: TODO',
-        ]
+        main_ctn = Container(self._screen, 'VERTICAL', pos=(0, 0),
+                             size=RenderConfig.screen_size)
+        if self.__render_gameplay and self.__game:
+            hud_ctn = Container(self._screen, 'HORIZONTAL')
+            hud_ctn.add_content([
+                {RenderText(self._screen, f'Life: {self.__game.lives}'): '0%'},
+                {RenderText(self._screen, f'Score: {self.__game.score}'
+                            ): '0%'},
+                {RenderText(self._screen, f'Time: {self.__game.remaining_time}'
+                            ): '0%'},
+                {RenderText(self._screen, f'Level: {self.__game.level.number}'
+                            ): '0%'},
+            ])
 
-        x = 20
-        for text in texts:
-            surface = font.render(text, True, (255, 255, 255))
-            self._screen.screen.blit(surface, (x, 15))
-            x += surface.get_width() + 30
+            main_ctn.add_content([
+                {hud_ctn: '10%'},
+                {self.__render_gameplay: '90%'}])
+
+        return main_ctn
 
     def __load_placeholder(self) -> Container:
         from pacman.render.RenderText import RenderText

@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from enum import Enum
 
 from pacman.level import Level
 from pacman.player import PlayerState, Direction
@@ -8,9 +9,18 @@ from pacman.game_config import GameConfig
 from pacman.ghost import GhostState
 
 
+class GameOutcome(str, Enum):
+    PLAYING = "PLAYING"
+    LEVEL_CLEARED = "LEVEL_CLEARED"
+    GAME_OVER = "GAME_OVER"
+
+
 @dataclass(slots=True)
 class GameState:
     level: Level
+    lives: int
+    remaining_time: int
+    outcome: GameOutcome
     player: PlayerState
     score: int
     pacgums: set[CellPosition] = field(repr=False)
@@ -47,12 +57,23 @@ class GameState:
             for name, position, color
             in zip(ghost_names, ghost_positions, ghost_colors, strict=True)
         ]
-        return cls(level=level, player=PlayerState(level.player_spawn),
+        return cls(level=level,
+                   lives=config.lives,
+                   remaining_time=level.max_time,
+                   outcome=GameOutcome.PLAYING,
+                   player=PlayerState(level.player_spawn),
                    score=0, pacgums=pacgums,
                    super_pacgums=set(level.super_pacgum_positions),
                    points_per_pacgum=config.points_per_pacgum,
                    points_per_super_pacgum=config.points_per_super_pacgum,
                    ghosts=ghosts)
+
+    def timer_tick(self) -> None:
+        if self.outcome is GameOutcome.PLAYING:
+            self.remaining_time -= 1
+            if self.remaining_time <= 0:
+                self.remaining_time = 0
+                self.outcome = GameOutcome.GAME_OVER
 
     def _get_target_position(
         self,
@@ -107,6 +128,16 @@ class GameState:
                 self.player.position = target
                 self.collect_at(target)
 
+    def collect_at(self, position: CellPosition) -> None:
+        if not self.level.is_inside(position):
+            return
+        if position in self.pacgums:
+            self.pacgums.remove(position)
+            self.score += self.points_per_pacgum
+        elif position in self.super_pacgums:
+            self.super_pacgums.remove(position)
+            self.score += self.points_per_super_pacgum
+
     def move_ghosts(self) -> None:
         for ghost in self.ghosts:
             best_target: CellPosition | None = None
@@ -126,15 +157,29 @@ class GameState:
                 ghost.direction = best_direction
                 ghost.position = best_target
 
-    def collect_at(self, position: CellPosition) -> None:
-        if not self.level.is_inside(position):
+    def respawn_entities(self) -> None:
+        self.player.position = self.level.player_spawn
+        self.player.current_direction = None
+        self.player.queued_direction = None
+
+        for ghost in self.ghosts:
+            ghost.position = ghost.spawn_position
+            ghost.direction = None
+
+    def handle_player_ghost_collision(self) -> None:
+        if self.outcome is not GameOutcome.PLAYING:
             return
-        if position in self.pacgums:
-            self.pacgums.remove(position)
-            self.score += self.points_per_pacgum
-        elif position in self.super_pacgums:
-            self.super_pacgums.remove(position)
-            self.score += self.points_per_super_pacgum
+        if any(self.player.position == ghost.position
+               for ghost in self.ghosts):
+            self.lives -= 1
+            if self.lives <= 0:
+                self.outcome = GameOutcome.GAME_OVER
+            else:
+                self.respawn_entities()
 
     def has_collected_all_pacgums(self) -> bool:
         return not self.pacgums and not self.super_pacgums
+
+    def debug_collect_all_pacgums(self) -> None:
+        self.pacgums.clear()
+        self.super_pacgums.clear()
