@@ -16,6 +16,7 @@ from pacman.render.Screen import Screen
 from pacman.states.base_state import StateManager
 from pacman.states.menu_state import MenuState
 from pacman.states.play_state import PlayState
+from pacman.states.game_over_state import GameOverState
 from pacman.states.setting_state import SettingsState
 
 
@@ -52,6 +53,9 @@ def run(config: GameConfig) -> int:
                 StateManager.PLAYING: (
                     lambda screen, manager: create_play_state(screen, manager)
                 ),
+                StateManager.GAMEOVER: (
+                    lambda screen, manager: GameOverState(screen, manager)
+                )
             }
         )
 
