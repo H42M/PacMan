@@ -4,7 +4,7 @@ import pygame
 class Animator:
     def __init__(self, frames: list[pygame.Surface], tick_rate: int = 1
                  ) -> None:
-        self.__frames = frames
+        self.__frames = frames + frames[-2:0:-1]  # [0,1,2,3,2,1] puis boucle
         self.__index: int = 0
         self.__tick_rate = tick_rate
         self.__tick_count = 0

@@ -6,6 +6,7 @@ from pacman.render.RenderMaze import RenderMaze
 from pacman.render.Screen import Screen
 from pacman.render.RenderConfig import RenderConfig
 from pacman.render.RenderObj import RenderOBJ
+from pacman.render.animation import AnimPacman
 
 
 class RenderGameplay (RenderOBJ):
@@ -20,6 +21,7 @@ class RenderGameplay (RenderOBJ):
         self.player_image = pygame.image.load(
             "assets/sprites/pacman.png"
         ).convert_alpha()
+        self.__render_pacman = AnimPacman(screen)
 
     def render(self) -> None:
         self.maze_renderer.render()
@@ -30,13 +32,19 @@ class RenderGameplay (RenderOBJ):
     def _render_player(self) -> None:
         cell_width, cell_height = self.maze_renderer.cell_size
         player_size = min(cell_width, cell_height) - 6
-        player_surface = pygame.transform.smoothscale(
-                         self.player_image,
-                         (player_size, player_size),)
-        player_pos = self.maze_renderer.grid_to_screen(
-                     self.game.player.position,
-                     (player_size, player_size),)
-        self.screen.screen.blit(player_surface, player_pos)
+        # player_surface = pygame.transform.smoothscale(
+        #                  self.player_image,
+        #                  (player_size, player_size),)
+        # player_pos = self.maze_renderer.grid_to_screen(
+        #              self.game.player.position,
+        #              (player_size, player_size),)
+        # self.screen.screen.blit(player_surface, player_pos)
+        self.__render_pacman.size = (player_size, player_size)
+        self.__render_pacman.pos = self.maze_renderer.grid_to_screen(
+            self.game.player.position, (player_size, player_size),)
+        self.__render_pacman.set_rotation(self.game.player.current_direction)
+        self.__render_pacman.tick_animator()
+        self.__render_pacman.render()
 
     def _render_ghosts(self) -> None:
         surface = self.screen.screen
