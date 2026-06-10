@@ -62,10 +62,12 @@ class ScreenState(ABC):
     @abstractmethod
     def update(self) -> None:
         """Update the screen state."""
+        ...
 
     @abstractmethod
     def render(self) -> None:
         """Render the screen state."""
+        ...
 
 
 StateFactory = Callable[[Screen, "StateManager"], ScreenState]
