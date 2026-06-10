@@ -2,7 +2,7 @@ from typing import Optional
 
 import pygame
 
-from pacman.render.Animator import Animator
+from pacman.render.animation.Animator import Animator
 from pacman.render.RenderObj import RenderOBJ
 from pacman.render.Screen import Screen
 
