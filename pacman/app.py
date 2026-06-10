@@ -55,6 +55,10 @@ def run(config: GameConfig) -> int:
                 ),
                 StateManager.GAMEOVER: (
                     lambda screen, manager: GameOverState(screen, manager)
+                ),
+                StateManager.VICTORY: (
+                    lambda screen, manager: GameOverState(
+                        screen, manager, GameOverState.WIN_SCREEN)
                 )
             }
         )
