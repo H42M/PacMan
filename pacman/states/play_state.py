@@ -24,7 +24,9 @@ class PlayState(ScreenState):
     ) -> None:
         super().__init__(screen, state_manager)
         self.__game = game
-        self.__renderer = RenderGameplay(screen, game) if game else None
+        self.__render_gameplay = (RenderGameplay(screen, game)
+                                  if game else None)
+        self.__renderer = self.__load_game()
         self.__placeholder_ctn = self.__load_placeholder()
         self.__pause_menu = self.__load_pause_menu()
         self.__last_player_move_ms = pygame.time.get_ticks()
@@ -63,6 +65,11 @@ class PlayState(ScreenState):
     def update(self) -> None:
         if self.__game is None:
             return
+
+        if (self.__game.outcome is GameOutcome.GAME_OVER
+                and self._state_manager):
+            self._state_manager.set_state(StateManager.GAMEOVER)
+
         if self.__pause_menu.display:
             now = pygame.time.get_ticks()
             self.__last_timer_tick_ms = now
@@ -107,33 +114,37 @@ class PlayState(ScreenState):
 
     def render(self) -> None:
         self._screen.clear()
-
+        self.__renderer = self.__load_game()
         if self.__renderer:
             self.__renderer.render()
-            self.__render_hud()
         else:
             self.__placeholder_ctn.render()
 
         self.__pause_menu.render()
         self._screen.flip()
 
-    def __render_hud(self) -> None:
-        if not self.__game:
-            return
+    def __load_game(self) -> Container:
+        from pacman.render.RenderText import RenderText
 
-        font = pygame.font.Font(None, 28)
-        texts = [
-            f'Score: {self.__game.score}',
-            f'Level: {self.__game.level.number}',
-            f'Lives: {self.__game.lives}',
-            f'Time: {self.__game.remaining_time}',
-        ]
+        main_ctn = Container(self._screen, 'VERTICAL', pos=(0, 0),
+                             size=RenderConfig.screen_size)
+        if self.__render_gameplay and self.__game:
+            hud_ctn = Container(self._screen, 'HORIZONTAL')
+            hud_ctn.add_content([
+                {RenderText(self._screen, f'Life: {self.__game.lives}'): '0%'},
+                {RenderText(self._screen, f'Score: {self.__game.score}'
+                            ): '0%'},
+                {RenderText(self._screen, f'Time: {self.__game.remaining_time}'
+                            ): '0%'},
+                {RenderText(self._screen, f'Level: {self.__game.level.number}'
+                            ): '0%'},
+            ])
 
-        x = 20
-        for text in texts:
-            surface = font.render(text, True, (255, 255, 255))
-            self._screen.screen.blit(surface, (x, 15))
-            x += surface.get_width() + 30
+            main_ctn.add_content([
+                {hud_ctn: '10%'},
+                {self.__render_gameplay: '90%'}])
+
+        return main_ctn
 
     def __load_placeholder(self) -> Container:
         from pacman.render.RenderText import RenderText
