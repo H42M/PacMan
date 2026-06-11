@@ -81,3 +81,7 @@ class RenderEntity(RenderOBJ):
         if self.__animator:
             return self.__animator.current_frame
         return self.__static
+
+    @property
+    def animator(self) -> Optional[Animator]:
+        return self.__animator

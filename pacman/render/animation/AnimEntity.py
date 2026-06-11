@@ -31,7 +31,7 @@ class AnimEntity(RenderOBJ):
         self._SHEET_SPRITE_W = self._sheet.size[0] // self._SHEET_NB_SPRITES_H
         self._SHEET_SPRITE_H = self._sheet.size[1] // self._SHEET_NB_SPRITES_V
 
-        self._render_entity: RenderEntity
+        self._render_entity = RenderEntity(screen)
 
     def _load_sheet(self, path: str) -> SpriteSheet:
         try:
@@ -91,3 +91,12 @@ class AnimEntity(RenderOBJ):
             Direction.LEFT: 'W',
         }
         self._render_entity.set_rotation(dir_mapper[rotation])
+
+    def is_anim_over(self, nb_frames: Optional[int] = None):
+        animator = self._render_entity.animator
+        if not animator:
+            return
+        if nb_frames is None:
+            nb_frames = len(animator.frames)
+
+        return True if animator.frame_index >= nb_frames else False

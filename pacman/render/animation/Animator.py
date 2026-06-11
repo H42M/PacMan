@@ -22,3 +22,11 @@ class Animator:
     @property
     def current_frame(self) -> pygame.Surface:
         return self.__frames[self.__index]
+
+    @property
+    def frame_index(self) -> int:
+        return self.__index
+
+    @property
+    def frames(self) -> list[pygame.Surface]:
+        return self.__frames
