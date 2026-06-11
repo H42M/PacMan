@@ -30,7 +30,8 @@ def run(config: GameConfig) -> int:
                               manager: StateManager) -> PlayState:
             level = build_level(config, 0)
             game = GameState.from_level(config, level)
-            return PlayState(screen, manager, game)
+            return PlayState(screen, manager, game,
+                             total_levels=len(config.levels))
 
         # pygame initialization
         def final_score_from_payload(payload: dict[str, object]) -> int:
@@ -51,7 +52,7 @@ def run(config: GameConfig) -> int:
             {
                 StateManager.MENU: (
                     lambda screen, manager, _payload: MenuState(
-                        screen, manager)
+                        screen, manager, config.highscore_filename)
                 ),
                 StateManager.SETTINGS: (
                     lambda screen, manager, _payload: SettingsState(

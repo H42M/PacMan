@@ -52,7 +52,7 @@ class GameOverState(ScreenState):
             self.__player_name = input_name.value
 
         input_name_ctn = Container(self._screen, 'HORIZONTAL')
-        input_name = Input(self._screen, 'ex: player_2',
+        input_name = Input(self._screen, 'ex: PacMan',
                            base_color=RenderConfig.RED,
                            focus_color=(255, 50, 50))
         input_name_ctn.add_content([
