@@ -51,7 +51,7 @@ class PlayState(ScreenState):
             if event.type == pygame.KEYDOWN:
                 if (event.key == pygame.K_F1 and self.__game
                         and self.__game.outcome is GameOutcome.PLAYING):
-                    self.__game.debug_collect_all_pacgums()
+                    self.__game.debug_trigger_level_clear()
 
                 if (event.key == pygame.K_F2 and self.__game
                         and self.__game.outcome is GameOutcome.PLAYING):

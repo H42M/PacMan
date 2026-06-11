@@ -231,9 +231,8 @@ class GameState:
     def has_collected_all_pacgums(self) -> bool:
         return not self.pacgums and not self.super_pacgums
 
-    def debug_collect_all_pacgums(self) -> None:
-        self.pacgums.clear()
-        self.super_pacgums.clear()
+    def debug_trigger_level_clear(self) -> None:
+        self.outcome = GameOutcome.LEVEL_CLEARED
 
     def debug_trigger_game_over(self) -> None:
-        self.lives = 0
+        self.outcome = GameOutcome.GAME_OVER
