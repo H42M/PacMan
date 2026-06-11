@@ -104,6 +104,9 @@ class RenderGameplay (RenderOBJ):
             (screen_height - maze_size) // 2,
         )
 
+    def set_player_move_delay(self, delay_ms: int) -> None:
+        self.__render_pacman.set_move_delay(delay_ms)
+
     @property
     def size(self) -> Optional[tuple[int, int]]:
         return self._size
