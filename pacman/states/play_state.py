@@ -111,6 +111,7 @@ class PlayState(ScreenState):
         if ghost_elapsed >= self.__ghost_move_delay_ms:
             self.__game.move_ghosts()
             self.__game.handle_player_ghost_collision()
+            self.__game.tick_ghost_timers(ghost_elapsed)
             self.__last_ghost_move_ms = now
             if self.__game.outcome is not GameOutcome.PLAYING:
                 return

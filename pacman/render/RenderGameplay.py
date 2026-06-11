@@ -2,6 +2,7 @@ import pygame
 from typing import Optional
 
 from pacman.game_state import GameState
+from pacman.ghost import GhostMode
 from pacman.render.RenderMaze import RenderMaze
 from pacman.render.Screen import Screen
 from pacman.render.RenderConfig import RenderConfig
@@ -52,6 +53,8 @@ class RenderGameplay (RenderOBJ):
         ghost_size = min(cell_width, cell_height) - 8
 
         for ghost in self.game.ghosts:
+            if ghost.mode is GhostMode.DEAD:
+                continue
             ghost_pos = self.maze_renderer.grid_to_screen(
                 ghost.position,
                 (ghost_size, ghost_size),

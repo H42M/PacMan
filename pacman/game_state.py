@@ -6,7 +6,7 @@ from pacman.level import Level
 from pacman.player import PlayerState, Direction
 from pacman.maze_adapter import Wall, CellPosition
 from pacman.game_config import GameConfig
-from pacman.ghost import GhostState
+from pacman.ghost import GhostState, GhostMode
 
 
 class GameOutcome(str, Enum):
@@ -28,6 +28,9 @@ class GameState:
     points_per_pacgum: int
     points_per_super_pacgum: int
     ghosts: list[GhostState]
+    frightened_timer_ms: int
+    ghost_respawn_timer_ms: int
+    points_per_ghost: int
 
     @classmethod
     def from_level(cls, config: GameConfig, level: Level) -> GameState:
@@ -66,7 +69,10 @@ class GameState:
                    super_pacgums=set(level.super_pacgum_positions),
                    points_per_pacgum=config.points_per_pacgum,
                    points_per_super_pacgum=config.points_per_super_pacgum,
-                   ghosts=ghosts)
+                   ghosts=ghosts,
+                   frightened_timer_ms=0,
+                   ghost_respawn_timer_ms=10000,
+                   points_per_ghost=config.points_per_ghost)
 
     def timer_tick(self) -> None:
         if self.outcome is GameOutcome.PLAYING:
@@ -74,6 +80,25 @@ class GameState:
             if self.remaining_time <= 0:
                 self.remaining_time = 0
                 self.outcome = GameOutcome.GAME_OVER
+
+    def tick_ghost_timers(self, elapsed_ms: int) -> None:
+        if self.frightened_timer_ms > 0:
+            self.frightened_timer_ms -= elapsed_ms
+            if self.frightened_timer_ms <= 0:
+                self.frightened_timer_ms = 0
+                for ghost in self.ghosts:
+                    if ghost.mode is GhostMode.FRIGHTENED:
+                        ghost.mode = GhostMode.NORMAL
+        for ghost in self.ghosts:
+            if ghost.mode is GhostMode.DEAD:
+                ghost.respawn_timer_ms -= elapsed_ms
+                if ghost.respawn_timer_ms <= 0:
+                    ghost.respawn_timer_ms = 0
+                    ghost.position = ghost.spawn_position
+                    ghost.direction = None
+                    ghost.mode = (GhostMode.FRIGHTENED
+                                  if self.frightened_timer_ms > 0
+                                  else GhostMode.NORMAL)
 
     def _get_target_position(
         self,
@@ -128,6 +153,12 @@ class GameState:
                 self.player.position = target
                 self.collect_at(target)
 
+    def activate_frightened_mode(self) -> None:
+        self.frightened_timer_ms = 10000
+        for ghost in self.ghosts:
+            if ghost.mode is not GhostMode.DEAD:
+                ghost.mode = GhostMode.FRIGHTENED
+
     def collect_at(self, position: CellPosition) -> None:
         if not self.level.is_inside(position):
             return
@@ -137,9 +168,12 @@ class GameState:
         elif position in self.super_pacgums:
             self.super_pacgums.remove(position)
             self.score += self.points_per_super_pacgum
+            self.activate_frightened_mode()
 
     def move_ghosts(self) -> None:
         for ghost in self.ghosts:
+            if ghost.mode is GhostMode.DEAD:
+                continue
             best_target: CellPosition | None = None
             best_direction: Direction | None = None
             best_distance: int | None = None
@@ -149,7 +183,13 @@ class GameState:
                     dx = target[0] - self.player.position[0]
                     dy = target[1] - self.player.position[1]
                     distance = dx * dx + dy * dy
-                    if best_distance is None or distance < best_distance:
+                    if best_distance is None:
+                        better_distance = True
+                    elif ghost.mode is GhostMode.FRIGHTENED:
+                        better_distance = distance > best_distance
+                    else:
+                        better_distance = distance < best_distance
+                    if better_distance:
                         best_distance = distance
                         best_direction = direction
                         best_target = target
@@ -161,21 +201,32 @@ class GameState:
         self.player.position = self.level.player_spawn
         self.player.current_direction = None
         self.player.queued_direction = None
+        self.frightened_timer_ms = 0
 
         for ghost in self.ghosts:
             ghost.position = ghost.spawn_position
             ghost.direction = None
+            ghost.mode = GhostMode.NORMAL
+            ghost.respawn_timer_ms = 0
 
     def handle_player_ghost_collision(self) -> None:
         if self.outcome is not GameOutcome.PLAYING:
             return
-        if any(self.player.position == ghost.position
-               for ghost in self.ghosts):
-            self.lives -= 1
-            if self.lives <= 0:
-                self.outcome = GameOutcome.GAME_OVER
-            else:
-                self.respawn_entities()
+        for ghost in self.ghosts:
+            if (ghost.mode is GhostMode.NORMAL and
+                    self.player.position == ghost.position):
+                self.lives -= 1
+                if self.lives <= 0:
+                    self.outcome = GameOutcome.GAME_OVER
+                else:
+                    self.respawn_entities()
+                return
+            if (ghost.mode is GhostMode.FRIGHTENED and
+                    self.player.position == ghost.position):
+                self.score += self.points_per_ghost
+                ghost.mode = GhostMode.DEAD
+                ghost.respawn_timer_ms = self.ghost_respawn_timer_ms
+                ghost.direction = None
 
     def has_collected_all_pacgums(self) -> bool:
         return not self.pacgums and not self.super_pacgums

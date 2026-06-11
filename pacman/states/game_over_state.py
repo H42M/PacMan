@@ -18,7 +18,7 @@ class GameOverState(ScreenState):
         self.__game_over_ctn = self.__load_game_over_ctn()
         self.__player_name = ""
 
-    def save_and_quit(self):
+    def save_and_quit(self) -> None:
         if self._state_manager:
             # TODO: RECORD SCORE:
             self._state_manager.set_state(StateManager.MENU)
@@ -29,7 +29,7 @@ class GameOverState(ScreenState):
         from pacman.render.RenderText import RenderText
         from pacman.render.interactives import Input, ToggleButton
 
-        def save():
+        def save() -> None:
             self.__player_name = input_name.value
 
         input_name_ctn = Container(self._screen, 'HORIZONTAL')
@@ -57,7 +57,7 @@ class GameOverState(ScreenState):
                                   padding=30,
                                   gap=30)
 
-        def get_player_name():
+        def get_player_name() -> str:
             return self.__player_name
 
         game_over_ctn.add_content([
@@ -82,7 +82,7 @@ class GameOverState(ScreenState):
         self._screen.flip()
 
     def update(self) -> None:
-        return super().update()
+        pass
 
     def handle_events(self, events: list[Event]) -> bool:
         return super().handle_events(events)
