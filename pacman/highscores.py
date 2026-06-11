@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import json
 
 MAX_HIGHSCORES = 10
 MAX_PLAYER_NAME_LENGTH = 10
@@ -60,3 +61,33 @@ def add_highscore(entries: list[HighscoreEntry],
     entry = HighscoreEntry(name, score)
     entries.append(entry)
     return sort_highscores(entries)
+
+
+def load_highscores(path: str) -> list[HighscoreEntry]:
+    highscores_list: list[HighscoreEntry] = []
+    try:
+        with open(path, "r") as file:
+            file_raw = json.load(file)
+            if not isinstance(file_raw, list):
+                raise ValueError("Highscore file must contain a list.")
+            for line in file_raw:
+                entry = entry_from_raw(line)
+                if entry is not None:
+                    highscores_list.append(entry)
+        return sort_highscores(highscores_list)
+
+    except (OSError, json.JSONDecodeError, ValueError):
+        return []
+
+
+def save_highscores(path: str, entries: list[HighscoreEntry]) -> bool:
+    entries = sort_highscores(entries)
+    raw_entries = []
+    for entry in entries:
+        raw_entries.append(entry_to_raw(entry))
+    try:
+        with open(path, "w") as file:
+            json.dump(raw_entries, file, indent=4)
+        return True
+    except (OSError, TypeError):
+        return False
