@@ -2,7 +2,7 @@ from typing import Optional
 
 import pygame
 
-from pacman.render.Animator import Animator
+from pacman.render.animation.Animator import Animator
 from pacman.render.RenderObj import RenderOBJ
 from pacman.render.Screen import Screen
 
@@ -65,13 +65,14 @@ class RenderEntity(RenderOBJ):
 
         if self.__dir_animators:
             scaled = pygame.transform.scale(texture, self._size)
+            self._screen.screen.blit(scaled, self._pos)
         else:
             angles = {'E': 0, 'W': 180, 'N': 90, 'S': 270}
             angle = angles.get(self.__rotation, 0)
-            rotated = pygame.transform.rotate(texture, angle)
-            scaled = pygame.transform.scale(rotated, self._size)
+            scaled = pygame.transform.scale(texture, self._size)
+            rotated = pygame.transform.rotate(scaled, angle)
 
-        self._screen.screen.blit(scaled, self._pos)
+            self._screen.screen.blit(rotated, self._pos)
 
     def __resolve_texture(self) -> Optional[pygame.Surface]:
         if self.__dir_animators:
