@@ -40,10 +40,10 @@ class RenderGameplay (RenderOBJ):
         #              (player_size, player_size),)
         # self.screen.screen.blit(player_surface, player_pos)
         self.__render_pacman.size = (player_size, player_size)
-        self.__render_pacman.pos = self.maze_renderer.grid_to_screen(
-            self.game.player.position, (player_size, player_size),)
+        self.__render_pacman.set_target_pos(self.maze_renderer.grid_to_screen(
+            self.game.player.position, (player_size, player_size)))
         self.__render_pacman.set_rotation(self.game.player.current_direction)
-        self.__render_pacman.tick_animator()
+        self.__render_pacman.tick()
         self.__render_pacman.render()
 
     def _render_ghosts(self) -> None:

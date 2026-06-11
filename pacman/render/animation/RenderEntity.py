@@ -71,7 +71,6 @@ class RenderEntity(RenderOBJ):
             angle = angles.get(self.__rotation, 0)
             scaled = pygame.transform.scale(texture, self._size)
             rotated = pygame.transform.rotate(scaled, angle)
-            print(f'dir: {angle}')
 
             self._screen.screen.blit(rotated, self._pos)
 
