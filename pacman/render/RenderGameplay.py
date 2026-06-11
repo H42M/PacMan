@@ -7,7 +7,7 @@ from pacman.render.RenderMaze import RenderMaze
 from pacman.render.Screen import Screen
 from pacman.render.RenderConfig import RenderConfig
 from pacman.render.RenderObj import RenderOBJ
-from pacman.render.animation import AnimPacman
+from pacman.render.animation import AnimPacman, AnimGhost
 
 
 class RenderGameplay (RenderOBJ):
@@ -19,10 +19,9 @@ class RenderGameplay (RenderOBJ):
         self.game = game
         self.maze_renderer = RenderMaze(screen, game.level.maze)
         self._configure_maze_renderer()
-        self.player_image = pygame.image.load(
-            "assets/sprites/pacman.png"
-        ).convert_alpha()
         self.__render_pacman = AnimPacman(screen)
+        self.__render_ghosts = [AnimGhost(screen, ghost_color=i)
+                                for i, _ in enumerate(self.game.ghosts)]
 
     def render(self) -> None:
         self.maze_renderer.render()
@@ -33,13 +32,7 @@ class RenderGameplay (RenderOBJ):
     def _render_player(self) -> None:
         cell_width, cell_height = self.maze_renderer.cell_size
         player_size = min(cell_width, cell_height) - 6
-        # player_surface = pygame.transform.smoothscale(
-        #                  self.player_image,
-        #                  (player_size, player_size),)
-        # player_pos = self.maze_renderer.grid_to_screen(
-        #              self.game.player.position,
-        #              (player_size, player_size),)
-        # self.screen.screen.blit(player_surface, player_pos)
+
         self.__render_pacman.size = (player_size, player_size)
         self.__render_pacman.set_target_pos(self.maze_renderer.grid_to_screen(
             self.game.player.position, (player_size, player_size)))
@@ -48,22 +41,21 @@ class RenderGameplay (RenderOBJ):
         self.__render_pacman.render()
 
     def _render_ghosts(self) -> None:
-        surface = self.screen.screen
+        # surface = self.screen.screen
         cell_width, cell_height = self.maze_renderer.cell_size
         ghost_size = min(cell_width, cell_height) - 8
 
-        for ghost in self.game.ghosts:
+        for render_ghost, ghost in zip(self.__render_ghosts, self.game.ghosts):
             if ghost.mode is GhostMode.DEAD:
                 continue
-            ghost_pos = self.maze_renderer.grid_to_screen(
-                ghost.position,
-                (ghost_size, ghost_size),
-            )
-            center = (
-                ghost_pos[0] + ghost_size // 2,
-                ghost_pos[1] + ghost_size // 2,
-            )
-            pygame.draw.circle(surface, ghost.color, center, ghost_size // 2)
+
+            render_ghost.size = (ghost_size, ghost_size)
+            render_ghost.set_target_pos(self.maze_renderer.grid_to_screen(
+                ghost.position, (ghost_size, ghost_size)
+            ))
+            render_ghost.set_rotation(ghost.direction)
+            render_ghost.tick()
+            render_ghost.render()
 
     def _render_pacgums(self) -> None:
         surface = self.screen.screen
@@ -107,8 +99,11 @@ class RenderGameplay (RenderOBJ):
             (screen_height - maze_size) // 2,
         )
 
-    def set_player_move_delay(self, delay_ms: int) -> None:
+    def set_entities_move_delay(self, delay_ms: int, ghost_delay_ms: int
+                                ) -> None:
         self.__render_pacman.set_move_delay(delay_ms)
+        for ghost in self.__render_ghosts:
+            ghost.set_move_delay(ghost_delay_ms)
 
     @property
     def size(self) -> Optional[tuple[int, int]]:

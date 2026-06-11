@@ -31,13 +31,14 @@ class PlayState(ScreenState):
         self.__pause_menu = self.__load_pause_menu()
         self.__last_player_move_ms = pygame.time.get_ticks()
         self.__player_move_delay_ms = 200
-        if self.__render_gameplay:
-            self.__render_gameplay.set_player_move_delay(
-                self.__player_move_delay_ms)
         self.__last_ghost_move_ms = pygame.time.get_ticks()
         self.__ghost_move_delay_ms = 500
         self.__last_timer_tick_ms = pygame.time.get_ticks()
         self.__countdown_timer_delay_ms = 1000
+        if self.__render_gameplay:
+            self.__render_gameplay.set_entities_move_delay(
+                self.__player_move_delay_ms,
+                self.__ghost_move_delay_ms)
 
     def handle_events(self, events: list[Event]) -> bool:
         for event in events:
