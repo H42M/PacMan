@@ -3,25 +3,44 @@ from pygame.event import Event
 from pacman.render.Screen import Screen
 from pacman.states.base_state import ScreenState, StateManager
 from pacman.render.Container import Container
+from pacman.highscores import add_highscore, load_highscores, save_highscores
 
 
 class GameOverState(ScreenState):
     LOOSE_SCREEN = 'LOOSE_SCEEN'
     WIN_SCREEN = 'WIN_SCREEN'
 
-    def __init__(self, screen: Screen,
-                 state_manager: StateManager | None = None,
-                 win_or_lose: str = LOOSE_SCREEN
-                 ) -> None:
+    def __init__(
+        self,
+        screen: Screen,
+        state_manager: StateManager | None = None,
+        win_or_lose: str = LOOSE_SCREEN,
+        final_score: int = 0,
+        highscore_path: str = "highscores.json",
+    ) -> None:
         super().__init__(screen, state_manager)
         self.__win_or_loose = win_or_lose
+        self.__final_score = final_score
+        self.__highscore_path = highscore_path
         self.__game_over_ctn = self.__load_game_over_ctn()
         self.__player_name = ""
 
     def save_and_quit(self) -> None:
-        if self._state_manager:
-            # TODO: RECORD SCORE:
-            self._state_manager.set_state(StateManager.MENU)
+        if not self._state_manager:
+            return
+
+        try:
+            highscores = load_highscores(self.__highscore_path)
+            highscores = add_highscore(
+                highscores,
+                self.__player_name,
+                self.__final_score,
+            )
+            save_highscores(self.__highscore_path, highscores)
+        except ValueError:
+            return
+
+        self._state_manager.set_state(StateManager.MENU)
 
     def __load_game_over_ctn(self) -> Container:
         from pacman.render.RenderConfig import RenderConfig
@@ -44,14 +63,14 @@ class GameOverState(ScreenState):
                           state_callback=input_name.get_value,
                           callback=save): '20%'}
         ])
-        score = 1201
         game_over_header = Container(self._screen, 'VERTICAL', gap=5)
         game_over_header.add_content([
             {RenderText(self._screen,
                         'You Win' if self.__win_or_loose == self.WIN_SCREEN
                         else 'Game Over',
                         font_size=70): '40%'},
-            {RenderText(self._screen, f'Your Score: {score}'): '0%'}
+            {RenderText(
+                self._screen, f'Your Score: {self.__final_score}'): '0%'}
         ])
         game_over_ctn = Container(self._screen, 'VERTICAL',
                                   padding=30,

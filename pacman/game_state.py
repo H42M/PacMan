@@ -234,3 +234,6 @@ class GameState:
     def debug_collect_all_pacgums(self) -> None:
         self.pacgums.clear()
         self.super_pacgums.clear()
+
+    def debug_trigger_game_over(self) -> None:
+        self.lives = 0

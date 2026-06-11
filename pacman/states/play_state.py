@@ -46,6 +46,10 @@ class PlayState(ScreenState):
                         and self.__game.outcome is GameOutcome.PLAYING):
                     self.__game.debug_collect_all_pacgums()
 
+                if (event.key == pygame.K_F2 and self.__game
+                        and self.__game.outcome is GameOutcome.PLAYING):
+                    self.__game.debug_trigger_game_over()
+
                 if event.key == pygame.K_ESCAPE:
                     self.__pause_menu.switch_display()
                     if self.__pause_menu.display:
@@ -68,7 +72,10 @@ class PlayState(ScreenState):
 
         if (self.__game.outcome is GameOutcome.GAME_OVER
                 and self._state_manager):
-            self._state_manager.set_state(StateManager.GAMEOVER)
+            self._state_manager.set_state(
+                StateManager.GAMEOVER,
+                {"final_score": self.__game.score},
+            )
 
         if self.__pause_menu.display:
             now = pygame.time.get_ticks()
