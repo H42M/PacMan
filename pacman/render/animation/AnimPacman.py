@@ -1,6 +1,9 @@
 from pacman.render.RenderObj import RenderOBJ
 from pacman.render.Screen import Screen
-from pacman.render.animation import SpriteSheet, RenderEntity, Animator
+from pacman.render.animation.SpriteSheet import SpriteSheet
+from pacman.render.animation.Animator import Animator
+from pacman.render.animation.RenderEntity import RenderEntity
+
 
 from typing import Optional
 import pygame
@@ -81,7 +84,7 @@ class AnimPacman(RenderOBJ):
             self._pos = self.__target_pos
             self.__real_pos = self.__target_pos
 
-    def render(self):
+    def render(self) -> None:
         self.__render_pacman.pos = self.__real_pos
         self.__render_pacman.size = self.size
         self.__render_pacman.render()
