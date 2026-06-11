@@ -11,7 +11,7 @@ class HighscoreEntry:
 
 
 def validate_player_name(name: str) -> str:
-    if not name:
+    if not name.strip():
         raise ValueError("Enter a valid name.")
     name = name.strip()
     if len(name) > MAX_PLAYER_NAME_LENGTH:
@@ -42,3 +42,21 @@ def entry_from_raw(raw: object) -> HighscoreEntry | None:
                               validate_score(score))
     except ValueError:
         return None
+
+
+def entry_to_raw(entry: HighscoreEntry) -> dict[str, object]:
+    return {"name": entry.name, "score": entry.score}
+
+
+def sort_highscores(entries: list[HighscoreEntry]) -> list[HighscoreEntry]:
+    return (sorted(entries, key=lambda entry: entry.score,
+                   reverse=True)[:MAX_HIGHSCORES])
+
+
+def add_highscore(entries: list[HighscoreEntry],
+                  name: str, score: int) -> list[HighscoreEntry]:
+    name = validate_player_name(name)
+    score = validate_score(score)
+    entry = HighscoreEntry(name, score)
+    entries.append(entry)
+    return sort_highscores(entries)
