@@ -14,6 +14,7 @@ class AnimSet(str, Enum):
     NORMAL = "NORMAL"
     DEATH = "DEATH"
     BOOSTED = 'BOOSTED'
+    FRIGHTENED = 'FRIGHTENED'
 
 
 class AnimEntity(RenderOBJ):
@@ -37,6 +38,9 @@ class AnimEntity(RenderOBJ):
         self._SHEET_NB_SPRITES_V = 15
         self._SHEET_SPRITE_W = self._sheet.size[0] // self._SHEET_NB_SPRITES_H
         self._SHEET_SPRITE_H = self._sheet.size[1] // self._SHEET_NB_SPRITES_V
+
+        self._anim_set = AnimSet.NORMAL
+        self._prev_anim_set = self._anim_set
 
         self._render_entity = RenderEntity(screen)
 
@@ -107,3 +111,13 @@ class AnimEntity(RenderOBJ):
             nb_frames = len(animator.frames)
 
         return True if animator.frame_index >= nb_frames else False
+
+    @property
+    def anim_set(self) -> str:
+        return self._anim_set
+
+    @anim_set.setter
+    def anim_set(self, anim_set: AnimSet) -> None:
+        if self._prev_anim_set != anim_set:
+            self._prev_anim_set = self._anim_set
+            self._anim_set = anim_set
