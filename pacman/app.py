@@ -6,8 +6,7 @@ import pygame
 from pacman.constants import WINDOW_HEIGHT, WINDOW_WIDTH
 from pacman.game_config import GameConfig
 from pacman.maze_adapter import MazeGenerationError
-from pacman.level import build_level
-from pacman.game_state import GameState
+from pacman.game_session import GameSession
 
 
 from pacman.render.RenderConfig import RenderConfig
@@ -28,10 +27,9 @@ def run(config: GameConfig) -> int:
         # level building and maze generation
         def create_play_state(screen: Screen,
                               manager: StateManager) -> PlayState:
-            level = build_level(config, 0)
-            game = GameState.from_level(config, level)
-            return PlayState(screen, manager, game,
-                             total_levels=len(config.levels))
+            session = GameSession.from_config(config)
+            game = session.create_game_state()
+            return PlayState(screen, manager, game, session=session)
 
         # pygame initialization
         def final_score_from_payload(payload: dict[str, object]) -> int:

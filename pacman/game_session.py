@@ -29,8 +29,7 @@ class GameSession:
 
     @property
     def is_final_level(self) -> bool:
-        return (True if self.current_level_index
-                >= self.total_levels - 1 else False)
+        return self.current_level_index >= self.total_levels - 1
 
     def create_game_state(self) -> GameState:
         level = build_level(self.config, self.current_level_index)
