@@ -60,6 +60,8 @@ def generate_maze(level: LevelConfig) -> GeneratedMaze:
     try:
         maze = MazeGenerator(size=(level.width, level.height),
                              perfect=False,
+                             entry_cell=(0, 0),
+                             exit_cell=(0, 1),
                              seed=translate_seed(level.seed))
     except Exception as error:
         raise MazeGenerationError("Maze generation failed.") from error
