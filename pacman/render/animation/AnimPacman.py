@@ -1,13 +1,6 @@
-from pacman.render.animation.AnimEntity import AnimEntity
+from pacman.render.animation.AnimEntity import AnimEntity, AnimSet
 from pacman.render.Screen import Screen
 from pacman.render.animation.Animator import Animator
-from enum import Enum
-
-
-class AnimSet(str, Enum):
-    NORMAL = "NORMAL"
-    DEATH = "DEATH"
-    BOOSTED = 'BOOSTED'
 
 
 class AnimPacman(AnimEntity):

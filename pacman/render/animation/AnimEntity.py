@@ -7,6 +7,13 @@ from pacman.render.Screen import Screen
 from pacman.render.animation.RenderEntity import RenderEntity
 from pacman.render.animation.SpriteSheet import SpriteSheet
 from pacman.player import Direction
+from enum import Enum
+
+
+class AnimSet(str, Enum):
+    NORMAL = "NORMAL"
+    DEATH = "DEATH"
+    BOOSTED = 'BOOSTED'
 
 
 class AnimEntity(RenderOBJ):
