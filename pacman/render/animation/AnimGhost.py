@@ -7,7 +7,7 @@ class AnimGhost(AnimEntity):
     def __init__(self, screen: Screen, ghost_color: int = 0) -> None:
         super().__init__(screen)
         self.__ghost_color = ghost_color
-        self.__set_frightened_ghost()
+        self.__set_render_ghost()
 
     def __set_render_ghost(self) -> None:
         animators = {}
@@ -50,18 +50,7 @@ class AnimGhost(AnimEntity):
         self._render_entity.set_animator(Animator(frames,
                                                   tick_rate=self._tick_rate))
 
-    def __check_anim_set(self) -> None:
-        if self._anim_set == self._prev_anim_set:
-            return
-        self._prev_anim_set = self._anim_set
-        anim_set = self._anim_set
-        if anim_set == AnimSet.NORMAL:
-            self.__set_render_ghost()
-        elif anim_set == AnimSet.FRIGHTENED:
-            self.__set_frightened_ghost()
-
     def tick(self) -> None:
-        self.__check_anim_set()
         super().tick()
 
     @property
@@ -70,15 +59,12 @@ class AnimGhost(AnimEntity):
 
     @anim_set.setter
     def anim_set(self, anim_set: AnimSet) -> None:
-        if self._prev_anim_set != anim_set:
-            self._prev_anim_set = self._anim_set
-            self._anim_set = anim_set
-            animator = self._render_entity.animator
-            if not animator:
-                return
-            if anim_set is AnimSet.FRIGHTENED:
-                self.__set_frightened_ghost()
-            elif anim_set is AnimSet.FRIGHTENED_FLASHING:
-                self.__set_frightened_flashing_ghost()
-            elif anim_set is AnimSet.NORMAL:
-                self.__set_render_ghost()
+        if self._anim_set == anim_set:
+            return
+        self._anim_set = anim_set
+        if anim_set is AnimSet.FRIGHTENED:
+            self.__set_frightened_ghost()
+        elif anim_set is AnimSet.FRIGHTENED_FLASHING:
+            self.__set_frightened_flashing_ghost()
+        elif anim_set is AnimSet.NORMAL:
+            self.__set_render_ghost()

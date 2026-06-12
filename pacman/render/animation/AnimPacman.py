@@ -31,22 +31,7 @@ class AnimPacman(AnimEntity):
         self._render_entity.set_animator(Animator(frames,
                                                   tick_rate=self._tick_rate))
 
-    def __check_anim_set(self) -> None:
-        if self._anim_set == self._prev_anim_set:
-            return
-        self._prev_anim_set = self._anim_set
-        animator = self._render_entity.animator
-        if not animator:
-            return
-        if self._anim_set is AnimSet.BOOSTED:
-            animator.tick_rate = 8
-        elif self._anim_set is AnimSet.NORMAL:
-            animator.tick_rate = 18
-        elif self._anim_set is AnimSet.DEATH:
-            self.__set_death_anim()
-
     def tick(self) -> None:
-        self.__check_anim_set()
         if (self._anim_set is AnimSet.DEATH and
                 self.is_anim_over(nb_frames=12)):
             self._anim_set = AnimSet.NORMAL
@@ -59,4 +44,14 @@ class AnimPacman(AnimEntity):
 
     @anim_set.setter
     def anim_set(self, anim_set: AnimSet) -> None:
-        self._anim_set = anim_set
+        if self._anim_set == anim_set:
+            return
+        animator = self._render_entity.animator
+        if not animator:
+            return
+        if self._anim_set is AnimSet.BOOSTED:
+            animator.tick_rate = 8
+        elif self._anim_set is AnimSet.NORMAL:
+            animator.tick_rate = 18
+        elif self._anim_set is AnimSet.DEATH:
+            self.__set_death_anim()

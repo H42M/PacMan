@@ -15,7 +15,6 @@ class Animator:
         self.__index = int(t * (n - 1))
 
     def tick(self, step: int = 1) -> None:
-        print(f'tick rate: {self.__tick_rate}')
         if self.__tick_count >= self.__tick_rate:
             self.__index = (self.__index + step) % len(self.__frames)
         self.__tick_count = (self.__tick_count + 1) % self.__tick_rate + 1

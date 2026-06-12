@@ -109,6 +109,10 @@ class RenderGameplay (RenderOBJ):
     def set_pacman_anim(self, anim_set: AnimSet):
         self.__render_pacman.anim_set = anim_set
 
+    def set_ghosts_anim(self, anim_set: AnimSet):
+        for ghost in self.__render_ghosts:
+            ghost.anim_set = anim_set
+
     @property
     def size(self) -> Optional[tuple[int, int]]:
         return self._size

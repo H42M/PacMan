@@ -119,6 +119,4 @@ class AnimEntity(RenderOBJ):
 
     @anim_set.setter
     def anim_set(self, anim_set: AnimSet) -> None:
-        if self._prev_anim_set != anim_set:
-            self._prev_anim_set = self._anim_set
-            self._anim_set = anim_set
+        self._anim_set = anim_set

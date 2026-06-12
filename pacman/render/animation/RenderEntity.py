@@ -34,9 +34,11 @@ class RenderEntity(RenderOBJ):
 
     def set_animator(self, animator: Animator) -> None:
         self.__animator = animator
+        self.__dir_animators = None
 
     def set_dir_animators(self, animators: dict[str, Animator]) -> None:
         self.__dir_animators = animators
+        self.__animator = None
 
     def set_rotation(self, direction: str) -> None:
         d = direction.upper()
