@@ -70,7 +70,8 @@ class ScreenState(ABC):
         ...
 
 
-StateFactory = Callable[[Screen, "StateManager"], ScreenState]
+StatePayload = dict[str, object]
+StateFactory = Callable[[Screen, "StateManager", StatePayload], ScreenState]
 
 
 class StateManager:
@@ -120,7 +121,11 @@ class StateManager:
         """Render the current screen state."""
         self.__current_state.render()
 
-    def set_state(self, state: str) -> ScreenState:
+    def set_state(
+        self,
+        state: str,
+        payload: StatePayload | None = None,
+    ) -> ScreenState:
         """Switch to a registered screen state."""
         state_key = state.upper()
         factory = self.__state_factories.get(state_key)
@@ -133,7 +138,7 @@ class StateManager:
             )
 
         self.__screen.reset_clickables()
-        new_state = factory(self.__screen, self)
+        new_state = factory(self.__screen, self, payload or {})
         self.__current_state = new_state
         return new_state
 

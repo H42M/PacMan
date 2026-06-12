@@ -20,7 +20,9 @@ class PlayState(ScreenState):
         self,
         screen: Screen,
         state_manager: Optional[StateManager] = None,
-        game: Optional[GameplayState] = None
+        game: Optional[GameplayState] = None,
+        *,
+        total_levels: int,
     ) -> None:
         super().__init__(screen, state_manager)
         self.__game = game
@@ -35,6 +37,7 @@ class PlayState(ScreenState):
         self.__ghost_move_delay_ms = 500
         self.__last_timer_tick_ms = pygame.time.get_ticks()
         self.__countdown_timer_delay_ms = 1000
+        self.__total_levels = total_levels
         if self.__render_gameplay:
             self.__render_gameplay.set_entities_move_delay(
                 self.__player_move_delay_ms,
@@ -48,7 +51,11 @@ class PlayState(ScreenState):
             if event.type == pygame.KEYDOWN:
                 if (event.key == pygame.K_F1 and self.__game
                         and self.__game.outcome is GameOutcome.PLAYING):
-                    self.__game.debug_collect_all_pacgums()
+                    self.__game.debug_trigger_level_clear()
+
+                if (event.key == pygame.K_F2 and self.__game
+                        and self.__game.outcome is GameOutcome.PLAYING):
+                    self.__game.debug_trigger_game_over()
 
                 if event.key == pygame.K_ESCAPE:
                     self.__pause_menu.switch_display()
@@ -72,7 +79,18 @@ class PlayState(ScreenState):
 
         if (self.__game.outcome is GameOutcome.GAME_OVER
                 and self._state_manager):
-            self._state_manager.set_state(StateManager.GAMEOVER)
+            self._state_manager.set_state(
+                StateManager.GAMEOVER,
+                {"final_score": self.__game.score},
+            )
+        if (self.__game.outcome is GameOutcome.LEVEL_CLEARED
+                and self._state_manager):
+            if self.__game.level.number >= self.__total_levels:
+                self._state_manager.set_state(
+                    StateManager.VICTORY,
+                    {"final_score": self.__game.score},
+                )
+            return
 
         if self.__pause_menu.display:
             now = pygame.time.get_ticks()

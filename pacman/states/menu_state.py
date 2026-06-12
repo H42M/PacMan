@@ -4,15 +4,18 @@ from pacman.render.Container import Container
 from pacman.render.RenderConfig import RenderConfig
 from pacman.render.Screen import Screen
 from pacman.states.base_state import ScreenState, StateManager
+from pacman.highscores import load_highscores
 
 
 class MenuState(ScreenState):
     def __init__(
         self,
         screen: Screen,
-        state_manager: Optional[StateManager] = None
+        state_manager: Optional[StateManager] = None,
+        highscore_path: str = "highscores.json",
     ) -> None:
         super().__init__(screen, state_manager)
+        self.__highscore_path = highscore_path
         self.__menu_ctn = self.__load_menu()
 
     def update(self) -> None:
@@ -73,7 +76,29 @@ class MenuState(ScreenState):
             {Button(self._screen, 'SETTINGS', callback=on_settings): '0%'},
             {Button(self._screen, 'QUIT', callback=on_quit): '0%'},
         ])
+        highscores = load_highscores(self.__highscore_path)
 
+        highscores_ctn = Container(self._screen, 'VERTICAL', gap=5)
+        highscores_ctn.add_content([
+            {RenderText(self._screen, 'HIGHSCORES', font_size=22): '0%'}
+        ])
+
+        if highscores:
+            highscores_ctn.add_content([
+                {
+                    RenderText(
+                        self._screen,
+                        f'{index + 1}. {entry.name}: {entry.score}',
+                        font_size=18
+                    ): '0%'
+                }
+                for index, entry in enumerate(highscores)
+            ])
+        else:
+            highscores_ctn.add_content([
+                {RenderText(self._screen,
+                            'No highscores yet', font_size=18): '0%'}
+            ])
         footer_ctn = Container(self._screen, 'VERTICAL', gap=20)
         footer_info = Container(self._screen, 'HORIZONTAL')
         footer_info.add_content([
@@ -87,7 +112,7 @@ class MenuState(ScreenState):
             {
                 RenderText(
                     self._screen,
-                    'Max score: TODO',
+                    f'Highscore file: {self.__highscore_path}',
                     font_size=20
                 ): '0%'
             }
@@ -100,7 +125,8 @@ class MenuState(ScreenState):
 
         menu_ctn.add_content([
             {title_ctn: '20%'},
-            {btns_ctn: '70%'},
+            {btns_ctn: '45%'},
+            {highscores_ctn: '25%'},
             {footer_ctn: '10%'}
         ])
         container.add_content({menu_ctn: '90%'})

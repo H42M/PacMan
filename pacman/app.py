@@ -30,9 +30,15 @@ def run(config: GameConfig) -> int:
                               manager: StateManager) -> PlayState:
             level = build_level(config, 0)
             game = GameState.from_level(config, level)
-            return PlayState(screen, manager, game)
+            return PlayState(screen, manager, game,
+                             total_levels=len(config.levels))
 
         # pygame initialization
+        def final_score_from_payload(payload: dict[str, object]) -> int:
+            final_score = payload.get("final_score", 0)
+            if isinstance(final_score, int):
+                return final_score
+            return 0
         os.environ["SDL_VIDEO_WINDOW_POS"] = "100,100"
         RenderConfig.init(
             (WINDOW_WIDTH, WINDOW_HEIGHT),
@@ -45,22 +51,35 @@ def run(config: GameConfig) -> int:
             StateManager.MENU,
             {
                 StateManager.MENU: (
-                    lambda screen, manager: MenuState(screen, manager)
+                    lambda screen, manager, _payload: MenuState(
+                        screen, manager, config.highscore_filename)
                 ),
                 StateManager.SETTINGS: (
-                    lambda screen, manager: SettingsState(screen, manager)
+                    lambda screen, manager, _payload: SettingsState(
+                        screen, manager)
                 ),
                 StateManager.PLAYING: (
-                    lambda screen, manager: create_play_state(screen, manager)
+                    lambda screen, manager, _payload: create_play_state(
+                        screen, manager)
                 ),
                 StateManager.GAMEOVER: (
-                    lambda screen, manager: GameOverState(screen, manager)
+                    lambda screen, manager, payload: GameOverState(
+                        screen,
+                        manager,
+                        final_score=final_score_from_payload(payload),
+                        highscore_path=config.highscore_filename,
+                    )
                 ),
                 StateManager.VICTORY: (
-                    lambda screen, manager: GameOverState(
-                        screen, manager, GameOverState.WIN_SCREEN)
-                )
-            }
+                    lambda screen, manager, payload: GameOverState(
+                        screen,
+                        manager,
+                        GameOverState.WIN_SCREEN,
+                        final_score=final_score_from_payload(payload),
+                        highscore_path=config.highscore_filename,
+                    )
+                ),
+            },
         )
 
         # game loop
