@@ -15,6 +15,7 @@ class Animator:
         self.__index = int(t * (n - 1))
 
     def tick(self, step: int = 1) -> None:
+        print(f'tick rate: {self.__tick_rate}')
         if self.__tick_count >= self.__tick_rate:
             self.__index = (self.__index + step) % len(self.__frames)
         self.__tick_count = (self.__tick_count + 1) % self.__tick_rate + 1
@@ -30,3 +31,12 @@ class Animator:
     @property
     def frames(self) -> list[pygame.Surface]:
         return self.__frames
+
+    @property
+    def tick_rate(self) -> int:
+        return self.__tick_rate
+
+    @tick_rate.setter
+    def tick_rate(self, value: int) -> None:
+        self.__tick_rate = value
+        self.__tick_count = 0

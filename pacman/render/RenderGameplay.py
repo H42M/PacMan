@@ -7,7 +7,8 @@ from pacman.render.RenderMaze import RenderMaze
 from pacman.render.Screen import Screen
 from pacman.render.RenderConfig import RenderConfig
 from pacman.render.RenderObj import RenderOBJ
-from pacman.render.animation import AnimPacman, AnimGhost
+from pacman.render.animation import AnimGhost
+from pacman.render.animation.AnimPacman import AnimPacman, AnimSet
 
 
 class RenderGameplay (RenderOBJ):
@@ -104,6 +105,9 @@ class RenderGameplay (RenderOBJ):
         self.__render_pacman.set_move_delay(delay_ms)
         for ghost in self.__render_ghosts:
             ghost.set_move_delay(ghost_delay_ms)
+
+    def set_pacman_anim(self, anim_set: AnimSet):
+        self.__render_pacman.anim_set = anim_set
 
     @property
     def size(self) -> Optional[tuple[int, int]]:

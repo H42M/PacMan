@@ -13,7 +13,7 @@ class AnimEntity(RenderOBJ):
     def __init__(self, screen: Screen) -> None:
         self._move_progress: float = 1.0
         self._move_speed = 1.0 / ((200 / 1000) * 60)
-        self._tick_rate = 12
+        self._tick_rate = 18
 
         super().__init__(screen)
 

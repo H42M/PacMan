@@ -117,6 +117,13 @@ class PlayState(ScreenState):
             if self.__game.outcome is not GameOutcome.PLAYING:
                 return
 
+        if self.__render_gameplay:
+            from pacman.render.animation.AnimPacman import AnimSet
+            if self.__game.frightened_timer_ms > 0:
+                self.__render_gameplay.set_pacman_anim(AnimSet.BOOSTED)
+            else:
+                self.__render_gameplay.set_pacman_anim(AnimSet.NORMAL)
+
     def render(self) -> None:
         self._screen.clear()
         self.__renderer = self.__load_game()

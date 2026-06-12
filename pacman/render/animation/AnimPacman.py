@@ -7,13 +7,15 @@ from enum import Enum
 class AnimSet(str, Enum):
     NORMAL = "NORMAL"
     DEATH = "DEATH"
+    BOOSTED = 'BOOSTED'
 
 
 class AnimPacman(AnimEntity):
     def __init__(self, screen: Screen) -> None:
         super().__init__(screen)
-        self.__set_death_anim()
-        self.__anim_set = AnimSet.DEATH
+        self.__set_pacman_anim()
+        self.__anim_set = AnimSet.NORMAL
+        self.__prev_anim_set = self.__anim_set
 
     def __set_pacman_anim(self) -> None:
         frames = []
@@ -39,9 +41,25 @@ class AnimPacman(AnimEntity):
                                                   tick_rate=self._tick_rate))
 
     def tick(self) -> None:
-        super().tick()
-        # TEMP TICK:
         if (self.__anim_set is AnimSet.DEATH and
                 self.is_anim_over(nb_frames=12)):
             self.__anim_set = AnimSet.NORMAL
             self.__set_pacman_anim()
+        super().tick()
+
+    @property
+    def anim_set(self) -> str:
+        return self.__anim_set
+
+    @anim_set.setter
+    def anim_set(self, anim_set: AnimSet) -> None:
+        if self.__prev_anim_set != anim_set:
+            self.__prev_anim_set = self.__anim_set
+            self.__anim_set = anim_set
+            animator = self._render_entity.animator
+            if not animator:
+                return
+            if anim_set is AnimSet.BOOSTED:
+                animator.tick_rate = 8
+            elif anim_set is AnimSet.NORMAL:
+                animator.tick_rate = 18
