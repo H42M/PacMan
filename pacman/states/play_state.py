@@ -127,7 +127,6 @@ class PlayState(ScreenState):
                 self.__last_ghost_move_ms = now
                 return
             if self.__game.has_collected_all_pacgums():
-                print("Congratulations, you won!")
                 self.__game.outcome = GameOutcome.LEVEL_CLEARED
                 return
 

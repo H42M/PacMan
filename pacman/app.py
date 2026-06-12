@@ -8,7 +8,6 @@ from pacman.game_config import GameConfig
 from pacman.maze_adapter import MazeGenerationError
 from pacman.game_session import GameSession
 
-
 from pacman.render.RenderConfig import RenderConfig
 from pacman.render.Screen import Screen
 
@@ -21,8 +20,6 @@ from pacman.states.setting_state import SettingsState
 
 def run(config: GameConfig) -> int:
     """Run the Pac-Man application."""
-    print()
-    print(f"Starting Pac-Man with config: {config}")
     try:
         # level building and maze generation
         def create_play_state(screen: Screen,
