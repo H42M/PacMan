@@ -15,6 +15,7 @@ class AnimSet(str, Enum):
     DEATH = "DEATH"
     BOOSTED = 'BOOSTED'
     FRIGHTENED = 'FRIGHTENED'
+    FRIGHTENED_FLASHING = "FRIGHTENED_FLASHING"
 
 
 class AnimEntity(RenderOBJ):

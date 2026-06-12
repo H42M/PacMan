@@ -24,6 +24,7 @@ class RenderEntity(RenderOBJ):
         self.__animator: Optional[Animator] = None
         self.__dir_animators: Optional[dict[str, Animator]] = None
         self.__rotation: str = 'E'
+        self.__fix_rotation = False
 
     def set_skin(self, texture: Optional[pygame.Surface]) -> None:
         if texture:
@@ -70,7 +71,10 @@ class RenderEntity(RenderOBJ):
             angles = {'E': 0, 'W': 180, 'N': 90, 'S': 270}
             angle = angles.get(self.__rotation, 0)
             scaled = pygame.transform.scale(texture, self._size)
-            rotated = pygame.transform.rotate(scaled, angle)
+            if self.__fix_rotation:
+                rotated = scaled
+            else:
+                rotated = pygame.transform.rotate(scaled, angle)
 
             self._screen.screen.blit(rotated, self._pos)
 
@@ -85,3 +89,11 @@ class RenderEntity(RenderOBJ):
     @property
     def animator(self) -> Optional[Animator]:
         return self.__animator
+
+    @property
+    def fix_rotation(self) -> bool:
+        return self.__fix_rotation
+
+    @fix_rotation.setter
+    def fix_rotation(self, value: bool) -> None:
+        self.__fix_rotation = value

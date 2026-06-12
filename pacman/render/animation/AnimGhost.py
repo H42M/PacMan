@@ -25,6 +25,20 @@ class AnimGhost(AnimEntity):
         self._render_entity.set_dir_animators(animators)
 
     def __set_frightened_ghost(self) -> None:
+        self._render_entity.fix_rotation = True
+        frames = []
+        for i in range(2):
+            w = self._SHEET_SPRITE_W
+            h = self._SHEET_SPRITE_H
+            x = (i + 8) * w
+            y = 4 * h
+            frames.append(self._sheet.crop_rect((x, y, w, h)))
+
+        self._render_entity.set_animator(Animator(frames,
+                                                  tick_rate=self._tick_rate))
+
+    def __set_frightened_flashing_ghost(self) -> None:
+        self._render_entity.fix_rotation = True
         frames = []
         for i in range(4):
             w = self._SHEET_SPRITE_W
@@ -64,5 +78,7 @@ class AnimGhost(AnimEntity):
                 return
             if anim_set is AnimSet.FRIGHTENED:
                 self.__set_frightened_ghost()
+            elif anim_set is AnimSet.FRIGHTENED_FLASHING:
+                self.__set_frightened_flashing_ghost()
             elif anim_set is AnimSet.NORMAL:
                 self.__set_render_ghost()
