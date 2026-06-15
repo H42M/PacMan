@@ -3,14 +3,16 @@ from typing import Optional
 import pygame
 from pygame.event import Event
 
+from pacman.states.base_state import ScreenState, StateManager
 from pacman.game_state import GameState as GameplayState, GameOutcome
 from pacman.input import direction_from_key
+from pacman.game_session import GameSession
+
 from pacman.render.Container import Container
 from pacman.render.RenderConfig import RenderConfig
 from pacman.render.RenderGameplay import RenderGameplay
 from pacman.render.Screen import Screen
 from pacman.render.Window import Window
-from pacman.states.base_state import ScreenState, StateManager
 
 
 class PlayState(ScreenState):
@@ -22,10 +24,11 @@ class PlayState(ScreenState):
         state_manager: Optional[StateManager] = None,
         game: Optional[GameplayState] = None,
         *,
-        total_levels: int,
+        session: GameSession,
     ) -> None:
         super().__init__(screen, state_manager)
         self.__game = game
+        self.__session: GameSession = session
         self.__render_gameplay = (RenderGameplay(screen, game)
                                   if game else None)
         self.__renderer = self.__load_game()
@@ -37,7 +40,6 @@ class PlayState(ScreenState):
         self.__ghost_move_delay_ms = 500
         self.__last_timer_tick_ms = pygame.time.get_ticks()
         self.__countdown_timer_delay_ms = 1000
-        self.__total_levels = total_levels
         if self.__render_gameplay:
             self.__render_gameplay.set_entities_move_delay(
                 self.__player_move_delay_ms,
@@ -85,11 +87,13 @@ class PlayState(ScreenState):
             )
         if (self.__game.outcome is GameOutcome.LEVEL_CLEARED
                 and self._state_manager):
-            if self.__game.level.number >= self.__total_levels:
+            if self.__session.is_final_level:
                 self._state_manager.set_state(
                     StateManager.VICTORY,
                     {"final_score": self.__game.score},
                 )
+            else:
+                self.__start_next_level()
             return
 
         if self.__pause_menu.display:
@@ -123,7 +127,6 @@ class PlayState(ScreenState):
                 self.__last_ghost_move_ms = now
                 return
             if self.__game.has_collected_all_pacgums():
-                print("Congratulations, you won!")
                 self.__game.outcome = GameOutcome.LEVEL_CLEARED
                 return
 
@@ -160,6 +163,22 @@ class PlayState(ScreenState):
 
         self.__pause_menu.render()
         self._screen.flip()
+
+    def __start_next_level(self) -> None:
+        if self.__game is None:
+            return
+        self.__session.sync_from_game(self.__game)
+        self.__session.advance_level()
+        self.__game = self.__session.create_game_state()
+        self.__render_gameplay = RenderGameplay(self._screen, self.__game)
+        self.__render_gameplay.set_entities_move_delay(
+            self.__player_move_delay_ms,
+            self.__ghost_move_delay_ms,
+        )
+        now = pygame.time.get_ticks()
+        self.__last_player_move_ms = now
+        self.__last_ghost_move_ms = now
+        self.__last_timer_tick_ms = now
 
     def __load_game(self) -> Container:
         from pacman.render.RenderText import RenderText
