@@ -52,10 +52,7 @@ class AnimPacman(AnimEntity):
             return
         if self._anim_set is AnimSet.BOOSTED:
             animator.tick_rate = 8
-            print('Anim Boosted')
         elif self._anim_set is AnimSet.NORMAL:
             animator.tick_rate = 18
-            print('Anim Normal')
         elif self._anim_set is AnimSet.DEATH:
             self.__set_death_anim()
-            print('Anim DEATH')
