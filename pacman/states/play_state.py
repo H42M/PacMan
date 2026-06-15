@@ -182,13 +182,26 @@ class PlayState(ScreenState):
 
     def __load_game(self) -> Container:
         from pacman.render.RenderText import RenderText
+        from pacman.render.Divider import Divider
+        from pacman.render.Image import RenderImg
 
         main_ctn = Container(self._screen, 'VERTICAL', pos=(0, 0),
                              size=RenderConfig.screen_size)
         if self.__render_gameplay and self.__game:
+            lifes_ctn = Container(self._screen, 'HORIZONTAL', padding=20)
+            lifes_ctn.add_content([
+                    {RenderText(self._screen, 'Lifes: '): '20%'},
+                    {Divider(self._screen): '1%'}
+                ])
+            for _ in range(self.__game.lives):
+                lifes_ctn.add_content(
+                    {RenderImg(self._screen, 'assets/sprites/pacman.png',
+                               is_square=True): '15%'}
+                )
             hud_ctn = Container(self._screen, 'HORIZONTAL')
             hud_ctn.add_content([
-                {RenderText(self._screen, f'Life: {self.__game.lives}'): '0%'},
+
+                {lifes_ctn: '25%'},
                 {RenderText(self._screen, f'Score: {self.__game.score}'
                             ): '0%'},
                 {RenderText(self._screen, f'Time: {self.__game.remaining_time}'
