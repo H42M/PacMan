@@ -209,12 +209,14 @@ class GameState:
             ghost.mode = GhostMode.NORMAL
             ghost.respawn_timer_ms = 0
 
-    def handle_player_ghost_collision(self) -> None:
+    def handle_player_ghost_collision(self, *, god_mode: bool = False) -> None:
         if self.outcome is not GameOutcome.PLAYING:
             return
         for ghost in self.ghosts:
             if (ghost.mode is GhostMode.NORMAL and
                     self.player.position == ghost.position):
+                if god_mode:
+                    continue
                 self.lives -= 1
                 if self.lives <= 0:
                     self.outcome = GameOutcome.GAME_OVER

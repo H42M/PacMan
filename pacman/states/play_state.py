@@ -7,6 +7,7 @@ from pacman.states.base_state import ScreenState, StateManager
 from pacman.game_state import GameState as GameplayState, GameOutcome
 from pacman.input import direction_from_key
 from pacman.game_session import GameSession
+from pacman.cheats import CheatState
 
 from pacman.render.Container import Container
 from pacman.render.RenderConfig import RenderConfig
@@ -40,6 +41,7 @@ class PlayState(ScreenState):
         self.__ghost_move_delay_ms = 500
         self.__last_timer_tick_ms = pygame.time.get_ticks()
         self.__countdown_timer_delay_ms = 1000
+        self.__cheats = CheatState()
         if self.__render_gameplay:
             self.__render_gameplay.set_entities_move_delay(
                 self.__player_move_delay_ms,
@@ -58,6 +60,21 @@ class PlayState(ScreenState):
                 if (event.key == pygame.K_F2 and self.__game
                         and self.__game.outcome is GameOutcome.PLAYING):
                     self.__game.debug_trigger_game_over()
+
+                if (event.key == pygame.K_F3 and self.__game
+                        and self.__game.outcome is GameOutcome.PLAYING):
+                    self.__cheats.toggle_god_mode()
+                    print("God mode: "
+                          f"{'ON' if self.__cheats.god_mode else 'OFF'}")
+
+                if (event.key == pygame.K_F4 and self.__game
+                        and self.__game.outcome is GameOutcome.PLAYING):
+                    self.__cheats.toggle_ghost_freeze()
+
+                if (event.key == pygame.K_F5 and self.__game
+                        and self.__game.outcome is GameOutcome.PLAYING):
+                    self.__game.lives += 1
+                    print(f"Extra life added: {self.__game.lives}")
 
                 if event.key == pygame.K_ESCAPE:
                     self.__pause_menu.switch_display()
@@ -118,7 +135,9 @@ class PlayState(ScreenState):
             lives_before = self.__game.lives
 
             self.__game.advance_player()
-            self.__game.handle_player_ghost_collision()
+            self.__game.handle_player_ghost_collision(
+                god_mode=self.__cheats.god_mode
+            )
             self.__last_player_move_ms = now
 
             if self.__game.outcome is not GameOutcome.PLAYING:
@@ -131,8 +150,11 @@ class PlayState(ScreenState):
                 return
 
         if ghost_elapsed >= self.__ghost_move_delay_ms:
-            self.__game.move_ghosts()
-            self.__game.handle_player_ghost_collision()
+            if not self.__cheats.ghost_freeze:
+                self.__game.move_ghosts()
+                self.__game.handle_player_ghost_collision(
+                    god_mode=self.__cheats.god_mode
+                )
             self.__game.tick_ghost_timers(ghost_elapsed)
             self.__last_ghost_move_ms = now
             if self.__game.outcome is not GameOutcome.PLAYING:
