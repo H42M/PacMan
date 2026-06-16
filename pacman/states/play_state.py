@@ -241,7 +241,8 @@ class PlayState(ScreenState):
                     {lifes_ctn_img_ctn: '70%'}
                 ])
 
-            hud_ctn = Container(self._screen, 'HORIZONTAL')
+            hud_ctn = Container(self._screen, 'HORIZONTAL',
+                                bg_color=RenderConfig.BLUE)
             hud_ctn.add_content([
 
                 {lifes_ctn: '0%'},

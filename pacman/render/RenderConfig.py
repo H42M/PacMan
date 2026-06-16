@@ -18,6 +18,7 @@ class RenderConfig:
     RED = (200, 50, 50)
     GREEN = (100, 205, 100)
     GREY = (100, 100, 100)
+    BLUE = (30, 60, 220)
 
     @classmethod
     def init(cls, screen_size: tuple[int, int],
