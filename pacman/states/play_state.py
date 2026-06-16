@@ -81,7 +81,8 @@ class PlayState(ScreenState):
                 if (event.key == pygame.K_F5 and self.__game
                         and self.__game.outcome is GameOutcome.PLAYING
                         and self.__game.phase is GameplayPhase.PLAYING):
-                    self.__game.lives += 1
+                    if self.__game.lives < 5:
+                        self.__game.lives += 1
 
                 if (event.key == pygame.K_ESCAPE and
                         (self.__game is None or
