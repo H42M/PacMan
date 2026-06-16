@@ -19,6 +19,7 @@ class RenderConfig:
     GREEN = (100, 205, 100)
     GREY = (100, 100, 100)
     BLUE = (30, 60, 220)
+    FONT = 'assets/fonts/Emulogic.ttf'
 
     @classmethod
     def init(cls, screen_size: tuple[int, int],
