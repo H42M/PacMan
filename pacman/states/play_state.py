@@ -4,7 +4,11 @@ import pygame
 from pygame.event import Event
 
 from pacman.states.base_state import ScreenState, StateManager
-from pacman.game_state import GameState as GameplayState, GameOutcome
+from pacman.game_state import (
+    GameState as GameplayState,
+    GameOutcome,
+    GameplayPhase,
+)
 from pacman.input import direction_from_key
 from pacman.game_session import GameSession
 
@@ -40,6 +44,8 @@ class PlayState(ScreenState):
         self.__ghost_move_delay_ms = 500
         self.__last_timer_tick_ms = pygame.time.get_ticks()
         self.__countdown_timer_delay_ms = 1000
+        self.__player_death_started_ms: Optional[int] = None
+        self.__player_death_duration_ms = 1500
         if self.__render_gameplay:
             self.__render_gameplay.set_entities_move_delay(
                 self.__player_move_delay_ms,
@@ -52,20 +58,25 @@ class PlayState(ScreenState):
 
             if event.type == pygame.KEYDOWN:
                 if (event.key == pygame.K_F1 and self.__game
-                        and self.__game.outcome is GameOutcome.PLAYING):
+                        and self.__game.outcome is GameOutcome.PLAYING
+                        and self.__game.phase is GameplayPhase.PLAYING):
                     self.__game.debug_trigger_level_clear()
 
                 if (event.key == pygame.K_F2 and self.__game
-                        and self.__game.outcome is GameOutcome.PLAYING):
+                        and self.__game.outcome is GameOutcome.PLAYING
+                        and self.__game.phase is GameplayPhase.PLAYING):
                     self.__game.debug_trigger_game_over()
 
-                if event.key == pygame.K_ESCAPE:
+                if (event.key == pygame.K_ESCAPE and
+                        (self.__game is None or
+                         self.__game.phase is GameplayPhase.PLAYING)):
                     self.__pause_menu.switch_display()
                     if self.__pause_menu.display:
                         self.__pause_menu.resize()
 
                 elif (not self.__pause_menu.display and self.__game and
-                        self.__game.outcome is GameOutcome.PLAYING):
+                        self.__game.outcome is GameOutcome.PLAYING and
+                        self.__game.phase is GameplayPhase.PLAYING):
                     direction = direction_from_key(event.key)
                     if direction:
                         self.__game.queue_player_direction(direction)
@@ -102,6 +113,8 @@ class PlayState(ScreenState):
             self.__last_player_move_ms = now
             self.__last_ghost_move_ms = now
             return
+        if self.__update_player_death_animation():
+            return
         if self.__game.outcome is not GameOutcome.PLAYING:
             return
 
@@ -115,16 +128,14 @@ class PlayState(ScreenState):
             self.__last_timer_tick_ms = now
 
         if player_elapsed >= self.__player_move_delay_ms:
-            lives_before = self.__game.lives
-
             self.__game.advance_player()
             self.__game.handle_player_ghost_collision()
             self.__last_player_move_ms = now
 
-            if self.__game.outcome is not GameOutcome.PLAYING:
+            if self.__game.phase is GameplayPhase.PLAYER_DYING:
+                self.__start_player_death_animation(now)
                 return
-            if self.__game.lives < lives_before:
-                self.__last_ghost_move_ms = now
+            if self.__game.outcome is not GameOutcome.PLAYING:
                 return
             if self.__game.has_collected_all_pacgums():
                 self.__game.outcome = GameOutcome.LEVEL_CLEARED
@@ -133,6 +144,9 @@ class PlayState(ScreenState):
         if ghost_elapsed >= self.__ghost_move_delay_ms:
             self.__game.move_ghosts()
             self.__game.handle_player_ghost_collision()
+            if self.__game.phase is GameplayPhase.PLAYER_DYING:
+                self.__start_player_death_animation(now)
+                return
             self.__game.tick_ghost_timers(ghost_elapsed)
             self.__last_ghost_move_ms = now
             if self.__game.outcome is not GameOutcome.PLAYING:
@@ -156,6 +170,7 @@ class PlayState(ScreenState):
     def render(self) -> None:
         self._screen.clear()
         self.__renderer = self.__load_game()
+
         if self.__renderer:
             self.__renderer.render()
         else:
@@ -179,6 +194,28 @@ class PlayState(ScreenState):
         self.__last_player_move_ms = now
         self.__last_ghost_move_ms = now
         self.__last_timer_tick_ms = now
+
+    def __start_player_death_animation(self, now: int) -> None:
+        from pacman.render.animation.AnimEntity import AnimSet
+        self.__last_player_move_ms = now
+        self.__last_ghost_move_ms = now
+        self.__last_timer_tick_ms = now
+        if self.__render_gameplay:
+            self.__render_gameplay.set_pacman_anim(AnimSet.DEATH)
+
+    def __update_player_death_animation(self) -> bool:
+        from pacman.render.animation.AnimEntity import AnimSet
+        if (self.__game is None or self.__game.phase is
+                not GameplayPhase.PLAYER_DYING):
+            return False
+        if not self.__render_gameplay:
+            return False
+        animator = self.__render_gameplay.pacman.animator
+        if animator and animator.finished:
+            self.__game.finish_player_death()
+            self.__render_gameplay.set_pacman_anim(AnimSet.NORMAL)
+
+        return True
 
     def __load_game(self) -> Container:
         from pacman.render.RenderText import RenderText

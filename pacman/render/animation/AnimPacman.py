@@ -1,6 +1,7 @@
 from pacman.render.animation.AnimEntity import AnimEntity, AnimSet
 from pacman.render.Screen import Screen
 from pacman.render.animation.Animator import Animator
+from typing import Optional
 
 
 class AnimPacman(AnimEntity):
@@ -29,9 +30,15 @@ class AnimPacman(AnimEntity):
             y = 0
             frames.append(self._sheet.crop_rect((x, y, w, h)))
         self._render_entity.set_animator(Animator(frames,
-                                                  tick_rate=self._tick_rate))
+                                                  tick_rate=self._tick_rate,
+                                                  loop=False))
 
     def tick(self) -> None:
+        # print test:
+        if self.anim_set is AnimSet.DEATH:
+            animator = self._render_entity.animator
+            print(animator.frame_index if animator else None)
+
         if (self._anim_set is AnimSet.DEATH and
                 self.is_anim_over(nb_frames=12)):
             self._anim_set = AnimSet.NORMAL
@@ -51,8 +58,14 @@ class AnimPacman(AnimEntity):
         if not animator:
             return
         if self._anim_set is AnimSet.BOOSTED:
+            self.__set_pacman_anim()
             animator.tick_rate = 8
         elif self._anim_set is AnimSet.NORMAL:
+            self.__set_pacman_anim()
             animator.tick_rate = 18
         elif self._anim_set is AnimSet.DEATH:
             self.__set_death_anim()
+
+    @property
+    def animator(self) -> Optional[Animator]:
+        return self._render_entity.animator

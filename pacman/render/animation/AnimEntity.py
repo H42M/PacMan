@@ -66,6 +66,14 @@ class AnimEntity(RenderOBJ):
             self._move_start_ms = pygame.time.get_ticks()
             self._move_progress = 0.0
 
+    def snap_to_target_pos(self) -> None:
+        if self._target_pos is None:
+            return
+        self._pos = self._target_pos
+        self._real_pos = self._target_pos
+        self._prev_pos = self._target_pos
+        self._move_progress = 1.0
+
     def tick(self) -> None:
         self._render_entity.tick_animator()
         if not self._prev_pos or not self._target_pos:
@@ -88,6 +96,9 @@ class AnimEntity(RenderOBJ):
     def set_move_delay(self, delay_ms: int) -> None:
         self._move_duration_ms = delay_ms
 
+    def set_animation_progress(self, progress: float) -> None:
+        self._render_entity.set_progress(progress)
+
     def render(self) -> None:
         self._render_entity.pos = self._real_pos
         self._render_entity.size = self.size
@@ -104,10 +115,10 @@ class AnimEntity(RenderOBJ):
         }
         self._render_entity.set_rotation(dir_mapper[rotation])
 
-    def is_anim_over(self, nb_frames: Optional[int] = None):
+    def is_anim_over(self, nb_frames: Optional[int] = None) -> bool:
         animator = self._render_entity.animator
         if not animator:
-            return
+            return True
         if nb_frames is None:
             nb_frames = len(animator.frames)
 

@@ -1,7 +1,7 @@
 import pygame
 from typing import Optional
 
-from pacman.game_state import GameState
+from pacman.game_state import GameState, GameplayPhase
 from pacman.ghost import GhostMode
 from pacman.render.RenderMaze import RenderMaze
 from pacman.render.Screen import Screen
@@ -21,6 +21,7 @@ class RenderGameplay (RenderOBJ):
         self.maze_renderer = RenderMaze(screen, game.level.maze)
         self._configure_maze_renderer()
         self.__render_pacman = AnimPacman(screen)
+        self.__player_death_progress: float | None = None
         self.__render_ghosts = [AnimGhost(screen, ghost_color=i)
                                 for i, _ in enumerate(self.game.ghosts)]
 
@@ -38,7 +39,13 @@ class RenderGameplay (RenderOBJ):
         self.__render_pacman.set_target_pos(self.maze_renderer.grid_to_screen(
             self.game.player.position, (player_size, player_size)))
         self.__render_pacman.set_rotation(self.game.player.current_direction)
-        self.__render_pacman.tick()
+        if self.__player_death_progress is None:
+            self.__render_pacman.tick()
+        else:
+            self.__render_pacman.snap_to_target_pos()
+            self.__render_pacman.set_animation_progress(
+                self.__player_death_progress,
+            )
         self.__render_pacman.render()
 
     def _render_ghosts(self) -> None:
@@ -55,8 +62,14 @@ class RenderGameplay (RenderOBJ):
                 ghost.position, (ghost_size, ghost_size)
             ))
             render_ghost.set_rotation(ghost.direction)
-            render_ghost.tick()
+            if self.game.phase is GameplayPhase.PLAYER_DYING:
+                render_ghost.snap_to_target_pos()
+            else:
+                render_ghost.tick()
             render_ghost.render()
+
+    def set_player_death_progress(self, progress: float | None) -> None:
+        self.__player_death_progress = progress
 
     def _render_pacgums(self) -> None:
         surface = self.screen.screen
@@ -106,12 +119,16 @@ class RenderGameplay (RenderOBJ):
         for ghost in self.__render_ghosts:
             ghost.set_move_delay(ghost_delay_ms)
 
-    def set_pacman_anim(self, anim_set: AnimSet):
+    def set_pacman_anim(self, anim_set: AnimSet) -> None:
         self.__render_pacman.anim_set = anim_set
 
-    def set_ghosts_anim(self, anim_set: AnimSet):
+    def set_ghosts_anim(self, anim_set: AnimSet) -> None:
         for ghost in self.__render_ghosts:
             ghost.anim_set = anim_set
+
+    @property
+    def pacman(self) -> AnimPacman:
+        return self.__render_pacman
 
     @property
     def size(self) -> Optional[tuple[int, int]]:
