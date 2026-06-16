@@ -7,13 +7,22 @@ from pacman.render.Screen import Screen
 from pacman.render.animation.RenderEntity import RenderEntity
 from pacman.render.animation.SpriteSheet import SpriteSheet
 from pacman.player import Direction
+from enum import Enum
+
+
+class AnimSet(str, Enum):
+    NORMAL = "NORMAL"
+    DEATH = "DEATH"
+    BOOSTED = 'BOOSTED'
+    FRIGHTENED = 'FRIGHTENED'
+    FRIGHTENED_FLASHING = "FRIGHTENED_FLASHING"
 
 
 class AnimEntity(RenderOBJ):
     def __init__(self, screen: Screen) -> None:
         self._move_progress: float = 1.0
         self._move_speed = 1.0 / ((200 / 1000) * 60)
-        self._tick_rate = 12
+        self._tick_rate = 18
 
         super().__init__(screen)
 
@@ -31,7 +40,10 @@ class AnimEntity(RenderOBJ):
         self._SHEET_SPRITE_W = self._sheet.size[0] // self._SHEET_NB_SPRITES_H
         self._SHEET_SPRITE_H = self._sheet.size[1] // self._SHEET_NB_SPRITES_V
 
-        self._render_entity: RenderEntity
+        self._anim_set = AnimSet.NORMAL
+        self._prev_anim_set = self._anim_set
+
+        self._render_entity = RenderEntity(screen)
 
     def _load_sheet(self, path: str) -> SpriteSheet:
         try:
@@ -53,6 +65,14 @@ class AnimEntity(RenderOBJ):
             self._target_pos = target_pos
             self._move_start_ms = pygame.time.get_ticks()
             self._move_progress = 0.0
+
+    def snap_to_target_pos(self) -> None:
+        if self._target_pos is None:
+            return
+        self._pos = self._target_pos
+        self._real_pos = self._target_pos
+        self._prev_pos = self._target_pos
+        self._move_progress = 1.0
 
     def tick(self) -> None:
         self._render_entity.tick_animator()
@@ -76,6 +96,9 @@ class AnimEntity(RenderOBJ):
     def set_move_delay(self, delay_ms: int) -> None:
         self._move_duration_ms = delay_ms
 
+    def set_animation_progress(self, progress: float) -> None:
+        self._render_entity.set_progress(progress)
+
     def render(self) -> None:
         self._render_entity.pos = self._real_pos
         self._render_entity.size = self.size
@@ -91,3 +114,20 @@ class AnimEntity(RenderOBJ):
             Direction.LEFT: 'W',
         }
         self._render_entity.set_rotation(dir_mapper[rotation])
+
+    def is_anim_over(self, nb_frames: Optional[int] = None) -> bool:
+        animator = self._render_entity.animator
+        if not animator:
+            return True
+        if nb_frames is None:
+            nb_frames = len(animator.frames)
+
+        return True if animator.frame_index >= nb_frames else False
+
+    @property
+    def anim_set(self) -> str:
+        return self._anim_set
+
+    @anim_set.setter
+    def anim_set(self, anim_set: AnimSet) -> None:
+        self._anim_set = anim_set

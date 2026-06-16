@@ -4,7 +4,11 @@ import pygame
 from pygame.event import Event
 
 from pacman.states.base_state import ScreenState, StateManager
-from pacman.game_state import GameState as GameplayState, GameOutcome
+from pacman.game_state import (
+    GameState as GameplayState,
+    GameOutcome,
+    GameplayPhase,
+)
 from pacman.input import direction_from_key
 from pacman.game_session import GameSession
 from pacman.cheats import CheatState
@@ -41,6 +45,8 @@ class PlayState(ScreenState):
         self.__ghost_move_delay_ms = 500
         self.__last_timer_tick_ms = pygame.time.get_ticks()
         self.__countdown_timer_delay_ms = 1000
+        self.__player_death_started_ms: Optional[int] = None
+        self.__player_death_duration_ms = 1500
         self.__cheats = CheatState()
         if self.__render_gameplay:
             self.__render_gameplay.set_entities_move_delay(
@@ -54,35 +60,39 @@ class PlayState(ScreenState):
 
             if event.type == pygame.KEYDOWN:
                 if (event.key == pygame.K_F1 and self.__game
-                        and self.__game.outcome is GameOutcome.PLAYING):
+                        and self.__game.outcome is GameOutcome.PLAYING
+                        and self.__game.phase is GameplayPhase.PLAYING):
                     self.__game.debug_trigger_level_clear()
 
                 if (event.key == pygame.K_F2 and self.__game
-                        and self.__game.outcome is GameOutcome.PLAYING):
+                        and self.__game.outcome is GameOutcome.PLAYING
+                        and self.__game.phase is GameplayPhase.PLAYING):
                     self.__game.debug_trigger_game_over()
-
                 if (event.key == pygame.K_F3 and self.__game
-                        and self.__game.outcome is GameOutcome.PLAYING):
+                        and self.__game.outcome is GameOutcome.PLAYING
+                        and self.__game.phase is GameplayPhase.PLAYING):
                     self.__cheats.toggle_god_mode()
-                    print("God mode: "
-                          f"{'ON' if self.__cheats.god_mode else 'OFF'}")
 
                 if (event.key == pygame.K_F4 and self.__game
-                        and self.__game.outcome is GameOutcome.PLAYING):
+                        and self.__game.outcome is GameOutcome.PLAYING
+                        and self.__game.phase is GameplayPhase.PLAYING):
                     self.__cheats.toggle_ghost_freeze()
 
                 if (event.key == pygame.K_F5 and self.__game
-                        and self.__game.outcome is GameOutcome.PLAYING):
+                        and self.__game.outcome is GameOutcome.PLAYING
+                        and self.__game.phase is GameplayPhase.PLAYING):
                     self.__game.lives += 1
-                    print(f"Extra life added: {self.__game.lives}")
 
-                if event.key == pygame.K_ESCAPE:
+                if (event.key == pygame.K_ESCAPE and
+                        (self.__game is None or
+                         self.__game.phase is GameplayPhase.PLAYING)):
                     self.__pause_menu.switch_display()
                     if self.__pause_menu.display:
                         self.__pause_menu.resize()
 
                 elif (not self.__pause_menu.display and self.__game and
-                        self.__game.outcome is GameOutcome.PLAYING):
+                        self.__game.outcome is GameOutcome.PLAYING and
+                        self.__game.phase is GameplayPhase.PLAYING):
                     direction = direction_from_key(event.key)
                     if direction:
                         self.__game.queue_player_direction(direction)
@@ -119,6 +129,8 @@ class PlayState(ScreenState):
             self.__last_player_move_ms = now
             self.__last_ghost_move_ms = now
             return
+        if self.__update_player_death_animation():
+            return
         if self.__game.outcome is not GameOutcome.PLAYING:
             return
 
@@ -132,18 +144,15 @@ class PlayState(ScreenState):
             self.__last_timer_tick_ms = now
 
         if player_elapsed >= self.__player_move_delay_ms:
-            lives_before = self.__game.lives
-
             self.__game.advance_player()
             self.__game.handle_player_ghost_collision(
-                god_mode=self.__cheats.god_mode
-            )
+                god_mode=self.__cheats.god_mode,)
             self.__last_player_move_ms = now
 
-            if self.__game.outcome is not GameOutcome.PLAYING:
+            if self.__game.phase is GameplayPhase.PLAYER_DYING:
+                self.__start_player_death_animation(now)
                 return
-            if self.__game.lives < lives_before:
-                self.__last_ghost_move_ms = now
+            if self.__game.outcome is not GameOutcome.PLAYING:
                 return
             if self.__game.has_collected_all_pacgums():
                 self.__game.outcome = GameOutcome.LEVEL_CLEARED
@@ -153,16 +162,35 @@ class PlayState(ScreenState):
             if not self.__cheats.ghost_freeze:
                 self.__game.move_ghosts()
                 self.__game.handle_player_ghost_collision(
-                    god_mode=self.__cheats.god_mode
+                    god_mode=self.__cheats.god_mode,
                 )
+                if self.__game.phase is GameplayPhase.PLAYER_DYING:
+                    self.__start_player_death_animation(now)
+                    return
             self.__game.tick_ghost_timers(ghost_elapsed)
             self.__last_ghost_move_ms = now
             if self.__game.outcome is not GameOutcome.PLAYING:
                 return
 
+        # Animations:
+        if self.__render_gameplay:
+            from pacman.render.animation.AnimEntity import AnimSet
+            if self.__game.frightened_timer_ms > 0:
+                fright_timer = self.__game.frightened_timer_ms
+                self.__render_gameplay.set_pacman_anim(AnimSet.BOOSTED)
+                if fright_timer > 3000:
+                    self.__render_gameplay.set_ghosts_anim(AnimSet.FRIGHTENED)
+                else:
+                    self.__render_gameplay.set_ghosts_anim(AnimSet.
+                                                           FRIGHTENED_FLASHING)
+            else:
+                self.__render_gameplay.set_pacman_anim(AnimSet.NORMAL)
+                self.__render_gameplay.set_ghosts_anim(AnimSet.NORMAL)
+
     def render(self) -> None:
         self._screen.clear()
         self.__renderer = self.__load_game()
+
         if self.__renderer:
             self.__renderer.render()
         else:
@@ -187,26 +215,76 @@ class PlayState(ScreenState):
         self.__last_ghost_move_ms = now
         self.__last_timer_tick_ms = now
 
+    def __start_player_death_animation(self, now: int) -> None:
+        from pacman.render.animation.AnimEntity import AnimSet
+        self.__last_player_move_ms = now
+        self.__last_ghost_move_ms = now
+        self.__last_timer_tick_ms = now
+        if self.__render_gameplay:
+            self.__render_gameplay.set_pacman_anim(AnimSet.DEATH)
+
+    def __update_player_death_animation(self) -> bool:
+        from pacman.render.animation.AnimEntity import AnimSet
+        if (self.__game is None or self.__game.phase is
+                not GameplayPhase.PLAYER_DYING):
+            return False
+        if not self.__render_gameplay:
+            return False
+        animator = self.__render_gameplay.pacman.animator
+        if animator and animator.finished:
+            self.__game.finish_player_death()
+            self.__render_gameplay.set_pacman_anim(AnimSet.NORMAL)
+
+        return True
+
     def __load_game(self) -> Container:
         from pacman.render.RenderText import RenderText
+        from pacman.render.Image import RenderImg
 
         main_ctn = Container(self._screen, 'VERTICAL', pos=(0, 0),
-                             size=RenderConfig.screen_size)
+                             size=RenderConfig.screen_size,
+                             bg_color=RenderConfig.BLACK)
         if self.__render_gameplay and self.__game:
+            lifes_ctn_img = Container(self._screen, 'HORIZONTAL')
+            for _ in range(self.__game.lives):
+                lifes_ctn_img.add_content(
+                    {RenderImg(self._screen, 'assets/sprites/pacman.png',
+                               is_square=True): '20%'}
+                )
+
+            lifes_ctn = Container(self._screen, 'HORIZONTAL', gap=30,
+                                  padding=50)
+            lifes_ctn.add_content([
+                    {RenderText(self._screen, 'Lifes ',
+                                font_family=RenderConfig.FONT,
+                                font_size=18): '20%'},
+                    {lifes_ctn_img: '70%'}
+                ])
+
             hud_ctn = Container(self._screen, 'HORIZONTAL')
             hud_ctn.add_content([
-                {RenderText(self._screen, f'Life: {self.__game.lives}'): '0%'},
-                {RenderText(self._screen, f'Score: {self.__game.score}'
-                            ): '0%'},
-                {RenderText(self._screen, f'Time: {self.__game.remaining_time}'
-                            ): '0%'},
-                {RenderText(self._screen, f'Level: {self.__game.level.number}'
-                            ): '0%'},
+
+                {lifes_ctn: '30%'},
+                {RenderText(
+                    self._screen,
+                    f'Score: {self.__game.score}',
+                    font_family=RenderConfig.FONT,
+                    font_size=18): '20%'},
+                {RenderText(
+                    self._screen,
+                    f'Time: {self.__game.remaining_time}',
+                    font_family=RenderConfig.FONT,
+                    font_size=18): '20%'},
+                {RenderText(
+                    self._screen,
+                    f'Level: {self.__game.level.number}',
+                    font_family=RenderConfig.FONT,
+                    font_size=18): '20%'},
             ])
 
             main_ctn.add_content([
-                {hud_ctn: '10%'},
-                {self.__render_gameplay: '90%'}])
+                {hud_ctn: '12%'},
+                {self.__render_gameplay: '85%'}])
 
         return main_ctn
 

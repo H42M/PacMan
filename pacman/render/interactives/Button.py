@@ -26,15 +26,18 @@ class Button(RenderOBJ):
         color: Optional[tuple[int, int, int]] = None,
         callback: Optional[Union[Callable[..., Any],
                                  list[Callable[..., Any]]]] = None,
+        font_family: Optional[str] = None,
+        font_size: int = 28
     ) -> None:
         """Initialize the button."""
         super().__init__(screen, size=size, pos=pos)
         self._color = color
+
         self._text = text
         self._callback = callback
         self._is_hovered = False
         self._hover_color: tuple[int, int, int] | None = None
-        self._font = pygame.font.Font(None, 28)
+        self._font = pygame.font.Font(font_family, font_size)
         self._text_color = (255, 255, 255)
         if self._pos and self._size:
             self._surface = pygame.Surface(self._size)

@@ -15,7 +15,8 @@ class RenderText(RenderOBJ):
                  size: Optional[tuple[int, int]] = None,
                  bg_color: Optional[tuple[int, int, int]] = None,
                  font_color: Optional[tuple[int, int, int]] = None,
-                 font_size: Optional[int] = None
+                 font_size: Optional[int] = None,
+                 font_family: Optional[str] = None,
                  ) -> None:
         """Initialize the text object."""
         super().__init__(screen, pos, size)
@@ -23,7 +24,7 @@ class RenderText(RenderOBJ):
             self.__font_size = 28
         else:
             self.__font_size = font_size
-        self.__font = pygame.font.Font(None, self.__font_size)
+        self.__font = pygame.font.Font(font_family, self.__font_size)
         self.__text = text
 
         self.__bg_color = bg_color

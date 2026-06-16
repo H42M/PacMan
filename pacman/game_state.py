@@ -15,12 +15,18 @@ class GameOutcome(str, Enum):
     GAME_OVER = "GAME_OVER"
 
 
+class GameplayPhase(str, Enum):
+    PLAYING = "PLAYING"
+    PLAYER_DYING = "PLAYER_DYING"
+
+
 @dataclass(slots=True)
 class GameState:
     level: Level
     lives: int
     remaining_time: int
     outcome: GameOutcome
+    phase: GameplayPhase
     player: PlayerState
     score: int
     pacgums: set[CellPosition] = field(repr=False)
@@ -64,6 +70,7 @@ class GameState:
                    lives=config.lives,
                    remaining_time=level.max_time,
                    outcome=GameOutcome.PLAYING,
+                   phase=GameplayPhase.PLAYING,
                    player=PlayerState(level.player_spawn),
                    score=0, pacgums=pacgums,
                    super_pacgums=set(level.super_pacgum_positions),
@@ -75,13 +82,16 @@ class GameState:
                    points_per_ghost=config.points_per_ghost)
 
     def timer_tick(self) -> None:
-        if self.outcome is GameOutcome.PLAYING:
+        if (self.outcome is GameOutcome.PLAYING and
+                self.phase is GameplayPhase.PLAYING):
             self.remaining_time -= 1
             if self.remaining_time <= 0:
                 self.remaining_time = 0
                 self.outcome = GameOutcome.GAME_OVER
 
     def tick_ghost_timers(self, elapsed_ms: int) -> None:
+        if self.phase is not GameplayPhase.PLAYING:
+            return
         if self.frightened_timer_ms > 0:
             self.frightened_timer_ms -= elapsed_ms
             if self.frightened_timer_ms <= 0:
@@ -133,9 +143,13 @@ class GameState:
             return None
 
     def queue_player_direction(self, direction: Direction) -> None:
+        if self.phase is not GameplayPhase.PLAYING:
+            return
         self.player.queued_direction = direction
 
     def advance_player(self) -> None:
+        if self.phase is not GameplayPhase.PLAYING:
+            return
         if self.player.queued_direction is not None:
             target = self._get_target_position(self.player.position,
                                                self.player.queued_direction)
@@ -171,6 +185,8 @@ class GameState:
             self.activate_frightened_mode()
 
     def move_ghosts(self) -> None:
+        if self.phase is not GameplayPhase.PLAYING:
+            return
         for ghost in self.ghosts:
             if ghost.mode is GhostMode.DEAD:
                 continue
@@ -209,19 +225,33 @@ class GameState:
             ghost.mode = GhostMode.NORMAL
             ghost.respawn_timer_ms = 0
 
+    def begin_player_death(self) -> None:
+        if self.phase is GameplayPhase.PLAYER_DYING:
+            return
+        self.lives -= 1
+        self.phase = GameplayPhase.PLAYER_DYING
+        self.player.current_direction = None
+        self.player.queued_direction = None
+
+    def finish_player_death(self) -> None:
+        if self.phase is not GameplayPhase.PLAYER_DYING:
+            return
+        if self.lives <= 0:
+            self.outcome = GameOutcome.GAME_OVER
+        else:
+            self.respawn_entities()
+        self.phase = GameplayPhase.PLAYING
+
     def handle_player_ghost_collision(self, *, god_mode: bool = False) -> None:
-        if self.outcome is not GameOutcome.PLAYING:
+        if (self.outcome is not GameOutcome.PLAYING or
+                self.phase is not GameplayPhase.PLAYING):
             return
         for ghost in self.ghosts:
             if (ghost.mode is GhostMode.NORMAL and
                     self.player.position == ghost.position):
                 if god_mode:
                     continue
-                self.lives -= 1
-                if self.lives <= 0:
-                    self.outcome = GameOutcome.GAME_OVER
-                else:
-                    self.respawn_entities()
+                self.begin_player_death()
                 return
             if (ghost.mode is GhostMode.FRIGHTENED and
                     self.player.position == ghost.position):
