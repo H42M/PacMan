@@ -59,30 +59,20 @@ class PlayState(ScreenState):
                 return False
 
             if event.type == pygame.KEYDOWN:
-                if (event.key == pygame.K_F1 and self.__game
-                        and self.__game.outcome is GameOutcome.PLAYING
-                        and self.__game.phase is GameplayPhase.PLAYING):
-                    self.__game.debug_trigger_level_clear()
+                if event.key == pygame.K_F1:
+                    self.__skip_level()
 
-                if (event.key == pygame.K_F2 and self.__game
-                        and self.__game.outcome is GameOutcome.PLAYING
-                        and self.__game.phase is GameplayPhase.PLAYING):
-                    self.__game.debug_trigger_game_over()
-                if (event.key == pygame.K_F3 and self.__game
-                        and self.__game.outcome is GameOutcome.PLAYING
-                        and self.__game.phase is GameplayPhase.PLAYING):
-                    self.__cheats.toggle_god_mode()
+                if event.key == pygame.K_F2:
+                    self.__trigger_game_over()
 
-                if (event.key == pygame.K_F4 and self.__game
-                        and self.__game.outcome is GameOutcome.PLAYING
-                        and self.__game.phase is GameplayPhase.PLAYING):
-                    self.__cheats.toggle_ghost_freeze()
+                if event.key == pygame.K_F3:
+                    self.__toggle_god_mode()
 
-                if (event.key == pygame.K_F5 and self.__game
-                        and self.__game.outcome is GameOutcome.PLAYING
-                        and self.__game.phase is GameplayPhase.PLAYING):
-                    if self.__game.lives < 5:
-                        self.__game.lives += 1
+                if event.key == pygame.K_F4:
+                    self.__toggle_ghost_freeze()
+
+                if event.key == pygame.K_F5:
+                    self.__add_life()
 
                 if (event.key == pygame.K_ESCAPE and
                         (self.__game is None or
@@ -200,6 +190,37 @@ class PlayState(ScreenState):
         self.__pause_menu.render()
         self._screen.flip()
 
+    def __can_use_cheats(self) -> bool:
+        return (self.__game is not None and
+                self.__game.outcome is GameOutcome.PLAYING and
+                self.__game.phase is GameplayPhase.PLAYING)
+
+    def __skip_level(self) -> None:
+        if not self.__can_use_cheats() or self.__game is None:
+            return
+        self.__game.debug_trigger_level_clear()
+
+    def __trigger_game_over(self) -> None:
+        if not self.__can_use_cheats() or self.__game is None:
+            return
+        self.__game.debug_trigger_game_over()
+
+    def __toggle_god_mode(self) -> None:
+        if not self.__can_use_cheats():
+            return
+        self.__cheats.toggle_god_mode()
+
+    def __toggle_ghost_freeze(self) -> None:
+        if not self.__can_use_cheats():
+            return
+        self.__cheats.toggle_ghost_freeze()
+
+    def __add_life(self) -> None:
+        if not self.__can_use_cheats() or self.__game is None:
+            return
+        if self.__game.lives < 5:
+            self.__game.lives += 1
+
     def __start_next_level(self) -> None:
         if self.__game is None:
             return
@@ -312,7 +333,7 @@ class PlayState(ScreenState):
     def __load_pause_menu(self) -> Window:
         from pacman.render.Divider import Divider
         from pacman.render.RenderText import RenderText
-        from pacman.render.interactives import Button, SelectButton
+        from pacman.render.interactives import Button
 
         menu_size = 500
         menu_pos = (
@@ -346,6 +367,8 @@ class PlayState(ScreenState):
         def show_cheats_menu() -> None:
             normal_area_ctn.display = False
             cheats_area_ctn.display = True
+            disable_buttons(normal_buttons)
+            enable_buttons(cheat_buttons)
             window_menu.resize()
 
         def resume_game() -> None:
@@ -355,42 +378,98 @@ class PlayState(ScreenState):
             if self._state_manager:
                 self._state_manager.set_state(StateManager.MENU)
 
+        resume_button = Button(self._screen, 'Resume', callback=resume_game)
+        cheats_menu_button = Button(
+            self._screen,
+            'Cheats Menu',
+            callback=show_cheats_menu,
+        )
+        return_to_menu_button = Button(
+            self._screen,
+            'Return to Menu',
+            callback=return_to_menu,
+        )
+
+        normal_buttons = [
+            resume_button,
+            cheats_menu_button,
+            return_to_menu_button,
+        ]
         normal_area_ctn.add_content([
-            {Button(self._screen, 'Resume', callback=resume_game): '30%'},
-            {Button(self._screen, 'Cheats Menu',
-                    callback=show_cheats_menu): '30%'},
-            {Button(self._screen, 'Return to Menu',
-                    callback=return_to_menu): '30%'},
-        ])
-
-        godmode_ctn = Container(self._screen, 'HORIZONTAL')
-        godmode_ctn.add_content([
-            {RenderText(self._screen, 'God mode'): '40%'},
-            {SelectButton(self._screen, ['Disabled', 'Enabled']): '40%'},
-        ])
-
-        noclip_ctn = Container(self._screen, 'HORIZONTAL')
-        noclip_ctn.add_content([
-            {RenderText(self._screen, 'No Clip'): '40%'},
-            {SelectButton(self._screen, ['Disabled', 'Enabled']): '40%'},
-        ])
-
-        frightened_ctn = Container(self._screen, 'HORIZONTAL')
-        frightened_ctn.add_content([
-            {RenderText(self._screen, 'Frightened Ghosts'): '40%'},
-            {SelectButton(self._screen, ['Disabled', 'Enabled']): '40%'},
+            {resume_button: '30%'},
+            {cheats_menu_button: '30%'},
+            {return_to_menu_button: '30%'},
         ])
 
         def show_normal_menu() -> None:
             cheats_area_ctn.display = False
             normal_area_ctn.display = True
+            disable_buttons(cheat_buttons)
+            enable_buttons(normal_buttons)
             window_menu.resize()
 
+        def toggle_god_mode_from_menu() -> None:
+            self.__toggle_god_mode()
+            god_mode_button.text = (
+                'God Mode: ON' if self.__cheats.god_mode else 'God Mode: OFF'
+            )
+
+        def toggle_ghost_freeze_from_menu() -> None:
+            self.__toggle_ghost_freeze()
+            ghost_freeze_button.text = (
+                'Ghost Freeze: ON'
+                if self.__cheats.ghost_freeze
+                else 'Ghost Freeze: OFF'
+            )
+
+        god_mode_button = Button(
+            self._screen,
+            'God Mode: OFF',
+            callback=toggle_god_mode_from_menu,
+        )
+        ghost_freeze_button = Button(
+            self._screen,
+            'Ghost Freeze: OFF',
+            callback=toggle_ghost_freeze_from_menu,
+        )
+        add_life_button = Button(
+            self._screen,
+            'Add Life',
+            callback=self.__add_life,
+        )
+        skip_level_button = Button(
+            self._screen,
+            'Skip Level',
+            callback=self.__skip_level,
+        )
+        back_button = Button(
+            self._screen,
+            'Back',
+            callback=show_normal_menu,
+        )
+
+        cheat_buttons = [
+            god_mode_button,
+            ghost_freeze_button,
+            add_life_button,
+            skip_level_button,
+            back_button,
+        ]
+
+        def enable_buttons(buttons: list[Button]) -> None:
+            for button in buttons:
+                self._screen.record_clickable(button)
+
+        def disable_buttons(buttons: list[Button]) -> None:
+            for button in buttons:
+                self._screen.delete_clickable(button)
+
         cheats_area_ctn.add_content([
-            {godmode_ctn: '0%'},
-            {noclip_ctn: '0%'},
-            {frightened_ctn: '0%'},
-            {Button(self._screen, 'Back', callback=show_normal_menu): '0%'},
+            {god_mode_button: '0%'},
+            {ghost_freeze_button: '0%'},
+            {add_life_button: '0%'},
+            {skip_level_button: '0%'},
+            {back_button: '0%'},
         ])
 
         body_ctn = Container(self._screen, 'VERTICAL', padding=3, gap=10)
@@ -403,5 +482,7 @@ class PlayState(ScreenState):
             {title_ctn: '30%'},
             {body_ctn: '70%'},
         ])
+
+        disable_buttons(cheat_buttons)
 
         return window_menu
