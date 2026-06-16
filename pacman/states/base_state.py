@@ -43,13 +43,16 @@ class ScreenState(ABC):
             if event.type == pygame.QUIT:
                 return False
 
-            for clickable in self._screen.clickables:
+            mouse_pos = pygame.mouse.get_pos()
+
+            for clickable in list(self._screen.clickables):
                 if event.type == pygame.MOUSEMOTION:
-                    clickable.update_hover(pygame.mouse.get_pos())
+                    clickable.update_hover(mouse_pos)
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if clickable.is_hovered:
+                    if clickable.is_clicked(mouse_pos):
                         clickable.execute()
+                        break
 
                 elif (
                     event.type == pygame.KEYDOWN

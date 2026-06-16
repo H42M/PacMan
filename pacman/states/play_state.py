@@ -34,6 +34,7 @@ class PlayState(ScreenState):
         super().__init__(screen, state_manager)
         self.__game = game
         self.__session: GameSession = session
+        self.__cheats = CheatState()
         self.__render_gameplay = (RenderGameplay(screen, game)
                                   if game else None)
         self.__renderer = self.__load_game()
@@ -47,7 +48,6 @@ class PlayState(ScreenState):
         self.__countdown_timer_delay_ms = 1000
         self.__player_death_started_ms: Optional[int] = None
         self.__player_death_duration_ms = 1500
-        self.__cheats = CheatState()
         if self.__render_gameplay:
             self.__render_gameplay.set_entities_move_delay(
                 self.__player_move_delay_ms,
@@ -75,10 +75,13 @@ class PlayState(ScreenState):
                     self.__add_life()
 
                 if (event.key == pygame.K_ESCAPE and
-                        (self.__game is None or
-                         self.__game.phase is GameplayPhase.PLAYING)):
-                    self.__pause_menu.switch_display()
+                    (self.__game is None or
+                     self.__game.phase is GameplayPhase.PLAYING)):
                     if self.__pause_menu.display:
+                        self.__pause_menu.switch_display()
+                    else:
+                        self.__reset_pause_menu()
+                        self.__pause_menu.switch_display()
                         self.__pause_menu.resize()
 
                 elif (not self.__pause_menu.display and self.__game and
@@ -190,6 +193,10 @@ class PlayState(ScreenState):
         self.__pause_menu.render()
         self._screen.flip()
 
+    def __reset_pause_menu(self) -> None:
+        self._screen.reset_clickables()
+        self.__pause_menu = self.__load_pause_menu()
+
     def __can_use_cheats(self) -> bool:
         return (self.__game is not None and
                 self.__game.outcome is GameOutcome.PLAYING and
@@ -232,6 +239,7 @@ class PlayState(ScreenState):
             self.__player_move_delay_ms,
             self.__ghost_move_delay_ms,
         )
+        self.__reset_pause_menu()
         now = pygame.time.get_ticks()
         self.__last_player_move_ms = now
         self.__last_ghost_move_ms = now
@@ -369,6 +377,7 @@ class PlayState(ScreenState):
             cheats_area_ctn.display = True
             disable_buttons(normal_buttons)
             enable_buttons(cheat_buttons)
+            update_cheat_button_labels()
             window_menu.resize()
 
         def resume_game() -> None:
@@ -410,26 +419,22 @@ class PlayState(ScreenState):
 
         def toggle_god_mode_from_menu() -> None:
             self.__toggle_god_mode()
-            god_mode_button.text = (
-                'God Mode: ON' if self.__cheats.god_mode else 'God Mode: OFF'
-            )
+            update_cheat_button_labels()
 
         def toggle_ghost_freeze_from_menu() -> None:
             self.__toggle_ghost_freeze()
-            ghost_freeze_button.text = (
-                'Ghost Freeze: ON'
-                if self.__cheats.ghost_freeze
-                else 'Ghost Freeze: OFF'
-            )
+            update_cheat_button_labels()
 
         god_mode_button = Button(
             self._screen,
-            'God Mode: OFF',
+            'God Mode: ON' if self.__cheats.god_mode else 'God Mode: OFF',
             callback=toggle_god_mode_from_menu,
         )
         ghost_freeze_button = Button(
             self._screen,
-            'Ghost Freeze: OFF',
+            'Ghost Freeze: ON'
+            if self.__cheats.ghost_freeze
+            else 'Ghost Freeze: OFF',
             callback=toggle_ghost_freeze_from_menu,
         )
         add_life_button = Button(
@@ -455,6 +460,16 @@ class PlayState(ScreenState):
             skip_level_button,
             back_button,
         ]
+
+        def update_cheat_button_labels() -> None:
+            god_mode_button.text = (
+                'God Mode: ON' if self.__cheats.god_mode else 'God Mode: OFF'
+            )
+            ghost_freeze_button.text = (
+                'Ghost Freeze: ON'
+                if self.__cheats.ghost_freeze
+                else 'Ghost Freeze: OFF'
+            )
 
         def enable_buttons(buttons: list[Button]) -> None:
             for button in buttons:
