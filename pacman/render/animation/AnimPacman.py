@@ -34,11 +34,6 @@ class AnimPacman(AnimEntity):
                                                   loop=False))
 
     def tick(self) -> None:
-        # print test:
-        if self.anim_set is AnimSet.DEATH:
-            animator = self._render_entity.animator
-            print(animator.frame_index if animator else None)
-
         if (self._anim_set is AnimSet.DEATH and
                 self.is_anim_over(nb_frames=12)):
             self._anim_set = AnimSet.NORMAL
