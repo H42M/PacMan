@@ -115,10 +115,10 @@ class AnimEntity(RenderOBJ):
         }
         self._render_entity.set_rotation(dir_mapper[rotation])
 
-    def is_anim_over(self, nb_frames: Optional[int] = None):
+    def is_anim_over(self, nb_frames: Optional[int] = None) -> bool:
         animator = self._render_entity.animator
         if not animator:
-            return
+            return True
         if nb_frames is None:
             nb_frames = len(animator.frames)
 

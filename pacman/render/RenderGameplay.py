@@ -119,10 +119,10 @@ class RenderGameplay (RenderOBJ):
         for ghost in self.__render_ghosts:
             ghost.set_move_delay(ghost_delay_ms)
 
-    def set_pacman_anim(self, anim_set: AnimSet):
+    def set_pacman_anim(self, anim_set: AnimSet) -> None:
         self.__render_pacman.anim_set = anim_set
 
-    def set_ghosts_anim(self, anim_set: AnimSet):
+    def set_ghosts_anim(self, anim_set: AnimSet) -> None:
         for ghost in self.__render_ghosts:
             ghost.anim_set = anim_set
 

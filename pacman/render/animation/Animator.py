@@ -19,7 +19,7 @@ class Animator:
         t = 1.0 - abs(progress * 2 - 1.0)
         self.__index = int(t * (n - 1))
 
-    def tick(self, step=1):
+    def tick(self, step: int = 1) -> None:
         if self.__tick_count >= self.__tick_rate:
             if self.__loop:
                 self.__index = (self.__index + step) % len(self.__frames)
@@ -53,7 +53,7 @@ class Animator:
         self.__tick_count = 0
 
     @property
-    def finished(self):
+    def finished(self) -> bool:
         return (
             not self.__loop and
             self.__index == len(self.__frames) - 1
