@@ -26,7 +26,7 @@ class RenderImg(RenderOBJ):
             raise RenderIMGError("IMG path doesn't exist")
         return pygame.image.load(path).convert_alpha()
 
-    def render(self):
+    def render(self) -> None:
         if self.pos and self.size:
             if self.__is_rect:
                 min_size = min(*self.size)
