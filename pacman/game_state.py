@@ -241,6 +241,7 @@ class GameState:
         else:
             self.respawn_entities()
         self.phase = GameplayPhase.PLAYING
+        print(self.phase)
 
     def handle_player_ghost_collision(self) -> None:
         if (self.outcome is not GameOutcome.PLAYING or

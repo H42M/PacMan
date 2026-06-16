@@ -170,10 +170,7 @@ class PlayState(ScreenState):
     def render(self) -> None:
         self._screen.clear()
         self.__renderer = self.__load_game()
-        if self.__render_gameplay:
-            self.__render_gameplay.set_player_death_progress(
-                self.__player_death_progress(),
-            )
+
         if self.__renderer:
             self.__renderer.render()
         else:
@@ -197,50 +194,28 @@ class PlayState(ScreenState):
         self.__last_player_move_ms = now
         self.__last_ghost_move_ms = now
         self.__last_timer_tick_ms = now
-        self.__player_death_started_ms = None
 
     def __start_player_death_animation(self, now: int) -> None:
-        if self.__player_death_started_ms is None:
-            self.__player_death_started_ms = now
+        from pacman.render.animation.AnimEntity import AnimSet
         self.__last_player_move_ms = now
         self.__last_ghost_move_ms = now
         self.__last_timer_tick_ms = now
+        if self.__render_gameplay:
+            self.__render_gameplay.set_pacman_anim(AnimSet.DEATH)
 
     def __update_player_death_animation(self) -> bool:
-        if (self.__game is None or
-                self.__game.phase is not GameplayPhase.PLAYER_DYING):
-            self.__player_death_started_ms = None
+        from pacman.render.animation.AnimEntity import AnimSet
+        if (self.__game is None or self.__game.phase is
+                not GameplayPhase.PLAYER_DYING):
             return False
-
-        now = pygame.time.get_ticks()
-        if self.__player_death_started_ms is None:
-            self.__player_death_started_ms = now
-
-        self.__last_player_move_ms = now
-        self.__last_ghost_move_ms = now
-        self.__last_timer_tick_ms = now
-
-        elapsed = now - self.__player_death_started_ms
-        if elapsed >= self.__player_death_duration_ms:
+        if not self.__render_gameplay:
+            return False
+        animator = self.__render_gameplay.pacman.animator
+        if animator and animator.finished:
             self.__game.finish_player_death()
-            self.__player_death_started_ms = None
-            if self.__game.outcome is GameOutcome.PLAYING:
-                self.__render_gameplay = RenderGameplay(self._screen,
-                                                        self.__game)
-                self.__render_gameplay.set_entities_move_delay(
-                    self.__player_move_delay_ms,
-                    self.__ghost_move_delay_ms,
-                )
-        return True
+            self.__render_gameplay.set_pacman_anim(AnimSet.NORMAL)
 
-    def __player_death_progress(self) -> float | None:
-        if (self.__game is None or
-                self.__game.phase is not GameplayPhase.PLAYER_DYING):
-            return None
-        if self.__player_death_started_ms is None:
-            return 0.0
-        elapsed = pygame.time.get_ticks() - self.__player_death_started_ms
-        return min(elapsed / self.__player_death_duration_ms, 1.0)
+        return True
 
     def __load_game(self) -> Container:
         from pacman.render.RenderText import RenderText

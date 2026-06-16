@@ -127,6 +127,10 @@ class RenderGameplay (RenderOBJ):
             ghost.anim_set = anim_set
 
     @property
+    def pacman(self) -> AnimPacman:
+        return self.__render_pacman
+
+    @property
     def size(self) -> Optional[tuple[int, int]]:
         return self._size
 
