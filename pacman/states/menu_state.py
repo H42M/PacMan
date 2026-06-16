@@ -53,7 +53,8 @@ class MenuState(ScreenState):
                     self._screen,
                     'PACMAN',
                     font_color=(255, 255, 0),
-                    font_size=60
+                    font_size=60,
+                    font_family=RenderConfig.FONT
                 ): '0%'
             },
             {Divider(self._screen, (255, 255, 0)): '1%'}
@@ -72,15 +73,22 @@ class MenuState(ScreenState):
 
         btns_ctn = Container(self._screen, 'VERTICAL', gap=30)
         btns_ctn.add_content([
-            {Button(self._screen, 'PLAY', callback=on_play): '0%'},
-            {Button(self._screen, 'SETTINGS', callback=on_settings): '0%'},
-            {Button(self._screen, 'QUIT', callback=on_quit): '0%'},
+            {Button(self._screen, 'PLAY', callback=on_play,
+                    font_family=RenderConfig.FONT,
+                    font_size=20): '0%'},
+            {Button(self._screen, 'SETTINGS', callback=on_settings,
+                    font_family=RenderConfig.FONT,
+                    font_size=20): '0%'},
+            {Button(self._screen, 'QUIT', callback=on_quit,
+                    font_family=RenderConfig.FONT,
+                    font_size=20): '0%'},
         ])
         highscores = load_highscores(self.__highscore_path)
 
         highscores_ctn = Container(self._screen, 'VERTICAL', gap=5)
         highscores_ctn.add_content([
-            {RenderText(self._screen, 'HIGHSCORES', font_size=22): '0%'}
+            {RenderText(self._screen, 'HIGHSCORES', font_size=18,
+                        font_family=RenderConfig.FONT): '0%'}
         ])
 
         if highscores:
@@ -89,7 +97,8 @@ class MenuState(ScreenState):
                     RenderText(
                         self._screen,
                         f'{index + 1}. {entry.name}: {entry.score}',
-                        font_size=18
+                        font_size=18,
+                        font_family=RenderConfig.FONT
                     ): '0%'
                 }
                 for index, entry in enumerate(highscores)
@@ -97,7 +106,8 @@ class MenuState(ScreenState):
         else:
             highscores_ctn.add_content([
                 {RenderText(self._screen,
-                            'No highscores yet', font_size=18): '0%'}
+                            'No highscores yet', font_size=12,
+                            font_family=RenderConfig.FONT): '0%'}
             ])
         footer_ctn = Container(self._screen, 'VERTICAL', gap=20)
         footer_info = Container(self._screen, 'HORIZONTAL')

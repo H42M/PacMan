@@ -237,7 +237,9 @@ class PlayState(ScreenState):
             lifes_ctn = Container(self._screen, 'HORIZONTAL', gap=20,
                                   padding=40)
             lifes_ctn.add_content([
-                    {RenderText(self._screen, 'Lifes: '): '20%'},
+                    {RenderText(self._screen, 'Lifes ',
+                                font_family=RenderConfig.FONT,
+                                font_size=18): '20%'},
                     {lifes_ctn_img_ctn: '70%'}
                 ])
 
@@ -245,12 +247,15 @@ class PlayState(ScreenState):
             hud_ctn.add_content([
 
                 {lifes_ctn: '0%'},
-                {RenderText(self._screen, f'Score: {self.__game.score}'
+                {RenderText(self._screen, f'Score: {self.__game.score}',
+                            font_family=RenderConfig.FONT, font_size=18
                             ): '0%'},
-                {RenderText(self._screen, f'Time: {self.__game.remaining_time}'
-                            ): '0%'},
-                {RenderText(self._screen, f'Level: {self.__game.level.number}'
-                            ): '0%'},
+                {RenderText(
+                    self._screen, f'Time: {self.__game.remaining_time}',
+                    font_family=RenderConfig.FONT, font_size=18): '0%'},
+                {RenderText(self._screen, f'Level: {self.__game.level.number}',
+                            font_family=RenderConfig.FONT,
+                            font_size=18): '0%'},
             ])
 
             main_ctn.add_content([
