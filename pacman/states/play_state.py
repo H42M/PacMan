@@ -222,7 +222,8 @@ class PlayState(ScreenState):
         from pacman.render.Image import RenderImg
 
         main_ctn = Container(self._screen, 'VERTICAL', pos=(0, 0),
-                             size=RenderConfig.screen_size)
+                             size=RenderConfig.screen_size,
+                             bg_color=RenderConfig.BLACK)
         if self.__render_gameplay and self.__game:
             lifes_ctn_img = Container(self._screen, 'HORIZONTAL')
             for _ in range(self.__game.lives):
@@ -231,37 +232,39 @@ class PlayState(ScreenState):
                                is_square=True): '20%'}
                 )
 
-            lifes_ctn_img_ctn = Container(self._screen, 'VERTICAL')
-            lifes_ctn_img_ctn.add_content({lifes_ctn_img: '0%'})
-
-            lifes_ctn = Container(self._screen, 'HORIZONTAL', gap=20,
-                                  padding=40)
+            lifes_ctn = Container(self._screen, 'HORIZONTAL', gap=30,
+                                  padding=50)
             lifes_ctn.add_content([
                     {RenderText(self._screen, 'Lifes ',
                                 font_family=RenderConfig.FONT,
                                 font_size=18): '20%'},
-                    {lifes_ctn_img_ctn: '70%'}
+                    {lifes_ctn_img: '70%'}
                 ])
 
-            hud_ctn = Container(self._screen, 'HORIZONTAL',
-                                bg_color=RenderConfig.BLUE)
+            hud_ctn = Container(self._screen, 'HORIZONTAL')
             hud_ctn.add_content([
 
-                {lifes_ctn: '0%'},
-                {RenderText(self._screen, f'Score: {self.__game.score}',
-                            font_family=RenderConfig.FONT, font_size=18
-                            ): '0%'},
+                {lifes_ctn: '30%'},
                 {RenderText(
-                    self._screen, f'Time: {self.__game.remaining_time}',
-                    font_family=RenderConfig.FONT, font_size=18): '0%'},
-                {RenderText(self._screen, f'Level: {self.__game.level.number}',
-                            font_family=RenderConfig.FONT,
-                            font_size=18): '0%'},
+                    self._screen,
+                    f'Score: {self.__game.score}',
+                    font_family=RenderConfig.FONT,
+                    font_size=18): '20%'},
+                {RenderText(
+                    self._screen,
+                    f'Time: {self.__game.remaining_time}',
+                    font_family=RenderConfig.FONT,
+                    font_size=18): '20%'},
+                {RenderText(
+                    self._screen,
+                    f'Level: {self.__game.level.number}',
+                    font_family=RenderConfig.FONT,
+                    font_size=18): '20%'},
             ])
 
             main_ctn.add_content([
-                {hud_ctn: '10%'},
-                {self.__render_gameplay: '90%'}])
+                {hud_ctn: '12%'},
+                {self.__render_gameplay: '85%'}])
 
         return main_ctn
 
