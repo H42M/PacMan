@@ -1,3 +1,4 @@
+from __future__ import annotations
 from dataclasses import dataclass
 from enum import IntFlag
 from typing import TypeAlias
@@ -28,6 +29,17 @@ class Wall(IntFlag):
     SOUTH = 4
     WEST = 8
     ALL = NORTH | EAST | SOUTH | WEST
+
+
+DIRECTIONS = (
+    (Wall.NORTH, 0, -1, Wall.SOUTH),
+    (Wall.EAST, 1, 0, Wall.WEST),
+    (Wall.SOUTH, 0, 1, Wall.NORTH),
+    (Wall.WEST, -1, 0, Wall.EAST),
+)
+
+
+DirectionInfo: TypeAlias = tuple[Wall, int, int, Wall]
 
 
 @dataclass(frozen=True, slots=True)
@@ -76,13 +88,113 @@ def generate_maze(level: LevelConfig) -> GeneratedMaze:
     height = len(cells)
     solid_positions = get_generator_solid_positions(width, height)
 
-    return GeneratedMaze(
+    generated_maze = GeneratedMaze(
         width=width,
         height=height,
         cells=cells,
         entry=maze.maze_entry,
         exit=maze.maze_exit,
         solid_positions=solid_positions,
+    )
+    return clean_dead_ends(generated_maze)
+
+
+def is_inside(width: int, height: int, position: CellPosition) -> bool:
+    x, y = position
+    return 0 <= x < width and 0 <= y < height
+
+
+def is_border(position: CellPosition, maze: GeneratedMaze) -> bool:
+    x, y = position
+    return (
+        x == 0
+        or y == 0
+        or x == maze.width - 1
+        or y == maze.height - 1
+    )
+
+
+def is_solid(maze: GeneratedMaze, position: CellPosition) -> bool:
+    return position in maze.solid_positions
+
+
+def is_playable_internal_cell(
+        maze: GeneratedMaze, position: CellPosition) -> bool:
+    return (
+        is_inside(maze.width, maze.height, position)
+        and not is_border(position, maze)
+        and not is_solid(maze, position)
+    )
+
+
+def count_usable_exits(
+        cells: list[list[Wall]],
+        maze: GeneratedMaze,
+        position: CellPosition) -> int:
+    x, y = position
+    walls = cells[y][x]
+    usable_exits = 0
+
+    for wall, dx, dy, _opposite_wall in DIRECTIONS:
+        if walls & wall:
+            continue
+
+        neighbor = (x + dx, y + dy)
+        if not is_playable_internal_cell(maze, neighbor):
+            continue
+
+        usable_exits += 1
+
+    return usable_exits
+
+
+def find_wall_to_open(cells: list[list[Wall]],
+                      maze: GeneratedMaze,
+                      position: CellPosition) -> DirectionInfo | None:
+    x, y = position
+    walls = cells[y][x]
+    for wall, dx, dy, opposite_wall in DIRECTIONS:
+        if not (wall & walls):
+            continue
+        neighbor = (x + dx, y + dy)
+        if not is_playable_internal_cell(maze, neighbor):
+            continue
+        return (wall, dx, dy, opposite_wall)
+    return None
+
+
+def open_wall_between(
+        cells: list[list[Wall]],
+        position: CellPosition,
+        direction: DirectionInfo) -> None:
+    x, y = position
+    wall, dx, dy, opposite_wall = direction
+    cells[y][x] &= ~wall
+    cells[y + dy][x + dx] &= ~opposite_wall
+
+
+def clean_dead_ends(generated_maze: GeneratedMaze) -> GeneratedMaze:
+    maze = generated_maze
+    cells = [list(row) for row in maze.cells]
+    for y, row in enumerate(cells):
+        for x, walls in enumerate(row):
+            position = (x, y)
+            if not is_playable_internal_cell(maze, position):
+                continue
+            if count_usable_exits(cells, maze, position) != 1:
+                continue
+            direction = find_wall_to_open(cells, maze, position)
+            if direction is None:
+                continue
+            open_wall_between(cells, position, direction)
+
+    return GeneratedMaze(
+        width=maze.width,
+        height=maze.height,
+        cells=tuple(tuple(row)for row in cells),
+        entry=maze.entry,
+        exit=maze.exit,
+        solid_positions=maze.solid_positions
     )
 
 
