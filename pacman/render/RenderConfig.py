@@ -20,6 +20,7 @@ class RenderConfig:
     GREY = (100, 100, 100)
     BLUE = (30, 60, 220)
     BLACK = (30, 30, 30)
+    YELLOW = (220, 220, 0)
     FONT = 'assets/fonts/Emulogic.ttf'
 
     @classmethod

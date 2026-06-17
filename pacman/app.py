@@ -16,6 +16,7 @@ from pacman.states.menu_state import MenuState
 from pacman.states.play_state import PlayState
 from pacman.states.game_over_state import GameOverState
 from pacman.states.setting_state import SettingsState
+from pacman.states.highscore_state import HighScoreState
 
 
 def run(config: GameConfig) -> int:
@@ -52,6 +53,11 @@ def run(config: GameConfig) -> int:
                 StateManager.SETTINGS: (
                     lambda screen, manager, _payload: SettingsState(
                         screen, manager)
+                ),
+                StateManager.HIGHSCORE: (
+                    lambda screen, manager, _payload: HighScoreState(
+                        screen, manager,
+                        highscore_path=config.highscore_filename)
                 ),
                 StateManager.PLAYING: (
                     lambda screen, manager, _payload: create_play_state(

@@ -39,13 +39,6 @@ class MenuState(ScreenState):
             padding=130
         )
 
-        menu_ctn = Container(
-            self._screen,
-            'VERTICAL',
-            padding=50,
-            bg_color=(0, 0, 0, RenderConfig.menu_opacity)
-        )
-
         title_ctn = Container(self._screen, 'VERTICAL')
         title_ctn.add_content([
             {
@@ -68,10 +61,14 @@ class MenuState(ScreenState):
             if self._state_manager:
                 self._state_manager.set_state(StateManager.SETTINGS)
 
+        def on_highscores() -> None:
+            if self._state_manager:
+                self._state_manager.set_state(StateManager.HIGHSCORE)
+
         def on_quit() -> None:
             raise SystemExit
 
-        btns_ctn = Container(self._screen, 'VERTICAL', gap=30)
+        btns_ctn = Container(self._screen, 'VERTICAL', gap=20)
         btns_ctn.add_content([
             {Button(self._screen, 'PLAY', callback=on_play,
                     font_family=RenderConfig.FONT,
@@ -79,11 +76,14 @@ class MenuState(ScreenState):
             {Button(self._screen, 'SETTINGS', callback=on_settings,
                     font_family=RenderConfig.FONT,
                     font_size=20): '0%'},
+            {Button(self._screen, 'HIGHSCORES', callback=on_highscores,
+                    font_family=RenderConfig.FONT,
+                    font_size=20): '0%'},
             {Button(self._screen, 'QUIT', callback=on_quit,
                     font_family=RenderConfig.FONT,
                     font_size=20): '0%'},
         ])
-        highscores = load_highscores(self.__highscore_path)
+        highscores = load_highscores(self.__highscore_path)[:3]
 
         highscores_ctn = Container(self._screen, 'VERTICAL', gap=5)
         highscores_ctn.add_content([
@@ -132,6 +132,13 @@ class MenuState(ScreenState):
             {Divider(self._screen): '2%'},
             {footer_info: '0%'}
         ])
+
+        menu_ctn = Container(
+            self._screen,
+            'VERTICAL',
+            padding=30,
+            bg_color=(0, 0, 0, RenderConfig.menu_opacity)
+        )
 
         menu_ctn.add_content([
             {title_ctn: '20%'},

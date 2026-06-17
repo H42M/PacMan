@@ -86,6 +86,7 @@ class StateManager:
 
     MENU = 'MENU'
     SETTINGS = 'SETTINGS'
+    HIGHSCORE = 'HIGHSCORE'
     PLAYING = 'PLAYING'
     GAMEOVER = 'GAMEOVER'
     VICTORY = 'VICTORY'
