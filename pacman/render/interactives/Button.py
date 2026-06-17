@@ -28,7 +28,7 @@ class Button(RenderOBJ):
         callback: Optional[Union[Callable[..., Any],
                                  list[Callable[..., Any]]]] = None,
         font_family: Optional[str] = RenderConfig.FONT,
-        font_size: int = 28
+        font_size: int = 18
     ) -> None:
         """Initialize the button."""
         super().__init__(screen, size=size, pos=pos)
