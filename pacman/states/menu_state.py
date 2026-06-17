@@ -116,14 +116,16 @@ class MenuState(ScreenState):
                 RenderText(
                     self._screen,
                     'Game made by ngaubil and hgeorges',
-                    font_size=20
+                    font_size=20,
+                    font_family=None
                 ): '0%'
             },
             {
                 RenderText(
                     self._screen,
                     f'Highscore file: {self.__highscore_path}',
-                    font_size=20
+                    font_size=20,
+                    font_family=None
                 ): '0%'
             }
         ])

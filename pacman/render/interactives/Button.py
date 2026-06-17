@@ -1,4 +1,5 @@
 from pacman.render.RenderObj import RenderOBJ
+from pacman.render.RenderConfig import RenderConfig
 from pacman.render.Screen import Screen
 import pygame
 
@@ -26,7 +27,7 @@ class Button(RenderOBJ):
         color: Optional[tuple[int, int, int]] = None,
         callback: Optional[Union[Callable[..., Any],
                                  list[Callable[..., Any]]]] = None,
-        font_family: Optional[str] = None,
+        font_family: Optional[str] = RenderConfig.FONT,
         font_size: int = 28
     ) -> None:
         """Initialize the button."""
