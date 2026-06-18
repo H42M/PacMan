@@ -31,14 +31,6 @@ class MenuState(ScreenState):
         from pacman.render.RenderText import RenderText
         from pacman.render.interactives import Button
 
-        container = Container(
-            self._screen,
-            'VERTICAL',
-            size=RenderConfig.screen_size,
-            pos=(0, 0),
-            padding=130
-        )
-
         title_ctn = Container(self._screen, 'VERTICAL')
         title_ctn.add_content([
             {
@@ -72,23 +64,28 @@ class MenuState(ScreenState):
         def on_quit() -> None:
             raise SystemExit
 
-        btns_ctn = Container(self._screen, 'VERTICAL', gap=20)
+        btns_ctn = Container(self._screen, 'VERTICAL', gap=10)
         btns_ctn.add_content([
             {Button(self._screen, 'PLAY', callback=on_play,
                     font_family=RenderConfig.FONT,
-                    font_size=20): '0%'},
+                    font_size=20,
+                    color=RenderConfig.RED): '0%'},
             {Button(self._screen, 'SETTINGS', callback=on_settings,
                     font_family=RenderConfig.FONT,
-                    font_size=20): '0%'},
+                    font_size=20,
+                    color=RenderConfig.RED): '0%'},
             {Button(self._screen, 'HIGHSCORES', callback=on_highscores,
                     font_family=RenderConfig.FONT,
-                    font_size=20): '0%'},
+                    font_size=20,
+                    color=RenderConfig.RED): '0%'},
             {Button(self._screen, 'INSTRUCTIONS', callback=on_instructions,
                     font_family=RenderConfig.FONT,
-                    font_size=20): '0%'},
+                    font_size=20,
+                    color=RenderConfig.RED): '0%'},
             {Button(self._screen, 'QUIT', callback=on_quit,
                     font_family=RenderConfig.FONT,
-                    font_size=20): '0%'},
+                    font_size=20,
+                    color=RenderConfig.RED): '0%'},
         ])
         highscores = load_highscores(self.__highscore_path)[:3]
 
@@ -142,18 +139,22 @@ class MenuState(ScreenState):
             {footer_info: '0%'}
         ])
 
-        menu_ctn = Container(
-            self._screen,
-            'VERTICAL',
-            padding=30,
-            bg_color=(0, 0, 0, RenderConfig.menu_opacity)
-        )
-
+        menu_ctn = Container(self._screen, 'VERTICAL',
+                             padding=30)
         menu_ctn.add_content([
             {title_ctn: '20%'},
             {btns_ctn: '45%'},
             {highscores_ctn: '25%'},
             {footer_ctn: '10%'}
         ])
+
+        container = Container(
+            self._screen,
+            'VERTICAL',
+            size=RenderConfig.screen_size,
+            pos=(0, 0),
+            padding=100,
+            bg_color=RenderConfig.BLACK
+        )
         container.add_content({menu_ctn: '90%'})
         return container
