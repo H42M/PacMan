@@ -26,7 +26,9 @@ class GameOverState(ScreenState):
         self.__player_name = ""
         self.__ghosts = self.__init_ghosts()
         self.__game_over_ctn = self.__load_game_over_ctn()
-        self.__ghost_dir = 10
+
+        self.__ghost_speed = 20
+        self.__ghost_dir = 1
 
     def __init_ghosts(self) -> list[AnimGhost]:
         ghosts: list[AnimGhost] = []
@@ -34,7 +36,7 @@ class GameOverState(ScreenState):
             ghost = AnimGhost(self._screen, i)
             cell = (50, 50)
             ghost.size = cell
-            pos = ((100 + (i * cell[0] + 20), 100))
+            pos = ((-300 + ((i * cell[0]) + 60 * i), 100))
             ghost.set_target_pos(pos)
             ghosts.append(ghost)
         return ghosts
@@ -142,14 +144,31 @@ class GameOverState(ScreenState):
 
     def update(self) -> None:
         from pacman.render.RenderConfig import RenderConfig
+        from pacman.player import Direction
+        screen_w, screen_h = RenderConfig.screen_size
         for _, ghost in enumerate(self.__ghosts):
-            if ghost.pos:
+            if ghost.pos and ghost.size:
                 x, y = ghost.pos
-                x += self.__ghost_dir
-                if x > RenderConfig.screen_size[0] + 10:
-                    x = 0 - (ghost.size[0] if ghost.size else 50)
+                ghost_dir = ghost.direction.upper()
+                if ghost_dir == 'E' and x > screen_w + 10:
+                    ghost.set_rotation(Direction.LEFT)
+                    x = screen_w + 10
+                    y += 100
                     ghost.pos = (x, y)
-                ghost.set_target_pos((x, y))
+                elif ghost_dir == 'W' and x < -10 - ghost.size[0]:
+                    ghost.set_rotation(Direction.RIGHT)
+                    x = -10 - ghost.size[0]
+                    y -= 100
+                    ghost.pos = (x, y)
+                ghost_dir = ghost.direction.upper()
+
+                print(y)
+                if ghost_dir == 'E':
+                    ghost.set_target_pos((x + (self.__ghost_dir *
+                                               self.__ghost_speed), y))
+                elif ghost_dir == 'W':
+                    ghost.set_target_pos((x + (-1 * self.__ghost_speed), y))
+
             ghost.tick()
 
     def handle_events(self, events: list[Event]) -> bool:

@@ -131,3 +131,7 @@ class AnimEntity(RenderOBJ):
     @anim_set.setter
     def anim_set(self, anim_set: AnimSet) -> None:
         self._anim_set = anim_set
+
+    @property
+    def direction(self) -> str:
+        return self._render_entity.direction

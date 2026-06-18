@@ -99,3 +99,7 @@ class RenderEntity(RenderOBJ):
     @fix_rotation.setter
     def fix_rotation(self, value: bool) -> None:
         self.__fix_rotation = value
+
+    @property
+    def direction(self) -> str:
+        return self.__rotation
