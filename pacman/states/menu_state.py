@@ -64,11 +64,6 @@ class MenuState(ScreenState):
             if self._state_manager:
                 self._state_manager.set_state(StateManager.PLAYING)
 
-        def on_settings() -> None:
-            """Open the settings screen."""
-            if self._state_manager:
-                self._state_manager.set_state(StateManager.SETTINGS)
-
         def on_highscores() -> None:
             """Open the highscore screen."""
             if self._state_manager:
@@ -86,9 +81,6 @@ class MenuState(ScreenState):
         btns_ctn = Container(self._screen, 'VERTICAL', gap=20)
         btns_ctn.add_content([
             {Button(self._screen, 'PLAY', callback=on_play,
-                    font_family=RenderConfig.FONT,
-                    font_size=20): '0%'},
-            {Button(self._screen, 'SETTINGS', callback=on_settings,
                     font_family=RenderConfig.FONT,
                     font_size=20): '0%'},
             {Button(self._screen, 'HIGHSCORES', callback=on_highscores,
