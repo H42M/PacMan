@@ -1,4 +1,5 @@
 from pacman.render.RenderObj import RenderOBJ
+from pacman.render.RenderConfig import RenderConfig
 
 import pygame
 from typing import Optional
@@ -16,7 +17,7 @@ class RenderText(RenderOBJ):
                  bg_color: Optional[tuple[int, int, int]] = None,
                  font_color: Optional[tuple[int, int, int]] = None,
                  font_size: Optional[int] = None,
-                 font_family: Optional[str] = None,
+                 font_family: Optional[str] = RenderConfig.FONT,
                  ) -> None:
         """Initialize the text object."""
         super().__init__(screen, pos, size)

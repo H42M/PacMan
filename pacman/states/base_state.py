@@ -90,6 +90,7 @@ class StateManager:
     PLAYING = 'PLAYING'
     GAMEOVER = 'GAMEOVER'
     VICTORY = 'VICTORY'
+    INSTRUCTIONS = 'INSTRUCTIONS'
 
     def __init__(
         self,

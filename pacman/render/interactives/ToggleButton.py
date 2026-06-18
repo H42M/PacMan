@@ -17,10 +17,11 @@ class ToggleButton(Button):
         callback: Optional[Union[Callable[..., Any],
                                  list[Callable[..., Any]]]] = None,
         state_callback: Optional[Callable[..., Any]] = None,
+        font_size: int = 18
     ) -> None:
         """Initialize Toggle Button."""
         super().__init__(screen, text, pos, size, color=color_on,
-                         callback=callback)
+                         callback=callback, font_size=font_size)
         self.__color_on = color_on if color_on else (0, 255, 0)
         self.__color_off = color_off if color_off else (255, 0, 0)
         self.__state_callback = state_callback
