@@ -4,7 +4,8 @@ from pacman.render.Screen import Screen
 from pacman.states.base_state import ScreenState, StateManager
 from pacman.render.Container import Container
 from pacman.highscores import add_highscore, load_highscores, save_highscores
-from pacman.render.animation.AnimGhost import AnimGhost
+from pacman.render.animation.AnimEntity import AnimEntity
+from pacman.render.animation import AnimGhost, AnimPacman
 
 
 class GameOverState(ScreenState):
@@ -24,22 +25,26 @@ class GameOverState(ScreenState):
         self.__final_score = final_score
         self.__highscore_path = highscore_path
         self.__player_name = ""
-        self.__ghosts = self.__init_ghosts()
+        self.__entities = self.__init_entities()
         self.__game_over_ctn = self.__load_game_over_ctn()
 
         self.__ghost_speed = 20
         self.__ghost_dir = 1
 
-    def __init_ghosts(self) -> list[AnimGhost]:
-        ghosts: list[AnimGhost] = []
+    def __init_entities(self) -> list[AnimEntity]:
+        cell = (50, 50)
+        entities: list[AnimEntity] = []
         for i in range(4):
             ghost = AnimGhost(self._screen, i)
-            cell = (50, 50)
             ghost.size = cell
-            pos = ((-300 + ((i * cell[0]) + 60 * i), 100))
+            pos = ((-500 + (((i + 1) * cell[0]) + 60 * i), 200))
             ghost.set_target_pos(pos)
-            ghosts.append(ghost)
-        return ghosts
+            entities.append(ghost)
+        pac = AnimPacman(self._screen)
+        pac.size = cell
+        pac.set_target_pos((0, 200))
+        entities.append(pac)
+        return entities
 
     def save_and_quit(self) -> None:
         if not self._state_manager:
@@ -78,7 +83,7 @@ class GameOverState(ScreenState):
                 self._screen, f'Your Score: {self.__final_score}',
                 font_size=15,
                 font_color=RenderConfig.YELLOW): '0%'},
-            {Divider(self._screen): '1%'}
+            {Divider(self._screen, color=RenderConfig.YELLOW): '1%'}
         ])
         input_name_ctn = Container(self._screen, 'HORIZONTAL')
         input_name = Input(self._screen, 'ex: PacMan',
@@ -130,13 +135,13 @@ class GameOverState(ScreenState):
     def render(self) -> None:
         self._screen.clear()
         self.__game_over_ctn.render()
-        for ghost in self.__ghosts:
+        for ghost in self.__entities:
             ghost.render()
         self._screen.flip()
 
     def ghosts_out_window(self) -> bool:
         from pacman.render.RenderConfig import RenderConfig
-        for ghost in self.__ghosts:
+        for ghost in self.__entities:
             if ghost.pos:
                 if (0 < ghost.pos[0] < RenderConfig.screen_size[0]):
                     return False
@@ -145,24 +150,23 @@ class GameOverState(ScreenState):
     def update(self) -> None:
         from pacman.render.RenderConfig import RenderConfig
         from pacman.player import Direction
-        screen_w, screen_h = RenderConfig.screen_size
-        for _, ghost in enumerate(self.__ghosts):
+        screen_w = RenderConfig.screen_size[0]
+        for _, ghost in enumerate(self.__entities):
             if ghost.pos and ghost.size:
                 x, y = ghost.pos
                 ghost_dir = ghost.direction.upper()
                 if ghost_dir == 'E' and x > screen_w + 10:
                     ghost.set_rotation(Direction.LEFT)
                     x = screen_w + 10
-                    y += 100
+                    y += 400
                     ghost.pos = (x, y)
                 elif ghost_dir == 'W' and x < -10 - ghost.size[0]:
                     ghost.set_rotation(Direction.RIGHT)
                     x = -10 - ghost.size[0]
-                    y -= 100
+                    y -= 400
                     ghost.pos = (x, y)
                 ghost_dir = ghost.direction.upper()
 
-                print(y)
                 if ghost_dir == 'E':
                     ghost.set_target_pos((x + (self.__ghost_dir *
                                                self.__ghost_speed), y))
