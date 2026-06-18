@@ -7,12 +7,8 @@ from pacman.player import PlayerState, Direction
 from pacman.maze_adapter import CellPosition
 from pacman.game_config import GameConfig
 from pacman.ghost import GhostState, GhostMode
-from pacman.ghost_ai import find_next_step_toward, choose_normal_ghost_target
-from pacman.navigation import (
-    get_target_position,
-    get_direction_between,
-    get_valid_neighbor_positions
-)
+from pacman.ghost_ai import choose_normal_ghost_step
+from pacman.navigation import get_direction_between, get_target_position
 
 
 class GameOutcome(str, Enum):
@@ -165,57 +161,53 @@ class GameState:
             self.score += self.points_per_super_pacgum
             self.activate_frightened_mode()
 
+    def _choose_frightened_ghost_step(
+            self, ghost: GhostState,
+    ) -> CellPosition | None:
+        best_target: CellPosition | None = None
+        best_distance: int | None = None
+
+        for direction in Direction:
+            target = self._get_target_position(ghost.position, direction)
+            if target is None:
+                continue
+
+            dx = target[0] - self.player.position[0]
+            dy = target[1] - self.player.position[1]
+            distance = dx * dx + dy * dy
+
+            if best_distance is None or distance > best_distance:
+                best_distance = distance
+                best_target = target
+
+        return best_target
+
     def move_ghosts(self) -> None:
         if self.phase is not GameplayPhase.PLAYING:
             return
+
         for ghost in self.ghosts:
             if ghost.mode is GhostMode.DEAD:
                 continue
+
             if ghost.mode is GhostMode.NORMAL:
-                target = choose_normal_ghost_target(ghost, self.player,
-                                                    self.level)
-                best_target = find_next_step_toward(
-                    ghost.position,
-                    target,
-                    lambda position: get_valid_neighbor_positions(self.level,
-                                                                  position),
+                next_position = choose_normal_ghost_step(
+                    ghost,
+                    self.ghosts,
+                    self.player,
+                    self.level,
                 )
-                if best_target is None and target != self.player.position:
-                    best_target = find_next_step_toward(
-                        ghost.position,
-                        self.player.position,
-                        lambda position: get_valid_neighbor_positions(
-                            self.level,
-                            position),
-                    )
-                if best_target is None:
-                    continue
-                ghost.direction = get_direction_between(ghost.position,
-                                                        best_target)
-                ghost.position = best_target
+            else:
+                next_position = self._choose_frightened_ghost_step(ghost)
+
+            if next_position is None:
                 continue
-            best_target: CellPosition | None = None
-            best_direction: Direction | None = None
-            best_distance: int | None = None
-            for direction in Direction:
-                target = self._get_target_position(ghost.position, direction)
-                if target is not None:
-                    dx = target[0] - self.player.position[0]
-                    dy = target[1] - self.player.position[1]
-                    distance = dx * dx + dy * dy
-                    if best_distance is None:
-                        better_distance = True
-                    elif ghost.mode is GhostMode.FRIGHTENED:
-                        better_distance = distance > best_distance
-                    else:
-                        better_distance = distance < best_distance
-                    if better_distance:
-                        best_distance = distance
-                        best_direction = direction
-                        best_target = target
-            if best_target is not None:
-                ghost.direction = best_direction
-                ghost.position = best_target
+
+            ghost.direction = get_direction_between(
+                ghost.position,
+                next_position,
+            )
+            ghost.position = next_position
 
     def respawn_entities(self) -> None:
         self.player.position = self.level.player_spawn
