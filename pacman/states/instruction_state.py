@@ -28,6 +28,7 @@ class InstructionState(ScreenState):
 
         title_color = RenderConfig.RED
         text_size = 12
+        title_size = 20
 
         # --- HEADER -----
         header_ctn = Container(self._screen, 'VERTICAL')
@@ -42,15 +43,16 @@ class InstructionState(ScreenState):
         htp_ctn = Container(self._screen, 'VERTICAL')
         htp_ctn.add_content([
             {RenderText(self._screen, 'HOW TO PLAY',
-                        font_color=title_color): '0%'},
-            {RenderText(self._screen, 'Eat all pacgums in the maze to'
+                        font_color=title_color,
+                        font_size=title_size): '0%'},
+            {RenderText(self._screen, 'Eat all pacgums in the maze to '
                         'complete the level.',
                         font_size=text_size): '0%'},
-            {RenderText(self._screen, 'Avoid ghosts unless they are'
+            {RenderText(self._screen, 'Avoid ghosts unless they are '
                         'vulnerable after eating a Super Pacgum.',
                         font_size=text_size): '0%'},
-            {RenderText(self._screen, 'Complete all levels before losing all'
-                        'your lives.',
+            {RenderText(self._screen, 'Complete all levels before losing all '
+                        'your lives within the allotted time.',
                         font_size=text_size): '0%'},
         ])
 
@@ -58,7 +60,8 @@ class InstructionState(ScreenState):
         controls_ctn = Container(self._screen, 'VERTICAL')
         controls_ctn.add_content([
             {RenderText(self._screen, 'CONTROLS',
-                        font_color=title_color): '0%'},
+                        font_color=title_color,
+                        font_size=title_size): '0%'},
             {RenderText(self._screen, 'W: Move UP',
                         font_size=text_size): '0%'},
             {RenderText(self._screen, 'A: Move LEFT',
@@ -75,7 +78,8 @@ class InstructionState(ScreenState):
         scoring_ctn = Container(self._screen, 'VERTICAL')
         scoring_ctn.add_content([
             {RenderText(self._screen, 'SCORING',
-                        font_color=title_color): '0%'},
+                        font_color=title_color,
+                        font_size=title_size): '0%'},
             {RenderText(self._screen, 'PACGUM: 10 points',
                         font_size=text_size): '0%'},
             {RenderText(self._screen, 'SUPER PACGUM: 50 points',
@@ -88,7 +92,8 @@ class InstructionState(ScreenState):
         cheats_ctn = Container(self._screen, 'VERTICAL')
         cheats_ctn.add_content([
             {RenderText(self._screen, 'CHEATS',
-                        font_color=title_color): '0%'},
+                        font_color=title_color,
+                        font_size=title_size): '0%'},
             {RenderText(self._screen, 'F1: Skip Current Level',
                         font_size=text_size): '0%'},
             {RenderText(self._screen, 'F2: Skip Game',
@@ -129,7 +134,8 @@ class InstructionState(ScreenState):
         main_container = Container(self._screen, 'VERTICAL',
                                    pos=(0, 0),
                                    size=(RenderConfig.screen_size),
-                                   padding=50)
+                                   padding=50,
+                                   bg_color=RenderConfig.BLACK)
         main_container.add_content([
             {header_ctn: '10%'},
             {main_section: '70%'},
