@@ -20,10 +20,12 @@ class SelectButton(Button):
         arrow_size = (30, size[1]) if size else (30, 30)
         self.__left_btn = Button(screen, '<',
                                  size=arrow_size,
-                                 callback=self.__left_option)
+                                 callback=self.__left_option,
+                                 color=color)
         self.__right_btn = Button(screen, '>',
                                   size=arrow_size,
-                                  callback=self.__right_option)
+                                  callback=self.__right_option,
+                                  color=color)
 
     def __left_option(self) -> None:
         self.__index = (self.__index - 1) % len(self.__options)
