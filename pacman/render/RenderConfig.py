@@ -2,7 +2,9 @@ import os.path
 import pygame
 from typing import Optional
 
-from Errors import LoadingError
+
+class LoadingError(Exception):
+    """Raised when a render asset cannot be loaded."""
 
 
 class RenderConfig:

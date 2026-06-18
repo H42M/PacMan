@@ -275,26 +275,26 @@ class PlayState(ScreenState):
                              size=RenderConfig.screen_size,
                              bg_color=RenderConfig.BLACK)
         if self.__render_gameplay and self.__game:
-            lifes_ctn_img = Container(self._screen, 'HORIZONTAL')
+            lives_ctn_img = Container(self._screen, 'HORIZONTAL')
             for _ in range(self.__game.lives):
-                lifes_ctn_img.add_content(
+                lives_ctn_img.add_content(
                     {RenderImg(self._screen, 'assets/sprites/pacman.png',
                                is_square=True): '20%'}
                 )
 
-            lifes_ctn = Container(self._screen, 'HORIZONTAL', gap=30,
+            lives_ctn = Container(self._screen, 'HORIZONTAL', gap=30,
                                   padding=50)
-            lifes_ctn.add_content([
-                    {RenderText(self._screen, 'Lifes ',
+            lives_ctn.add_content([
+                    {RenderText(self._screen, 'Lives ',
                                 font_family=RenderConfig.FONT,
                                 font_size=18): '20%'},
-                    {lifes_ctn_img: '70%'}
+                    {lives_ctn_img: '70%'}
                 ])
 
             hud_ctn = Container(self._screen, 'HORIZONTAL')
             hud_ctn.add_content([
 
-                {lifes_ctn: '30%'},
+                {lives_ctn: '30%'},
                 {RenderText(
                     self._screen,
                     f'Score: {self.__game.score}',

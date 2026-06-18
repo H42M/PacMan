@@ -96,7 +96,7 @@ class InstructionState(ScreenState):
                         font_size=title_size): '0%'},
             {RenderText(self._screen, 'F1: Skip Current Level',
                         font_size=text_size): '0%'},
-            {RenderText(self._screen, 'F2: Skip Game',
+            {RenderText(self._screen, 'F2: Trigger Game over',
                         font_size=text_size): '0%'},
             {RenderText(self._screen, 'F3: Enable/Disable God mode',
                         font_size=text_size): '0%'},
