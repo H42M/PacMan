@@ -65,6 +65,10 @@ class MenuState(ScreenState):
             if self._state_manager:
                 self._state_manager.set_state(StateManager.HIGHSCORE)
 
+        def on_instructions() -> None:
+            if self._state_manager:
+                self._state_manager.set_state(StateManager.INSTRUCTIONS)
+
         def on_quit() -> None:
             raise SystemExit
 
@@ -77,6 +81,9 @@ class MenuState(ScreenState):
                     font_family=RenderConfig.FONT,
                     font_size=20): '0%'},
             {Button(self._screen, 'HIGHSCORES', callback=on_highscores,
+                    font_family=RenderConfig.FONT,
+                    font_size=20): '0%'},
+            {Button(self._screen, 'INSTRUCTIONS', callback=on_instructions,
                     font_family=RenderConfig.FONT,
                     font_size=20): '0%'},
             {Button(self._screen, 'QUIT', callback=on_quit,
