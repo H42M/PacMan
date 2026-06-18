@@ -186,9 +186,17 @@ class GameState:
         if self.phase is not GameplayPhase.PLAYING:
             return
 
+        occupied_positions = {
+            ghost.position
+            for ghost in self.ghosts
+            if ghost.mode is not GhostMode.DEAD
+        }
+
         for ghost in self.ghosts:
             if ghost.mode is GhostMode.DEAD:
                 continue
+
+            occupied_positions.discard(ghost.position)
 
             if ghost.mode is GhostMode.NORMAL:
                 next_position = choose_normal_ghost_step(
@@ -201,6 +209,11 @@ class GameState:
                 next_position = self._choose_frightened_ghost_step(ghost)
 
             if next_position is None:
+                occupied_positions.add(ghost.position)
+                continue
+
+            if next_position in occupied_positions:
+                occupied_positions.add(ghost.position)
                 continue
 
             ghost.direction = get_direction_between(
@@ -208,6 +221,7 @@ class GameState:
                 next_position,
             )
             ghost.position = next_position
+            occupied_positions.add(ghost.position)
 
     def respawn_entities(self) -> None:
         self.player.position = self.level.player_spawn
