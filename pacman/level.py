@@ -19,10 +19,12 @@ class Level:
     super_pacgum_positions: tuple[CellPosition, ...]
 
     def is_inside(self, position: CellPosition) -> bool:
+        """Return whether a position is inside the level maze."""
         x, y = position
         return 0 <= x < self.maze.width and 0 <= y < self.maze.height
 
     def walls_at(self, position: CellPosition) -> Wall:
+        """Return the wall flags for a maze cell."""
         x, y = position
         if not self.is_inside(position):
             raise ValueError("Cell position is not inside maze.")
@@ -30,10 +32,12 @@ class Level:
 
 
 def get_center_position(maze: GeneratedMaze) -> CellPosition:
+    """Return the center cell of a generated maze."""
     return (maze.width // 2, maze.height // 2)
 
 
 def get_corner_positions(maze: GeneratedMaze) -> tuple[CellPosition, ...]:
+    """Return the four corner cells of a generated maze."""
     return (
         (maze.width - maze.width, maze.height - maze.height),
         (maze.width - maze.width, maze.height - 1),
@@ -43,6 +47,7 @@ def get_corner_positions(maze: GeneratedMaze) -> tuple[CellPosition, ...]:
 
 
 def build_level(config: GameConfig, level_index: int) -> Level:
+    """Build a runtime level from configuration."""
     if level_index < 0 or level_index >= len(config.levels):
         raise ValueError(f"Level {level_index} not in config.")
     level_config = config.levels[level_index]

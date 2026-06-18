@@ -5,7 +5,8 @@ from typing import Optional, Callable, Union, Any
 
 
 class ToggleButton(Button):
-    """Standar Button which color based on an variable state."""
+    """Render a button whose color reflects a state."""
+
     def __init__(
         self,
         screen: Screen,
@@ -19,7 +20,7 @@ class ToggleButton(Button):
         state_callback: Optional[Callable[..., Any]] = None,
         font_size: int = 18
     ) -> None:
-        """Initialize Toggle Button."""
+        """Initialize a toggle button."""
         super().__init__(screen, text, pos, size, color=color_on,
                          callback=callback, font_size=font_size)
         self.__color_on = color_on if color_on else (0, 255, 0)
@@ -35,5 +36,6 @@ class ToggleButton(Button):
         super().render()
 
     def execute(self) -> None:
+        """Run the callback when the button is active."""
         if self._color == self.__color_on:
             return super().execute()

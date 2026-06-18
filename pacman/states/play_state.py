@@ -31,6 +31,7 @@ class PlayState(ScreenState):
         *,
         session: GameSession,
     ) -> None:
+        """Initialize the gameplay screen state."""
         super().__init__(screen, state_manager)
         self.__game = game
         self.__session: GameSession = session
@@ -54,6 +55,7 @@ class PlayState(ScreenState):
                 self.__ghost_move_delay_ms)
 
     def handle_events(self, events: list[Event]) -> bool:
+        """Handle gameplay input events."""
         for event in events:
             if event.type == pygame.QUIT:
                 return False
@@ -97,6 +99,7 @@ class PlayState(ScreenState):
         return True
 
     def update(self) -> None:
+        """Update gameplay state and animations."""
         if self.__game is None:
             return
 
@@ -182,6 +185,7 @@ class PlayState(ScreenState):
                 self.__render_gameplay.set_ghosts_anim(AnimSet.NORMAL)
 
     def render(self) -> None:
+        """Render the gameplay screen."""
         self._screen.clear()
         self.__renderer = self.__load_game()
 
@@ -194,41 +198,49 @@ class PlayState(ScreenState):
         self._screen.flip()
 
     def __reset_pause_menu(self) -> None:
+        """Rebuild the pause menu and clickable registry."""
         self._screen.reset_clickables()
         self.__pause_menu = self.__load_pause_menu()
 
     def __can_use_cheats(self) -> bool:
+        """Return whether cheat actions can currently run."""
         return (self.__game is not None and
                 self.__game.outcome is GameOutcome.PLAYING and
                 self.__game.phase is GameplayPhase.PLAYING)
 
     def __skip_level(self) -> None:
+        """Trigger a debug level clear."""
         if not self.__can_use_cheats() or self.__game is None:
             return
         self.__game.debug_trigger_level_clear()
 
     def __trigger_game_over(self) -> None:
+        """Trigger a debug game over."""
         if not self.__can_use_cheats() or self.__game is None:
             return
         self.__game.debug_trigger_game_over()
 
     def __toggle_god_mode(self) -> None:
+        """Toggle god mode if cheats are available."""
         if not self.__can_use_cheats():
             return
         self.__cheats.toggle_god_mode()
 
     def __toggle_ghost_freeze(self) -> None:
+        """Toggle ghost freeze if cheats are available."""
         if not self.__can_use_cheats():
             return
         self.__cheats.toggle_ghost_freeze()
 
     def __add_life(self) -> None:
+        """Add a life if cheats are available."""
         if not self.__can_use_cheats() or self.__game is None:
             return
         if self.__game.lives < 5:
             self.__game.lives += 1
 
     def __start_next_level(self) -> None:
+        """Advance to the next configured level."""
         if self.__game is None:
             return
         self.__session.sync_from_game(self.__game)
@@ -246,6 +258,7 @@ class PlayState(ScreenState):
         self.__last_timer_tick_ms = now
 
     def __start_player_death_animation(self, now: int) -> None:
+        """Prepare the player death animation."""
         from pacman.render.animation.AnimEntity import AnimSet
         self.__last_player_move_ms = now
         self.__last_ghost_move_ms = now
@@ -254,6 +267,7 @@ class PlayState(ScreenState):
             self.__render_gameplay.set_pacman_anim(AnimSet.DEATH)
 
     def __update_player_death_animation(self) -> bool:
+        """Update the player death animation state."""
         from pacman.render.animation.AnimEntity import AnimSet
         if (self.__game is None or self.__game.phase is
                 not GameplayPhase.PLAYER_DYING):
@@ -268,6 +282,7 @@ class PlayState(ScreenState):
         return True
 
     def __load_game(self) -> Container:
+        """Build the gameplay HUD and renderer container."""
         from pacman.render.RenderText import RenderText
         from pacman.render.Image import RenderImg
 
@@ -319,6 +334,7 @@ class PlayState(ScreenState):
         return main_ctn
 
     def __load_placeholder(self) -> Container:
+        """Build the fallback gameplay placeholder container."""
         from pacman.render.RenderText import RenderText
 
         container = Container(
@@ -339,6 +355,7 @@ class PlayState(ScreenState):
         return container
 
     def __load_pause_menu(self) -> Window:
+        """Build the pause menu window."""
         from pacman.render.Divider import Divider
         from pacman.render.RenderText import RenderText
         from pacman.render.interactives import Button
@@ -373,6 +390,7 @@ class PlayState(ScreenState):
         )
 
         def show_cheats_menu() -> None:
+            """Switch the pause menu to cheat controls."""
             normal_area_ctn.display = False
             cheats_area_ctn.display = True
             disable_buttons(normal_buttons)
@@ -381,9 +399,11 @@ class PlayState(ScreenState):
             window_menu.resize()
 
         def resume_game() -> None:
+            """Close the pause menu."""
             window_menu.display = False
 
         def return_to_menu() -> None:
+            """Return from gameplay to the main menu."""
             if self._state_manager:
                 self._state_manager.set_state(StateManager.MENU)
 
@@ -411,6 +431,7 @@ class PlayState(ScreenState):
         ])
 
         def show_normal_menu() -> None:
+            """Switch the pause menu to normal controls."""
             cheats_area_ctn.display = False
             normal_area_ctn.display = True
             disable_buttons(cheat_buttons)
@@ -418,10 +439,12 @@ class PlayState(ScreenState):
             window_menu.resize()
 
         def toggle_god_mode_from_menu() -> None:
+            """Toggle god mode from the pause menu."""
             self.__toggle_god_mode()
             update_cheat_button_labels()
 
         def toggle_ghost_freeze_from_menu() -> None:
+            """Toggle ghost freeze from the pause menu."""
             self.__toggle_ghost_freeze()
             update_cheat_button_labels()
 
@@ -462,6 +485,7 @@ class PlayState(ScreenState):
         ]
 
         def update_cheat_button_labels() -> None:
+            """Refresh pause-menu cheat button labels."""
             god_mode_button.text = (
                 'God Mode: ON' if self.__cheats.god_mode else 'God Mode: OFF'
             )
@@ -472,10 +496,12 @@ class PlayState(ScreenState):
             )
 
         def enable_buttons(buttons: list[Button]) -> None:
+            """Register a list of buttons as clickable."""
             for button in buttons:
                 self._screen.record_clickable(button)
 
         def disable_buttons(buttons: list[Button]) -> None:
+            """Remove a list of buttons from click handling."""
             for button in buttons:
                 self._screen.delete_clickable(button)
 

@@ -12,18 +12,24 @@ from pacman.navigation import get_direction_between, get_target_position
 
 
 class GameOutcome(str, Enum):
+    """Represent the current gameplay outcome."""
+
     PLAYING = "PLAYING"
     LEVEL_CLEARED = "LEVEL_CLEARED"
     GAME_OVER = "GAME_OVER"
 
 
 class GameplayPhase(str, Enum):
+    """Represent the current gameplay phase."""
+
     PLAYING = "PLAYING"
     PLAYER_DYING = "PLAYER_DYING"
 
 
 @dataclass(slots=True)
 class GameState:
+    """Store per-level gameplay state."""
+
     level: Level
     lives: int
     remaining_time: int
@@ -42,6 +48,7 @@ class GameState:
 
     @classmethod
     def from_level(cls, config: GameConfig, level: Level) -> GameState:
+        """Create a new game state for a generated level."""
         reserved_cells: set[CellPosition] = {
             level.player_spawn,
             *level.ghost_spawns,
@@ -84,6 +91,7 @@ class GameState:
                    points_per_ghost=config.points_per_ghost)
 
     def timer_tick(self) -> None:
+        """Decrease the level timer while gameplay is active."""
         if (self.outcome is GameOutcome.PLAYING and
                 self.phase is GameplayPhase.PLAYING):
             self.remaining_time -= 1
@@ -92,6 +100,7 @@ class GameState:
                 self.outcome = GameOutcome.GAME_OVER
 
     def tick_ghost_timers(self, elapsed_ms: int) -> None:
+        """Update frightened and respawn timers."""
         if self.phase is not GameplayPhase.PLAYING:
             return
         if self.frightened_timer_ms > 0:
@@ -117,14 +126,17 @@ class GameState:
         position: CellPosition,
         direction: Direction,
     ) -> CellPosition | None:
+        """Return the next legal position for a direction."""
         return get_target_position(self.level, position, direction)
 
     def queue_player_direction(self, direction: Direction) -> None:
+        """Queue the player's next movement direction."""
         if self.phase is not GameplayPhase.PLAYING:
             return
         self.player.queued_direction = direction
 
     def advance_player(self) -> None:
+        """Move the player one step if movement is possible."""
         if self.phase is not GameplayPhase.PLAYING:
             return
         if self.player.queued_direction is not None:
@@ -145,12 +157,14 @@ class GameState:
                 self.collect_at(target)
 
     def activate_frightened_mode(self) -> None:
+        """Put active ghosts into frightened mode."""
         self.frightened_timer_ms = 10000
         for ghost in self.ghosts:
             if ghost.mode is not GhostMode.DEAD:
                 ghost.mode = GhostMode.FRIGHTENED
 
     def collect_at(self, position: CellPosition) -> None:
+        """Collect any pellet at a position."""
         if not self.level.is_inside(position):
             return
         if position in self.pacgums:
@@ -164,6 +178,7 @@ class GameState:
     def _choose_frightened_ghost_step(
             self, ghost: GhostState,
     ) -> CellPosition | None:
+        """Choose the frightened ghost step farthest from the player."""
         best_target: CellPosition | None = None
         best_distance: int | None = None
 
@@ -183,6 +198,7 @@ class GameState:
         return best_target
 
     def move_ghosts(self) -> None:
+        """Move active ghosts for one gameplay tick."""
         if self.phase is not GameplayPhase.PLAYING:
             return
 
@@ -224,6 +240,7 @@ class GameState:
             occupied_positions.add(ghost.position)
 
     def respawn_entities(self) -> None:
+        """Reset player and ghost positions after a life loss."""
         self.player.position = self.level.player_spawn
         self.player.current_direction = None
         self.player.queued_direction = None
@@ -236,6 +253,7 @@ class GameState:
             ghost.respawn_timer_ms = 0
 
     def begin_player_death(self) -> None:
+        """Enter the player death phase and remove one life."""
         if self.phase is GameplayPhase.PLAYER_DYING:
             return
         self.lives -= 1
@@ -244,6 +262,7 @@ class GameState:
         self.player.queued_direction = None
 
     def finish_player_death(self) -> None:
+        """Finish the player death phase."""
         if self.phase is not GameplayPhase.PLAYER_DYING:
             return
         if self.lives <= 0:
@@ -253,6 +272,7 @@ class GameState:
         self.phase = GameplayPhase.PLAYING
 
     def handle_player_ghost_collision(self, *, god_mode: bool = False) -> None:
+        """Resolve collisions between the player and ghosts."""
         if (self.outcome is not GameOutcome.PLAYING or
                 self.phase is not GameplayPhase.PLAYING):
             return
@@ -271,10 +291,13 @@ class GameState:
                 ghost.direction = None
 
     def has_collected_all_pacgums(self) -> bool:
+        """Return whether all pellets have been collected."""
         return not self.pacgums and not self.super_pacgums
 
     def debug_trigger_level_clear(self) -> None:
+        """Mark the current level as cleared for debugging."""
         self.outcome = GameOutcome.LEVEL_CLEARED
 
     def debug_trigger_game_over(self) -> None:
+        """Mark the current game as over for debugging."""
         self.outcome = GameOutcome.GAME_OVER

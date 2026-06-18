@@ -4,12 +4,16 @@ from pacman.render.animation.Animator import Animator
 
 
 class AnimGhost(AnimEntity):
+    """Render an animated ghost sprite."""
+
     def __init__(self, screen: Screen, ghost_color: int = 0) -> None:
+        """Initialize a ghost animation renderer."""
         super().__init__(screen)
         self.__ghost_color = ghost_color
         self.__set_normal_anim()
 
     def __set_normal_anim(self) -> None:
+        """Configure normal ghost animations."""
         animators = {}
         for dir_i, dir in enumerate('EWNS'):
             frames = []
@@ -25,6 +29,7 @@ class AnimGhost(AnimEntity):
         self._render_entity.set_dir_animators(animators)
 
     def __set_frightened_anim(self) -> None:
+        """Configure frightened ghost animation."""
         self._render_entity.fix_rotation = True
         frames = []
         for i in range(2):
@@ -38,6 +43,7 @@ class AnimGhost(AnimEntity):
                                                   tick_rate=self._tick_rate))
 
     def __set_dead_anim(self) -> None:
+        """Configure dead ghost animations."""
         animators = {}
         for dir_i, dir in enumerate('EWNS'):
             frames = []
@@ -51,6 +57,7 @@ class AnimGhost(AnimEntity):
         self._render_entity.set_dir_animators(animators)
 
     def __set_frightened_flashing_anim(self) -> None:
+        """Configure flashing frightened ghost animation."""
         self._render_entity.fix_rotation = True
         frames = []
         for i in range(4):
@@ -64,14 +71,17 @@ class AnimGhost(AnimEntity):
                                                   tick_rate=self._tick_rate))
 
     def tick(self) -> None:
+        """Advance the ghost animation."""
         super().tick()
 
     @property
     def anim_set(self) -> str:
+        """Return the current ghost animation set."""
         return self._anim_set
 
     @anim_set.setter
     def anim_set(self, anim_set: AnimSet) -> None:
+        """Set the current ghost animation set."""
         if self._anim_set == anim_set:
             return
         self._anim_set = anim_set

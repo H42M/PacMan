@@ -6,21 +6,26 @@ from typing import Optional
 
 
 class InstructionState(ScreenState):
+    """Render the instructions screen."""
 
     def __init__(self, screen: Screen,
                  state_manager: Optional[StateManager] = None) -> None:
+        """Initialize the instructions state."""
         super().__init__(screen, state_manager)
         self.__container = self.__load_page()
 
     def update(self) -> None:
+        """Update the instructions screen."""
         return
 
     def render(self) -> None:
+        """Render the instructions screen."""
         self._screen.clear()
         self.__container.render()
         self._screen.flip()
 
     def __load_page(self) -> Container:
+        """Build the instructions page container."""
         from pacman.render.RenderConfig import RenderConfig
         from pacman.render.RenderText import RenderText
         from pacman.render.Divider import Divider
@@ -121,6 +126,7 @@ class InstructionState(ScreenState):
 
         # --- FOOTER -----
         def on_quit() -> None:
+            """Return to the main menu."""
             if self._state_manager:
                 self._state_manager.set_state(StateManager.MENU)
 

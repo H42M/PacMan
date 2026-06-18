@@ -25,6 +25,7 @@ def find_next_step_toward(
         target: CellPosition,
         get_neighbors: Callable[[CellPosition], list[CellPosition]],
 ) -> CellPosition | None:
+    """Return the first step on a shortest path to a target."""
     if start == target:
         return None
 
@@ -61,6 +62,7 @@ def choose_normal_ghost_step(
         player: PlayerState,
         level: Level,
 ) -> CellPosition | None:
+    """Choose the next normal-mode step for a ghost."""
     if ghost.name == CLYDE and is_clyde_too_close(ghost, player):
         return choose_flee_step(level, ghost.position, player.position)
 
@@ -90,6 +92,7 @@ def choose_normal_ghost_target(
         player: PlayerState,
         level: Level,
 ) -> CellPosition:
+    """Choose the target cell for a normal-mode ghost."""
     if ghost.name == BLINKY:
         return player.position
 
@@ -110,6 +113,7 @@ def get_ambush_target(
         player: PlayerState,
         distance: int,
 ) -> CellPosition:
+    """Return a target ahead of the player's current direction."""
     if player.current_direction is None:
         return player.position
 
@@ -126,6 +130,7 @@ def get_inky_target(
         ghosts: list[GhostState],
         player: PlayerState,
 ) -> CellPosition:
+    """Return Inky's mirrored ambush target."""
     ahead = get_ambush_target(level, player, INKY_LOOKAHEAD)
     blinky = find_ghost_by_name(ghosts, BLINKY)
 
@@ -143,6 +148,7 @@ def is_clyde_too_close(
         ghost: GhostState,
         player: PlayerState,
 ) -> bool:
+    """Return whether Clyde should flee from the player."""
     return (
         squared_distance(ghost.position, player.position)
         <= CLYDE_FLEE_DISTANCE_SQUARED
@@ -154,6 +160,7 @@ def choose_flee_step(
         position: CellPosition,
         threat: CellPosition,
 ) -> CellPosition | None:
+    """Choose a neighboring cell farthest from a threat."""
     neighbors = get_valid_neighbor_positions(level, position)
     if not neighbors:
         return None
@@ -170,6 +177,7 @@ def project_position_ahead(
         direction: Direction,
         distance: int,
 ) -> CellPosition:
+    """Project a position forward through legal cells."""
     current = start_position
 
     for _ in range(distance):
@@ -185,6 +193,7 @@ def find_ghost_by_name(
         ghosts: list[GhostState],
         name: str,
 ) -> GhostState | None:
+    """Return the ghost with a matching name."""
     for ghost in ghosts:
         if ghost.name == name:
             return ghost
@@ -195,6 +204,7 @@ def mirror_position(
         origin: CellPosition,
         point: CellPosition,
 ) -> CellPosition:
+    """Return a point mirrored across another position."""
     origin_x, origin_y = origin
     point_x, point_y = point
 
@@ -205,6 +215,7 @@ def mirror_position(
 
 
 def is_playable_position(level: Level, position: CellPosition) -> bool:
+    """Return whether a position is inside and not solid."""
     return (
         level.is_inside(position)
         and position not in level.maze.solid_positions
@@ -212,6 +223,7 @@ def is_playable_position(level: Level, position: CellPosition) -> bool:
 
 
 def squared_distance(first: CellPosition, second: CellPosition) -> int:
+    """Return the squared distance between two cells."""
     first_x, first_y = first
     second_x, second_y = second
     dx = first_x - second_x

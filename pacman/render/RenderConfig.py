@@ -28,6 +28,7 @@ class RenderConfig:
     @classmethod
     def init(cls, screen_size: tuple[int, int],
              maze_size: tuple[int, int]) -> None:
+        """Initialize shared render configuration."""
 
         cls.screen_size = screen_size
 
@@ -40,6 +41,7 @@ class RenderConfig:
 
     @classmethod
     def load_asset(cls, key: str, path: str) -> None:
+        """Load an image asset into the render cache."""
         if os.path.isfile(path):
             try:
                 texture = pygame.image.load(path)
@@ -51,6 +53,7 @@ class RenderConfig:
 
     @classmethod
     def get_asset(cls, key: Optional[str]) -> Optional[pygame.Surface]:
+        """Return a cached image asset by key."""
         if key and key in cls.assets:
             return cls.assets[key]
         return None

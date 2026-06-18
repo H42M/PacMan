@@ -62,6 +62,7 @@ def translate_seed(seed: int | None) -> int:
 
 
 def generate_maze(level: LevelConfig) -> GeneratedMaze:
+    """Generate and normalize a maze for a level."""
     try:
         from mazegenerator.mazegenerator import MazeGenerator
     except ImportError as error:
@@ -100,11 +101,13 @@ def generate_maze(level: LevelConfig) -> GeneratedMaze:
 
 
 def is_inside(width: int, height: int, position: CellPosition) -> bool:
+    """Return whether a position is inside a rectangle."""
     x, y = position
     return 0 <= x < width and 0 <= y < height
 
 
 def is_border(position: CellPosition, maze: GeneratedMaze) -> bool:
+    """Return whether a position is on the maze border."""
     x, y = position
     return (
         x == 0
@@ -115,11 +118,13 @@ def is_border(position: CellPosition, maze: GeneratedMaze) -> bool:
 
 
 def is_solid(maze: GeneratedMaze, position: CellPosition) -> bool:
+    """Return whether a position is marked as solid."""
     return position in maze.solid_positions
 
 
 def is_playable_internal_cell(
         maze: GeneratedMaze, position: CellPosition) -> bool:
+    """Return whether a position is playable and not on the border."""
     return (
         is_inside(maze.width, maze.height, position)
         and not is_border(position, maze)
@@ -131,6 +136,7 @@ def count_usable_exits(
         cells: list[list[Wall]],
         maze: GeneratedMaze,
         position: CellPosition) -> int:
+    """Count usable exits from a maze cell."""
     x, y = position
     walls = cells[y][x]
     usable_exits = 0
@@ -151,6 +157,7 @@ def count_usable_exits(
 def find_wall_to_open(cells: list[list[Wall]],
                       maze: GeneratedMaze,
                       position: CellPosition) -> DirectionInfo | None:
+    """Find a neighboring wall that can be opened."""
     x, y = position
     walls = cells[y][x]
     for wall, dx, dy, opposite_wall in DIRECTIONS:
@@ -167,6 +174,7 @@ def open_wall_between(
         cells: list[list[Wall]],
         position: CellPosition,
         direction: DirectionInfo) -> None:
+    """Open a wall between a cell and its neighbor."""
     x, y = position
     wall, dx, dy, opposite_wall = direction
     cells[y][x] &= ~wall
@@ -174,6 +182,7 @@ def open_wall_between(
 
 
 def clean_dead_ends(generated_maze: GeneratedMaze) -> GeneratedMaze:
+    """Open selected walls to reduce dead ends."""
     maze = generated_maze
     cells = [list(row) for row in maze.cells]
     for y, row in enumerate(cells):
@@ -200,6 +209,7 @@ def clean_dead_ends(generated_maze: GeneratedMaze) -> GeneratedMaze:
 
 def get_generator_solid_positions(
         width: int, height: int) -> tuple[CellPosition, ...]:
+    """Return solid positions reserved from the generator pattern."""
     pattern_height = len(FT_PATTERN)
     pattern_width = len(FT_PATTERN[0])
 

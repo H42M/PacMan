@@ -8,6 +8,7 @@ def get_target_position(
         position: CellPosition,
         direction: Direction,
 ) -> CellPosition | None:
+    """Return the legal target position for one step."""
     if direction == Direction.UP:
         movement = (0, -1)
         blocking_wall = Wall.NORTH
@@ -38,6 +39,7 @@ def get_target_position(
 
 def get_valid_neighbor_positions(level: Level,
                                  position: CellPosition) -> list[CellPosition]:
+    """Return all legal neighboring positions."""
     neighbors = []
     for direction in Direction:
         target = get_target_position(level, position, direction)
@@ -48,6 +50,7 @@ def get_valid_neighbor_positions(level: Level,
 
 def get_direction_between(start: CellPosition,
                           target: CellPosition) -> Direction | None:
+    """Return the direction from one adjacent cell to another."""
     start_x, start_y = start
     target_x, target_y = target
     dx = target_x - start_x
