@@ -4,9 +4,15 @@ from enum import Enum
 
 from pacman.level import Level
 from pacman.player import PlayerState, Direction
-from pacman.maze_adapter import Wall, CellPosition
+from pacman.maze_adapter import CellPosition
 from pacman.game_config import GameConfig
 from pacman.ghost import GhostState, GhostMode
+from pacman.ghost_ai import find_next_step_toward, choose_normal_ghost_target
+from pacman.navigation import (
+    get_target_position,
+    get_direction_between,
+    get_valid_neighbor_positions
+)
 
 
 class GameOutcome(str, Enum):
@@ -115,32 +121,7 @@ class GameState:
         position: CellPosition,
         direction: Direction,
     ) -> CellPosition | None:
-        if direction == Direction.UP:
-            movement = (0, -1)
-            blocking_wall = Wall.NORTH
-        elif direction == Direction.DOWN:
-            movement = (0, 1)
-            blocking_wall = Wall.SOUTH
-        elif direction == Direction.LEFT:
-            movement = (-1, 0)
-            blocking_wall = Wall.WEST
-        elif direction == Direction.RIGHT:
-            movement = (1, 0)
-            blocking_wall = Wall.EAST
-        else:
-            raise ValueError("Direction is incorrect.")
-
-        x, y = position
-        dx, dy = movement
-        target = (x + dx, y + dy)
-
-        if target in self.level.maze.solid_positions:
-            return None
-        blocked = self.level.walls_at(position) & blocking_wall
-        if self.level.is_inside(target) and not blocked:
-            return target
-        else:
-            return None
+        return get_target_position(self.level, position, direction)
 
     def queue_player_direction(self, direction: Direction) -> None:
         if self.phase is not GameplayPhase.PLAYING:
@@ -189,6 +170,29 @@ class GameState:
             return
         for ghost in self.ghosts:
             if ghost.mode is GhostMode.DEAD:
+                continue
+            if ghost.mode is GhostMode.NORMAL:
+                target = choose_normal_ghost_target(ghost, self.player,
+                                                    self.level)
+                best_target = find_next_step_toward(
+                    ghost.position,
+                    target,
+                    lambda position: get_valid_neighbor_positions(self.level,
+                                                                  position),
+                )
+                if best_target is None and target != self.player.position:
+                    best_target = find_next_step_toward(
+                        ghost.position,
+                        self.player.position,
+                        lambda position: get_valid_neighbor_positions(
+                            self.level,
+                            position),
+                    )
+                if best_target is None:
+                    continue
+                ghost.direction = get_direction_between(ghost.position,
+                                                        best_target)
+                ghost.position = best_target
                 continue
             best_target: CellPosition | None = None
             best_direction: Direction | None = None
