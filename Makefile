@@ -5,7 +5,7 @@ MAIN = pac-man.py
 CONFIG = config/config.json
 DEPENDENCIES = requirements.txt
 
-.PHONY: install run debug clean fclean re lint lint-strict
+.PHONY: install run debug clean fclean re lint lint-strict package
 
 $(PYTHON):
 	python3 -m venv $(VENV)
@@ -48,3 +48,7 @@ lint-strict: $(PYTHON)
 		--disallow-untyped-defs \
 		--check-untyped-defs \
 		--exclude '(\.venv|venv|build|dist|mazegenerator-00001-py3-none-any)'
+
+package:
+	rm -rf build dist
+	pyinstaller pac-man.spec
