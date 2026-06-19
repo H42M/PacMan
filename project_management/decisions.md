@@ -10,16 +10,17 @@ This file records the main technical and organization decisions made during the 
 | Config ownership | Put typed config models and validation in a dedicated config layer. | The subject requires configurable values, comments, defaults, and no crash on bad config. | Gameplay receives validated data instead of raw JSON. |
 | Maze generation | Use the assigned A-Maze-ing package as-is behind `pacman/maze_adapter.py`. | Required by subject; adapter isolates external API details. | Future gameplay/render code depends on internal `GeneratedMaze`, not external package output. |
 | Internal maze model | Convert generator output into `GeneratedMaze` and `Wall`. | Keeps pathfinding, rendering, collectibles, and collision independent from generator internals. | Centralized representation for all maze consumers. |
-| `PERFECT=False` | Always request Pac-Man-compatible non-perfect corridors from the generator. | Perfect mazes are too tree-like for Pac-Man gameplay. | More usable corridors and loops. |
-| Level model | Add a runtime `Level` object. | Needed a clean bridge between config, generated maze, spawns, timer, and gameplay state. | Gameplay systems use a stable per-level data object. |
-| Gameplay state split | Separate `GameState` from `GameSession`. | Per-level state resets between levels; score/lives/current level must persist. | Level progression became easier to reason about. |
-| UI/render integration | Keep Hugo's clean gameplay architecture as source of truth and selectively integrate Nico's UI/render work. | Prevented two incompatible gameplay models from coexisting. | UI/render observes gameplay state instead of owning separate world logic. |
+| `PERFECT=False` | Always request Pac-Man-compatible non-perfect corridors. | Perfect mazes are too tree-like for Pac-Man gameplay. | More usable corridors and loops. |
+| Runtime level model | Add a `Level` object. | Needed a clean bridge between config, generated maze, spawns, timer, and gameplay state. | Gameplay systems use stable per-level data. |
+| Gameplay state split | Separate `GameState` from `GameSession`. | Per-level state resets between levels; score/lives/current level persist. | Level progression became easier to reason about. |
+| UI/render integration | Keep the clean gameplay architecture as source of truth and selectively integrate UI/render work. | Prevented incompatible gameplay models from coexisting. | UI/render observes gameplay state instead of owning separate world logic. |
 | Highscores | Store highscores in JSON with validation and top-10 sorting. | Simple, inspectable, robust enough for the subject. | Easy to document and recover from missing/corrupt files. |
-| Cheat mode | Add peer-review tools directly to gameplay flow and pause menu. | Subject asks for useful review helpers. | Reviewers can test level clear, game over, invincibility, ghost freeze, and extra lives. |
-| Ghost AI quality pass | Improve ghost movement after MVP instead of trying for arcade-perfect AI early. | The first greedy movement was compliant but felt bad. | Path-aware movement and personalities improved feel without a full rewrite. |
+| Cheat mode | Add review tools to gameplay flow and pause menu. | Subject asks for useful review helpers. | Reviewers can test level clear, game over, invincibility, ghost freeze, and extra lives. |
+| Ghost AI quality pass | Improve ghost movement after MVP instead of aiming for arcade-perfect AI early. | The first greedy movement was compliant but felt bad. | Path-aware movement and personalities improved game feel without a full rewrite. |
 | Dead-end cleanup | Post-process internal `GeneratedMaze` after external generation. | Smarter ghosts made excessive dead ends unfair. | Playability improved while still using the external generator as-is. |
-| Render/gameplay desync | Park the deeper fix unless QA proves it game-breaking. | Proper fix would touch movement, collision, and interpolation architecture late in the project. | Kept as known limitation instead of risky final-week refactor. |
-| Packaging/docs timing | Delay final README and packaging docs until features stabilize. | Documentation should describe the actual final project. | README can reference final architecture, project evidence, and packaging instructions accurately. |
+| Render/gameplay desync | Accept as a known limitation unless QA proved it game-breaking. | Proper fix would touch movement, collision, and interpolation architecture late in the project. | Avoided risky final-week refactor. |
+| Settings screen | Hide the non-functional Settings entry from the main menu. | A fake player-facing feature hurts polish more than it helps. | UI remains cleaner while the state code stays reversible. |
+| Packaging | Use PyInstaller `onedir` packaging and zip the output for Itch.io. | Simple, inspectable, and peer-review friendly. | Provides a reproducible Linux build workflow. |
 
 ## Architecture overview
 
@@ -44,6 +45,6 @@ flowchart TD
 ## Decision process
 
 - Defense-critical and architecture-heavy decisions were discussed before implementation.
-- The team preferred small feature branches with a clear definition of done.
-- When teammate work diverged, the team reconciled around a single gameplay source of truth rather than merging incompatible models blindly.
-- Late changes were limited to compliance, bug fixes, or low-risk polish.
+- Risky gameplay changes were split into focused branches.
+- Late-stage work avoided broad refactors unless the issue was a compliance blocker.
+- Final documentation and packaging were completed only after gameplay, UI, and project evidence stabilized.

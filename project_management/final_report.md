@@ -2,73 +2,76 @@
 
 ## Project summary
 
-This project recreates a Pac-Man-style game in Python with Pygame. The final game is built around a modular architecture: configuration loading, external maze generation, runtime level data, gameplay state, session progression, rendering, UI states, highscores, and cheat tools are separated into dedicated modules.
+The final project is a complete Python/Pygame Pac-Man-style game created for the 42 curriculum by hgeorges and ngaubil.
 
-The project reached a playable MVP-plus state: Pac-Man can move through generated mazes, collect pacgums and super-pacgums, score points, avoid or eat ghosts, lose lives, progress through multiple levels, save highscores, pause the game, and use cheat tools for peer review.
+The game includes generated mazes, Pac-Man movement, pacgums, super-pacgums, autonomous ghosts, frightened mode, scoring, lives, death/respawn flow, game over, victory, highscores, multiple levels, timer, pause, instructions, cheat mode, project-management evidence, documentation, and a Linux packaged release.
+
+The final release page is:
+
+```text
+https://h42m.itch.io/pacman-42-nh
+```
 
 ## Completed subject requirements
 
-| Requirement area | Status | Notes |
-| --- | --- | --- |
-| Python project and Makefile workflow | Done | `make install`, `make run`, `make debug`, `make clean`, and `make lint` are part of the workflow. |
-| CLI config argument | Done | Launch format is `python3 pac-man.py config/config.json`; wrong arg count handled cleanly. |
-| JSON config with comments/defaults | Done | Config supports comment handling, compliant defaults, validation, and clamping. |
-| Faulty config/dependency handling | Done | Missing/invalid config values and missing dependencies before `make install` are handled without raw tracebacks where applicable. |
-| Assigned A-Maze-ing package | Done | Used as-is behind the maze adapter with `perfect=False`. |
-| Generated maze gameplay | Done | Maze, walls, corridors, pacgums, super-pacgums, player, and ghosts are generated/initialized from level data. |
-| Player rules | Done | 4-direction movement, walls, lives, respawn, game over, level clear. |
-| Ghost rules | Done | Autonomous movement, normal chase, frightened flee, edible ghost scoring, dead/respawn behavior, and active ghost overlap prevention. |
-| Pacgums and scoring | Done | Normal pacgums, super-pacgums, and edible ghost scoring implemented. |
-| Multiple levels | Done | Ten configured levels with score/life carryover. |
-| Timer and pause | Done | Level timer, timeout behavior, pause/resume. |
-| Highscores | Done | Persistent JSON top-10 highscores with name and score validation. |
-| UI screens | Done | Main menu, highscores, instructions, HUD, pause, game over, victory, name entry; inactive settings entry hidden. |
-| Cheat mode | Done | God mode, level skip, game over trigger, ghost freeze, extra lives. |
-| Project-management evidence | Done | This directory contains the repo evidence files and current final-status tracking. |
-| Docstring compliance | Done | All classes/functions/methods have concise one-line docstrings; AST audit and behavior-neutral AST comparison passed. |
-| README | Pending final pass | Should be finalized after packaging instructions are stable. |
-| Packaging/public platform build | Pending final pass | Dedicated packaging branch/build evidence still required. |
+| Requirement | Final status |
+| --- | --- |
+| Python project with graphical game loop. | Completed with Python/Pygame. |
+| Makefile workflow. | Completed: install, run, debug, clean, fclean, re, lint, lint-strict, package, package-zip. |
+| JSON config with comments/defaults/safe handling. | Completed. |
+| Assigned A-Maze-ing package used as-is. | Completed through `pacman/maze_adapter.py`. |
+| Generated maze with pacgums, super-pacgums, ghosts, and player. | Completed. |
+| Player movement, lives, death, respawn, game over. | Completed. |
+| Ghost autonomous chase/flee/respawn behavior. | Completed. |
+| Scoring system. | Completed. |
+| Persistent top-10 highscores with name validation. | Completed. |
+| Multiple levels with score/life carryover. | Completed with 10 configured levels. |
+| Timer/timeout. | Completed. |
+| Cheat mode for peer review. | Completed. |
+| Main menu, highscores, instructions, HUD, pause, game over, victory. | Completed. |
+| Project packaging/release. | Completed with PyInstaller Linux build and Itch.io upload. |
+| Project-management evidence. | Completed in `project_management/`. |
+| README. | Completed at repository root. |
+| Docstrings/type hints/linting. | Completed and validated. |
 
 ## Architecture summary
 
-The final architecture keeps gameplay data and rendering separated:
+The project is organized around a clean separation between configuration, maze generation, runtime level data, gameplay rules, session progression, UI states, rendering, and persistence.
 
-- `pac-man.py` validates CLI usage and starts the app.
-- `pacman/config_loader.py` and `pacman/game_config.py` own config parsing and validated settings.
-- `pacman/maze_adapter.py` owns all contact with the external A-Maze-ing package.
-- `pacman/level.py` represents one generated playable level.
-- `pacman/game_session.py` stores cross-level campaign state.
-- `pacman/game_state.py` stores mutable per-level gameplay state.
-- `pacman/navigation.py` centralizes movement legality helpers.
-- `pacman/ghost_ai.py` owns normal ghost target/path behavior.
-- `pacman/highscores.py` owns highscore persistence.
-- `pacman/states/` owns UI/gameflow states.
-- `pacman/render/` owns drawing, sprites, and animation presentation.
+- Config loading validates raw JSON and provides safe typed data.
+- Maze generation is isolated behind an adapter so the assigned external package is used as-is.
+- `Level` stores generated per-level data.
+- `GameState` owns gameplay rules for the current level.
+- `GameSession` owns score, lives, and level progression across levels.
+- Navigation and ghost AI helpers keep movement logic reusable.
+- State classes manage menus, pause, play, game over, victory, highscores, and instructions.
+- Render classes draw gameplay and UI without owning gameplay rules.
 
-This split made the project easier to test, explain, and adapt after UI/render and gameplay work diverged.
+## Validation summary
 
-## Final validation status
+Final validation included:
 
-Manual validation confirmed the main gameplay loop, ghost behavior, frightened mode, highscores, level progression, cheat mode, pause behavior, and several cleanup fixes. `make lint`, docstring coverage audit, behavior-neutral docstring audit, and a headless layout audit for MenuState, HighScoreState, InstructionState, SettingsState, GameOverState, and PlayState have passed.
-
-The final remaining validation items are:
-
-- test final packaged build,
-- smoke-test the release package with assets/config,
-- finalize README to match the packaged delivery.
+- `make lint`;
+- compile checks;
+- AST docstring coverage audit;
+- behavior-neutral AST comparison after stripping docstrings;
+- manual gameplay testing;
+- cheat mode testing;
+- highscore save/load testing;
+- headless UI layout audit;
+- PyInstaller package build;
+- release ZIP generation;
+- packaged executable smoke test;
+- Itch.io upload.
 
 ## Known limitations
 
-| Limitation | Impact | Decision |
-| --- | --- | --- |
-| Render interpolation can appear slightly behind logical movement. | Collisions may sometimes feel slightly early visually. | Accepted for final unless QA finds it game-breaking. |
-| Ghost AI is improved but not arcade-perfect. | Ghosts are distinct and path-aware but not exact Namco behavior. | Accepted; exact arcade AI is outside mandatory scope. |
-| Settings state remains registered but hidden from the menu. | No player-facing fake options; code path remains easy to restore. | Accepted for final unless a real settings feature is added. |
+The remaining limitations are accepted as polish rather than compliance blockers:
 
-## Lessons learned
+- Render interpolation can feel slightly behind logical tile movement in some collision cases.
+- Ghost AI is path-aware and distinct but not an exact arcade-perfect recreation.
+- The packaged build targets Linux only.
 
-- Isolating the external maze generator early reduced later risk.
-- A clear `Level` / `GameState` / `GameSession` split made level progression and resets much easier.
-- UI/render and gameplay architecture need a shared source of truth to avoid conflicts.
-- Small branches with clear scope were easier to merge and defend.
-- Final compliance work should not be underestimated: README, project evidence, packaging, and QA are real deliverables, not afterthoughts.
+## Conclusion
+
+The project reached a complete playable, documented, and packaged state. The final result satisfies the mandatory gameplay, configuration, highscore, UI, project-management, README, and packaging expectations while preserving a modular architecture that can still be extended later.
