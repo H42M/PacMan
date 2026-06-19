@@ -74,7 +74,8 @@ class MenuState(ScreenState):
         btns_ctn.add_content([
             {Button(self._screen, 'PLAY', callback=on_play,
                     font_family=RenderConfig.FONT,
-                    font_size=20): '0%'},
+                    font_size=20,
+                    color=RenderConfig.RED): '0%'},
             {Button(self._screen, 'HIGHSCORES', callback=on_highscores,
                     font_family=RenderConfig.FONT,
                     font_size=20,

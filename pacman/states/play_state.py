@@ -375,10 +375,10 @@ class PlayState(ScreenState):
             padding=20
         )
 
-        title_ctn = Container(self._screen, 'VERTICAL')
+        title_ctn = Container(self._screen, 'VERTICAL', gap=40)
         title_ctn.add_content([
-            {RenderText(self._screen, 'PAUSE', font_size=40): '20%'},
-            {Divider(self._screen): '1%'}
+            {RenderText(self._screen, 'PAUSE', font_size=40): '0%'},
+            {Divider(self._screen): '3%'}
         ])
 
         normal_area_ctn = Container(self._screen, 'VERTICAL')
@@ -407,16 +407,20 @@ class PlayState(ScreenState):
             if self._state_manager:
                 self._state_manager.set_state(StateManager.MENU)
 
-        resume_button = Button(self._screen, 'Resume', callback=resume_game)
+        resume_button = Button(self._screen, 'Resume',
+                               callback=resume_game,
+                               color=RenderConfig.RED)
         cheats_menu_button = Button(
             self._screen,
             'Cheats Menu',
             callback=show_cheats_menu,
+            color=RenderConfig.RED
         )
         return_to_menu_button = Button(
             self._screen,
             'Return to Menu',
             callback=return_to_menu,
+            color=RenderConfig.RED
         )
 
         normal_buttons = [
@@ -452,6 +456,7 @@ class PlayState(ScreenState):
             self._screen,
             'God Mode: ON' if self.__cheats.god_mode else 'God Mode: OFF',
             callback=toggle_god_mode_from_menu,
+            color=RenderConfig.RED
         )
         ghost_freeze_button = Button(
             self._screen,
@@ -459,21 +464,25 @@ class PlayState(ScreenState):
             if self.__cheats.ghost_freeze
             else 'Ghost Freeze: OFF',
             callback=toggle_ghost_freeze_from_menu,
+            color=RenderConfig.RED
         )
         add_life_button = Button(
             self._screen,
             'Add Life',
             callback=self.__add_life,
+            color=RenderConfig.RED
         )
         skip_level_button = Button(
             self._screen,
             'Skip Level',
             callback=self.__skip_level,
+            color=RenderConfig.RED
         )
         back_button = Button(
             self._screen,
             'Back',
             callback=show_normal_menu,
+            color=RenderConfig.RED
         )
 
         cheat_buttons = [
@@ -506,22 +515,23 @@ class PlayState(ScreenState):
                 self._screen.delete_clickable(button)
 
         cheats_area_ctn.add_content([
-            {god_mode_button: '0%'},
-            {ghost_freeze_button: '0%'},
-            {add_life_button: '0%'},
-            {skip_level_button: '0%'},
-            {back_button: '0%'},
+            {god_mode_button: '19%'},
+            {ghost_freeze_button: '19%'},
+            {add_life_button: '19%'},
+            {skip_level_button: '19%'},
+            {Divider(self._screen): '1%'},
+            {back_button: '20%'},
         ])
 
         body_ctn = Container(self._screen, 'VERTICAL', padding=3, gap=10)
         body_ctn.add_content([
             {normal_area_ctn: '60%'},
-            {cheats_area_ctn: '60%'},
+            {cheats_area_ctn: '90%'},
         ])
 
         window_menu.add_content([
-            {title_ctn: '30%'},
-            {body_ctn: '70%'},
+            {title_ctn: '10%'},
+            {body_ctn: '65%'},
         ])
 
         disable_buttons(cheat_buttons)
