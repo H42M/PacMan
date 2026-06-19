@@ -8,6 +8,7 @@ from pacman.render.animation.RenderEntity import RenderEntity
 from pacman.render.animation.SpriteSheet import SpriteSheet
 from pacman.player import Direction
 from enum import Enum
+from utils.path import asset_path
 
 
 class AnimSet(str, Enum):
@@ -39,7 +40,8 @@ class AnimEntity(RenderOBJ):
         self._move_start_ms = 0
 
         self._sheet = self._load_sheet(
-            'assets/sprites/pacman-spritesheet.png')
+            asset_path("sprites/pacman-spritesheet.png")
+        )
         self._SHEET_NB_SPRITES_H = 14
         self._SHEET_NB_SPRITES_V = 15
         self._SHEET_SPRITE_W = self._sheet.size[0] // self._SHEET_NB_SPRITES_H

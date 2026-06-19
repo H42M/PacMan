@@ -285,6 +285,7 @@ class PlayState(ScreenState):
         """Build the gameplay HUD and renderer container."""
         from pacman.render.RenderText import RenderText
         from pacman.render.Image import RenderImg
+        from pacman.utils.path import asset_path
 
         main_ctn = Container(self._screen, 'VERTICAL', pos=(0, 0),
                              size=RenderConfig.screen_size,
@@ -293,7 +294,7 @@ class PlayState(ScreenState):
             lives_ctn_img = Container(self._screen, 'HORIZONTAL')
             for _ in range(self.__game.lives):
                 lives_ctn_img.add_content(
-                    {RenderImg(self._screen, 'assets/sprites/pacman.png',
+                    {RenderImg(self._screen, asset_path('sprites/pacman.png'),
                                is_square=True): '20%'}
                 )
 

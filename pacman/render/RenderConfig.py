@@ -1,6 +1,7 @@
 import os.path
 import pygame
 from typing import Optional
+from pacman.utils.path import asset_path
 
 
 class LoadingError(Exception):
@@ -23,7 +24,7 @@ class RenderConfig:
     BLUE = (30, 60, 220)
     BLACK = (30, 30, 30)
     YELLOW = (220, 220, 0)
-    FONT = 'assets/fonts/Emulogic.ttf'
+    FONT = asset_path("fonts/Emulogic.ttf")
 
     @classmethod
     def init(cls, screen_size: tuple[int, int],
