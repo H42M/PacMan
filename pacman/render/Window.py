@@ -22,6 +22,7 @@ class Window(Container):
                                  tuple[int, int, int, int]]] = None,
         display_default: bool = False,
     ) -> None:
+        """Initialize a bordered window container."""
         super().__init__(
             screen,
             way,
@@ -79,9 +80,11 @@ class Window(Container):
         self.display = not self.display
 
     def _on_display_changed(self) -> None:
+        """Synchronize the close button when visibility changes."""
         self.__sync_cross_button_clickable()
 
     def __sync_cross_button_clickable(self) -> None:
+        """Register or remove the close button based on visibility."""
         if self.display:
             self._screen.record_clickable(self.__cross_btn)
         else:

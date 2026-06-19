@@ -6,7 +6,8 @@ import pygame
 
 
 class Input(Button):
-    """Input text objetc."""
+    """Render an interactive text input."""
+
     def __init__(self, screen: Screen,
                  placeholder: str = "Text example",
                  base_color: Optional[tuple[int, int, int]] = None,
@@ -57,31 +58,39 @@ class Input(Button):
 
     @property
     def focus(self) -> bool:
+        """Return whether the input has focus."""
         return self.__focus
 
     @focus.setter
     def focus(self, value: bool) -> None:
+        """Set whether the input has focus."""
         self.__focus = value
 
     @property
     def base_color(self) -> tuple[int, int, int]:
+        """Return the input base color."""
         return self.__base_color
 
     @base_color.setter
     def base_color(self, value: tuple[int, int, int]) -> None:
+        """Set the input base color."""
         self.__base_color = value
 
     @property
     def focus_color(self) -> tuple[int, int, int]:
+        """Return the input focus color."""
         return self.__focus_color
 
     @focus_color.setter
     def focus_color(self, value: tuple[int, int, int]) -> None:
+        """Set the input focus color."""
         self.__focus_color = value
 
     @property
     def value(self) -> str:
+        """Return the input value."""
         return self.__value
 
     def get_value(self) -> str:
+        """Return the input value."""
         return self.__value

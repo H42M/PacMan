@@ -26,12 +26,14 @@ def run(config: GameConfig) -> int:
         # level building and maze generation
         def create_play_state(screen: Screen,
                               manager: StateManager) -> PlayState:
+            """Create a fresh play state for the current session."""
             session = GameSession.from_config(config)
             game = session.create_game_state()
             return PlayState(screen, manager, game, session=session)
 
         # pygame initialization
         def final_score_from_payload(payload: dict[str, object]) -> int:
+            """Return the final score stored in a state payload."""
             final_score = payload.get("final_score", 0)
             if isinstance(final_score, int):
                 return final_score

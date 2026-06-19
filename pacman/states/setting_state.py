@@ -8,12 +8,15 @@ from pacman.states.base_state import ScreenState, StateManager
 
 
 class SettingsState(ScreenState):
+    """Render the settings screen."""
+
     def __init__(
         self,
         screen: Screen,
         state_manager: Optional[StateManager] = None,
         infos: Optional[dict[str, str]] = None
     ) -> None:
+        """Initialize the settings state."""
         super().__init__(screen, state_manager)
         self.__infos = infos or {
             'godmode': 'Disabled',
@@ -23,20 +26,24 @@ class SettingsState(ScreenState):
         self.__menu_ctn = self.__load_settings()
 
     def update(self) -> None:
+        """Update the settings screen."""
         pass
 
     def render(self) -> None:
+        """Render the settings screen."""
         self._screen.clear()
         self.__menu_ctn.render()
         self._screen.flip()
 
     def load_infos(self, infos: dict[str, str]) -> None:
+        """Load settings labels into the screen state."""
         for required in ['godmode', 'difficulty', 'screen_size']:
             if required not in infos:
                 raise SettingsError(f'Missing {required} in settings')
         self.__infos = infos
 
     def __load_settings(self) -> Container:
+        """Build the settings screen container."""
         from pacman.render.Divider import Divider
         from pacman.render.RenderText import RenderText
         from pacman.render.interactives import Button, SelectButton
@@ -63,10 +70,12 @@ class SettingsState(ScreenState):
         screen_size_btn.set_index(current_size)
 
         def on_quit() -> None:
+            """Return to the main menu without saving."""
             if self._state_manager:
                 self._state_manager.set_state(StateManager.MENU)
 
         def on_save() -> None:
+            """Store selected settings labels and return to the menu."""
             self.__infos = {
                 'godmode': cheat_btn.text,
                 'difficulty': difficulty_btn.text,
@@ -148,4 +157,6 @@ class SettingsState(ScreenState):
 
 
 class SettingsError(Exception):
+    """Raised when settings data is incomplete."""
+
     pass

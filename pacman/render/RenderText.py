@@ -44,8 +44,10 @@ class RenderText(RenderOBJ):
 
     @property
     def text(self) -> str:
+        """Return the text content."""
         return self.__text
 
     @text.setter
     def text(self, value: str) -> None:
+        """Set the text content."""
         self.__text = value

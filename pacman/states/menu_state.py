@@ -8,25 +8,31 @@ from pacman.highscores import load_highscores
 
 
 class MenuState(ScreenState):
+    """Render the main menu screen."""
+
     def __init__(
         self,
         screen: Screen,
         state_manager: Optional[StateManager] = None,
         highscore_path: str = "highscores.json",
     ) -> None:
+        """Initialize the menu state."""
         super().__init__(screen, state_manager)
         self.__highscore_path = highscore_path
         self.__menu_ctn = self.__load_menu()
 
     def update(self) -> None:
+        """Update the menu screen."""
         pass
 
     def render(self) -> None:
+        """Render the menu screen."""
         self._screen.clear()
         self.__menu_ctn.render()
         self._screen.flip()
 
     def __load_menu(self) -> Container:
+        """Build the main menu container."""
         from pacman.render.Divider import Divider
         from pacman.render.RenderText import RenderText
         from pacman.render.interactives import Button
@@ -46,34 +52,29 @@ class MenuState(ScreenState):
         ])
 
         def on_play() -> None:
+            """Start gameplay."""
             if self._state_manager:
                 self._state_manager.set_state(StateManager.PLAYING)
 
-        def on_settings() -> None:
-            if self._state_manager:
-                self._state_manager.set_state(StateManager.SETTINGS)
-
         def on_highscores() -> None:
+            """Open the highscore screen."""
             if self._state_manager:
                 self._state_manager.set_state(StateManager.HIGHSCORE)
 
         def on_instructions() -> None:
+            """Open the instructions screen."""
             if self._state_manager:
                 self._state_manager.set_state(StateManager.INSTRUCTIONS)
 
         def on_quit() -> None:
+            """Exit the application."""
             raise SystemExit
 
         btns_ctn = Container(self._screen, 'VERTICAL', gap=10)
         btns_ctn.add_content([
             {Button(self._screen, 'PLAY', callback=on_play,
                     font_family=RenderConfig.FONT,
-                    font_size=20,
-                    color=RenderConfig.RED): '0%'},
-            {Button(self._screen, 'SETTINGS', callback=on_settings,
-                    font_family=RenderConfig.FONT,
-                    font_size=20,
-                    color=RenderConfig.RED): '0%'},
+                    font_size=20): '0%'},
             {Button(self._screen, 'HIGHSCORES', callback=on_highscores,
                     font_family=RenderConfig.FONT,
                     font_size=20,

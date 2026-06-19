@@ -5,6 +5,7 @@ from pacman.player import Direction
 
 
 def direction_from_key(key_pressed: int) -> Direction | None:
+    """Return the movement direction for a keyboard key."""
     if key_pressed == K_UP or key_pressed == K_w:
         return Direction.UP
     elif key_pressed == K_a or key_pressed == K_LEFT:

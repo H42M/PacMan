@@ -7,11 +7,14 @@ MAX_PLAYER_NAME_LENGTH = 10
 
 @dataclass(frozen=True, slots=True)
 class HighscoreEntry:
+    """Store one validated highscore entry."""
+
     name: str
     score: int
 
 
 def validate_player_name(name: str) -> str:
+    """Return a validated player name."""
     if not name.strip():
         raise ValueError("Enter a valid name.")
     name = name.strip()
@@ -24,12 +27,14 @@ def validate_player_name(name: str) -> str:
 
 
 def validate_score(score: int) -> int:
+    """Return a validated highscore value."""
     if score < 0:
         raise ValueError("Score is negative.")
     return score
 
 
 def entry_from_raw(raw: object) -> HighscoreEntry | None:
+    """Parse a highscore entry from raw JSON data."""
     if not isinstance(raw, dict):
         return None
     name = raw.get("name")
@@ -46,16 +51,19 @@ def entry_from_raw(raw: object) -> HighscoreEntry | None:
 
 
 def entry_to_raw(entry: HighscoreEntry) -> dict[str, object]:
+    """Convert a highscore entry to JSON data."""
     return {"name": entry.name, "score": entry.score}
 
 
 def sort_highscores(entries: list[HighscoreEntry]) -> list[HighscoreEntry]:
+    """Return highscores sorted from highest to lowest."""
     return (sorted(entries, key=lambda entry: entry.score,
                    reverse=True)[:MAX_HIGHSCORES])
 
 
 def add_highscore(entries: list[HighscoreEntry],
                   name: str, score: int) -> list[HighscoreEntry]:
+    """Add a highscore entry and return the sorted list."""
     name = validate_player_name(name)
     score = validate_score(score)
     entry = HighscoreEntry(name, score)
@@ -64,6 +72,7 @@ def add_highscore(entries: list[HighscoreEntry],
 
 
 def load_highscores(path: str) -> list[HighscoreEntry]:
+    """Load highscores from a JSON file."""
     highscores_list: list[HighscoreEntry] = []
     try:
         with open(path, "r") as file:
@@ -81,6 +90,7 @@ def load_highscores(path: str) -> list[HighscoreEntry]:
 
 
 def save_highscores(path: str, entries: list[HighscoreEntry]) -> bool:
+    """Save highscores to a JSON file."""
     entries = sort_highscores(entries)
     raw_entries = []
     for entry in entries:

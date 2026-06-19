@@ -198,29 +198,35 @@ class Button(RenderOBJ):
 
     @property
     def text(self) -> str:
+        """Return the button text."""
         return self._text
 
     @text.setter
     def text(self, value: str) -> None:
+        """Set the button text."""
         self._text = value
 
     @property
     def size(self) -> Optional[tuple[int, int]]:
+        """Return the button size."""
         return self._size
 
     @size.setter
     def size(self, value: Optional[tuple[int, int]]) -> None:
+        """Set the button size."""
         if value:
             self._size = value
 
     @property
     def w(self) -> Optional[int]:
+        """Return the button width."""
         if self._size:
             return self._size[0]
         return None
 
     @w.setter
     def w(self, value: Optional[int]) -> None:
+        """Set the button width."""
         if value:
             if self._size:
                 self._size = (value, self._size[1])
@@ -229,12 +235,14 @@ class Button(RenderOBJ):
 
     @property
     def h(self) -> Optional[int]:
+        """Return the button height."""
         if self._size:
             return self._size[1]
         return None
 
     @h.setter
     def h(self, value: Optional[int]) -> None:
+        """Set the button height."""
         if value:
             if self._size:
                 self._size = (self._size[0], value)
@@ -243,8 +251,10 @@ class Button(RenderOBJ):
 
     @property
     def is_hovered(self) -> bool:
+        """Return whether the button is hovered."""
         return self._is_hovered
 
     @is_hovered.setter
     def is_hovered(self, value: bool) -> None:
+        """Set whether the button is hovered."""
         self._is_hovered = value

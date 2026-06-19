@@ -6,11 +6,8 @@ import pygame
 
 
 class Container(RenderOBJ):
-    """Container class.
+    """Lay out render objects in a horizontal or vertical container."""
 
-    Used to automatically set elements sizes and positions.
-    Can be horizontal or vertical and can contain other containers.
-    """
     def __init__(
         self,
         screen: Screen,
@@ -34,6 +31,7 @@ class Container(RenderOBJ):
         self._gap_in_bg = True
 
     def __is_valid_percentage(self, value: str) -> bool:
+        """Return whether a value is a valid percentage string."""
         if not isinstance(value, str) or not value.endswith('%'):
             return False
         try:
@@ -45,9 +43,11 @@ class Container(RenderOBJ):
         return True
 
     def __is_visible_child(self, elm: RenderOBJ) -> bool:
+        """Return whether a child should be included in layout."""
         return not isinstance(elm, Container) or elm.display
 
     def __get_visible_content(self) -> dict[RenderOBJ, int]:
+        """Return container content that is currently visible."""
         return {
             elm: size
             for elm, size in self.__content.items()
@@ -58,10 +58,12 @@ class Container(RenderOBJ):
         self,
         visible_content: dict[RenderOBJ, int]
     ) -> None:
+        """Validate that visible content fits in the container."""
         if sum(size for _, size in visible_content.items()) > 100:
             raise ValueError("Sum of visible sizes is over 100% in container")
 
     def __are_all_elm_0(self, content: dict[RenderOBJ, int]) -> bool:
+        """Return whether all content sizes are zero."""
         for _, size in content.items():
             if size != 0:
                 return False
@@ -175,6 +177,7 @@ class Container(RenderOBJ):
                                  f' or VERTICAL: {self.__way}')
 
     def __process_gap(self, content: dict[RenderOBJ, int]) -> int:
+        """Compute the automatic gap between children."""
         if self._size and self._pos:
             if self.__way == 'VERTICAL':
                 available_height = self._size[1] - 2 * self.__padding
@@ -219,21 +222,25 @@ class Container(RenderOBJ):
 
     @property
     def size(self) -> Optional[tuple[int, int]]:
+        """Return the container size."""
         return self._size
 
     @size.setter
     def size(self, value: Optional[tuple[int, int]]) -> None:
+        """Set the container size."""
         if value:
             self._size = value
 
     @property
     def w(self) -> Optional[int]:
+        """Return the container width."""
         if self._size:
             return self._size[0]
         return None
 
     @w.setter
     def w(self, value: Optional[int]) -> None:
+        """Set the container width."""
         if value:
             if self._size:
                 self._size = (value, self._size[1])
@@ -242,12 +249,14 @@ class Container(RenderOBJ):
 
     @property
     def h(self) -> Optional[int]:
+        """Return the container height."""
         if self._size:
             return self._size[1]
         return None
 
     @h.setter
     def h(self, value: Optional[int]) -> None:
+        """Set the container height."""
         if value:
             if self._size:
                 self._size = (self._size[0], value)
@@ -256,43 +265,54 @@ class Container(RenderOBJ):
 
     @property
     def gap(self) -> int:
+        """Return the container gap."""
         return self.__gap
 
     @gap.setter
     def gap(self, value: int) -> None:
+        """Set the container gap."""
         self.__gap = value
         self.resize()
 
     @property
     def padding(self) -> int:
+        """Return the container padding."""
         return self.__padding
 
     @padding.setter
     def padding(self, value: int) -> None:
+        """Set the container padding."""
         self.__padding = value
         self.resize()
 
     @property
     def padding_in_bg(self) -> bool:
+        """Return whether padding is included in the background."""
         return self._gap_in_bg
 
     @padding_in_bg.setter
     def padding_in_bg(self, value: bool) -> None:
+        """Set whether padding is included in the background."""
         self._gap_in_bg = value
 
     @property
     def display(self) -> bool:
+        """Return whether the container is visible."""
         return self.__display
 
     @display.setter
     def display(self, value: bool) -> None:
+        """Set whether the container is visible."""
         self.__display = value
         self.resize()
         self._on_display_changed()
 
     def _on_display_changed(self) -> None:
+        """Handle container visibility changes."""
         pass
 
 
 class ContainerError(Exception):
+    """Raised when container layout configuration is invalid."""
+
     pass

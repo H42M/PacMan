@@ -54,26 +54,32 @@ class Screen:
             self.__clickables.remove(obj)
 
     def reset_clickables(self) -> None:
+        """Remove all registered clickable objects."""
         self.__clickables = []
 
     # GETTERS / SETTERS
 
     @property
     def screen(self) -> pygame.Surface:
+        """Return the pygame screen surface."""
         return self.__screen
 
     @screen.setter
     def screen(self, value: pygame.Surface) -> None:
+        """Set the pygame screen surface."""
         self.__screen = value
 
     @property
     def clickables(self) -> list[Button]:
+        """Return registered clickable objects."""
         return self.__clickables
 
     @property
     def background(self) -> Optional[pygame.Surface]:
+        """Return the screen background surface."""
         return self.__background
 
     @background.setter
     def background(self, value: pygame.Surface) -> None:
+        """Set the screen background surface."""
         self.__background = value

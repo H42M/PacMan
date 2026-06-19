@@ -5,6 +5,8 @@ from pacman.maze_adapter import CellPosition
 
 
 class Direction(str, Enum):
+    """Represent a grid movement direction."""
+
     UP = "UP"
     DOWN = "DOWN"
     LEFT = "LEFT"
@@ -13,6 +15,8 @@ class Direction(str, Enum):
 
 @dataclass(slots=True)
 class PlayerState:
+    """Store runtime state for the player."""
+
     position: CellPosition
     current_direction: Direction | None = None
     queued_direction: Direction | None = None

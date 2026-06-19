@@ -9,6 +9,8 @@ from pacman.render.animation import AnimGhost, AnimPacman
 
 
 class GameOverState(ScreenState):
+    """Render the game over or victory screen."""
+
     LOOSE_SCREEN = 'LOOSE_SCEEN'
     WIN_SCREEN = 'WIN_SCREEN'
 
@@ -20,6 +22,7 @@ class GameOverState(ScreenState):
         final_score: int = 0,
         highscore_path: str = "highscores.json",
     ) -> None:
+        """Initialize the game over state."""
         super().__init__(screen, state_manager)
         self.__win_or_loose = win_or_lose
         self.__final_score = final_score
@@ -32,6 +35,7 @@ class GameOverState(ScreenState):
         self.__ghost_dir = 1
 
     def __init_entities(self) -> list[AnimEntity]:
+        """Initialize animated entities for the end screen."""
         cell = (50, 50)
         entities: list[AnimEntity] = []
         for i in range(4):
@@ -47,6 +51,7 @@ class GameOverState(ScreenState):
         return entities
 
     def save_and_quit(self) -> None:
+        """Save the highscore and return to the menu."""
         if not self._state_manager:
             return
 
@@ -65,6 +70,7 @@ class GameOverState(ScreenState):
         self._state_manager.set_state(StateManager.MENU)
 
     def __load_game_over_ctn(self) -> Container:
+        """Build the game over screen container."""
         from pacman.render.RenderConfig import RenderConfig
         from pacman.render.Container import Container
         from pacman.render.RenderText import RenderText
@@ -100,10 +106,12 @@ class GameOverState(ScreenState):
                                   gap=30)
 
         def save_and_quit() -> None:
+            """Store the entered name and save the score."""
             self.__player_name = input_name.value
             self.save_and_quit()
 
         def quit() -> None:
+            """Return to the main menu without saving."""
             if self._state_manager:
                 self._state_manager.set_state(StateManager.MENU)
 
@@ -133,6 +141,7 @@ class GameOverState(ScreenState):
         return window_ctn
 
     def render(self) -> None:
+        """Render the game over screen."""
         self._screen.clear()
         self.__game_over_ctn.render()
         for ghost in self.__entities:
@@ -140,6 +149,7 @@ class GameOverState(ScreenState):
         self._screen.flip()
 
     def ghosts_out_window(self) -> bool:
+        """Return whether all animated entities are outside the window."""
         from pacman.render.RenderConfig import RenderConfig
         for ghost in self.__entities:
             if ghost.pos:
@@ -148,6 +158,7 @@ class GameOverState(ScreenState):
         return True
 
     def update(self) -> None:
+        """Update end-screen entity animations."""
         from pacman.render.RenderConfig import RenderConfig
         from pacman.player import Direction
         screen_w = RenderConfig.screen_size[0]
@@ -176,4 +187,5 @@ class GameOverState(ScreenState):
             ghost.tick()
 
     def handle_events(self, events: list[Event]) -> bool:
+        """Handle game over screen events."""
         return super().handle_events(events)

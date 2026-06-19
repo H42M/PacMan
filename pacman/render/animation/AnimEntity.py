@@ -11,6 +11,8 @@ from enum import Enum
 
 
 class AnimSet(str, Enum):
+    """Represent available animation sets."""
+
     NORMAL = "NORMAL"
     DEATH = "DEATH"
     BOOSTED = 'BOOSTED'
@@ -19,7 +21,10 @@ class AnimSet(str, Enum):
 
 
 class AnimEntity(RenderOBJ):
+    """Render an animated entity with movement interpolation."""
+
     def __init__(self, screen: Screen) -> None:
+        """Initialize an animated entity."""
         self._move_progress: float = 1.0
         self._move_speed = 1.0 / ((200 / 1000) * 60)
         self._tick_rate = 18
@@ -46,12 +51,14 @@ class AnimEntity(RenderOBJ):
         self._render_entity = RenderEntity(screen)
 
     def _load_sheet(self, path: str) -> SpriteSheet:
+        """Load the shared sprite sheet."""
         try:
             return SpriteSheet(path)
         except Exception as e:
             raise ValueError(f'Cannot load spritesheet: {e}')
 
     def set_target_pos(self, target_pos: tuple[int, int]) -> None:
+        """Set the target screen position for movement."""
         if not self._pos:
             self._pos = target_pos
 
@@ -67,6 +74,7 @@ class AnimEntity(RenderOBJ):
             self._move_progress = 0.0
 
     def snap_to_target_pos(self) -> None:
+        """Move immediately to the current target position."""
         if self._target_pos is None:
             return
         self._pos = self._target_pos
@@ -75,6 +83,7 @@ class AnimEntity(RenderOBJ):
         self._move_progress = 1.0
 
     def tick(self) -> None:
+        """Advance animation and movement interpolation."""
         self._render_entity.tick_animator()
         if not self._prev_pos or not self._target_pos:
             print('ghost pos not set')
@@ -94,17 +103,21 @@ class AnimEntity(RenderOBJ):
             self._real_pos = self._target_pos
 
     def set_move_delay(self, delay_ms: int) -> None:
+        """Set the movement interpolation duration."""
         self._move_duration_ms = delay_ms
 
     def set_animation_progress(self, progress: float) -> None:
+        """Set the animation progress directly."""
         self._render_entity.set_progress(progress)
 
     def render(self) -> None:
+        """Render the animated entity."""
         self._render_entity.pos = self._real_pos
         self._render_entity.size = self.size
         self._render_entity.render()
 
     def set_rotation(self, rotation: Optional[Direction]) -> None:
+        """Set the rendered rotation from a movement direction."""
         if not rotation:
             return
         dir_mapper = {
@@ -116,6 +129,7 @@ class AnimEntity(RenderOBJ):
         self._render_entity.set_rotation(dir_mapper[rotation])
 
     def is_anim_over(self, nb_frames: Optional[int] = None) -> bool:
+        """Return whether the current animation has reached a frame limit."""
         animator = self._render_entity.animator
         if not animator:
             return True
@@ -126,12 +140,15 @@ class AnimEntity(RenderOBJ):
 
     @property
     def anim_set(self) -> str:
+        """Return the current animation set."""
         return self._anim_set
 
     @anim_set.setter
     def anim_set(self, anim_set: AnimSet) -> None:
+        """Set the current animation set."""
         self._anim_set = anim_set
 
     @property
     def direction(self) -> str:
+        """Return the rendered direction."""
         return self._render_entity.direction

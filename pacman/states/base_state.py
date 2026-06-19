@@ -27,6 +27,7 @@ class ScreenState(ABC):
         screen: Screen,
         state_manager: Optional[StateManager] = None
     ) -> None:
+        """Initialize a screen state."""
         self._screen = screen
         self._state_manager = state_manager
 
@@ -98,6 +99,7 @@ class StateManager:
         initial_state: ScreenState | str,
         state_factories: Optional[dict[str, StateFactory]] = None,
     ) -> None:
+        """Initialize the state manager."""
         self.__screen = screen
         self.__state_factories = {
             key.upper(): factory

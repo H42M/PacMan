@@ -15,6 +15,7 @@ class RenderGameplay (RenderOBJ):
     """Render the current gameplay state."""
 
     def __init__(self, screen: Screen, game: GameState) -> None:
+        """Initialize the gameplay renderer."""
         super().__init__(screen)
         self.screen = screen
         self.game = game
@@ -26,12 +27,14 @@ class RenderGameplay (RenderOBJ):
                                 for i, _ in enumerate(self.game.ghosts)]
 
     def render(self) -> None:
+        """Render all gameplay elements."""
         self.maze_renderer.render()
         self._render_pacgums()
         self._render_ghosts()
         self._render_player()
 
     def _render_player(self) -> None:
+        """Render the player sprite."""
         cell_width, cell_height = self.maze_renderer.cell_size
         player_size = min(cell_width, cell_height) - 6
 
@@ -49,6 +52,7 @@ class RenderGameplay (RenderOBJ):
         self.__render_pacman.render()
 
     def _render_ghosts(self) -> None:
+        """Render active ghost sprites."""
         # surface = self.screen.screen
         cell_width, cell_height = self.maze_renderer.cell_size
         ghost_size = min(cell_width, cell_height) - 8
@@ -69,9 +73,11 @@ class RenderGameplay (RenderOBJ):
             render_ghost.render()
 
     def set_player_death_progress(self, progress: float | None) -> None:
+        """Set the player death animation progress."""
         self.__player_death_progress = progress
 
     def _render_pacgums(self) -> None:
+        """Render pacgums and super pacgums."""
         surface = self.screen.screen
         pacgum_color = (255, 220, 120)
         super_pacgum_color = (255, 255, 255)
@@ -103,6 +109,7 @@ class RenderGameplay (RenderOBJ):
                                center, super_dot_size // 2)
 
     def _configure_maze_renderer(self) -> None:
+        """Configure the maze renderer size and position."""
         screen_width, screen_height = RenderConfig.screen_size
         margin = 60
         maze_size = min(screen_width, screen_height) - margin
@@ -115,39 +122,47 @@ class RenderGameplay (RenderOBJ):
 
     def set_entities_move_delay(self, delay_ms: int, ghost_delay_ms: int
                                 ) -> None:
+        """Set movement animation delays for entities."""
         self.__render_pacman.set_move_delay(delay_ms)
         for ghost in self.__render_ghosts:
             ghost.set_move_delay(ghost_delay_ms)
 
     def set_pacman_anim(self, anim_set: AnimSet) -> None:
+        """Set Pac-Man's animation set."""
         self.__render_pacman.anim_set = anim_set
 
     def set_ghosts_anim(self, anim_set: AnimSet) -> None:
+        """Set all ghost animation sets."""
         for ghost in self.__render_ghosts:
             ghost.anim_set = anim_set
 
     @property
     def pacman(self) -> AnimPacman:
+        """Return the Pac-Man animation renderer."""
         return self.__render_pacman
 
     @property
     def size(self) -> Optional[tuple[int, int]]:
+        """Return the gameplay renderer size."""
         return self._size
 
     @size.setter
     def size(self, value: Optional[tuple[int, int]]) -> None:
+        """Set the gameplay renderer size."""
         if value is not None:
             self._size = value
             self.maze_renderer.size = value
 
     @property
     def w(self) -> Optional[int]:
+        """Return the gameplay renderer width."""
         if self._size:
             return self._size[0]
         return None
 
     @w.setter
     def w(self, value: Optional[int]) -> None:
+        """Set the gameplay renderer width."""
         if value is not None:
             if self._size:
                 self._size = (value, self._size[1])
@@ -157,12 +172,14 @@ class RenderGameplay (RenderOBJ):
 
     @property
     def h(self) -> Optional[int]:
+        """Return the gameplay renderer height."""
         if self._size is not None:
             return self._size[1]
         return None
 
     @h.setter
     def h(self, value: Optional[int]) -> None:
+        """Set the gameplay renderer height."""
         if value is not None:
             if self._size:
                 self._size = (self._size[0], value)
@@ -172,22 +189,26 @@ class RenderGameplay (RenderOBJ):
 
     @property
     def pos(self) -> Optional[tuple[int, int]]:
+        """Return the gameplay renderer position."""
         return self._pos
 
     @pos.setter
     def pos(self, value: Optional[tuple[int, int]]) -> None:
+        """Set the gameplay renderer position."""
         if value is not None:
             self._pos = value
             self.maze_renderer.pos = self._pos
 
     @property
     def x(self) -> Optional[int]:
+        """Return the gameplay renderer x position."""
         if self._pos is not None:
             return self._pos[0]
         return None
 
     @x.setter
     def x(self, value: Optional[int]) -> None:
+        """Set the gameplay renderer x position."""
         if value is not None:
             if self._pos:
                 self._pos = (value, self._pos[1])
@@ -197,12 +218,14 @@ class RenderGameplay (RenderOBJ):
 
     @property
     def y(self) -> Optional[int]:
+        """Return the gameplay renderer y position."""
         if self._pos is not None:
             return self._pos[1]
         return None
 
     @y.setter
     def y(self, value: Optional[int]) -> None:
+        """Set the gameplay renderer y position."""
         if value is not None:
             if self._pos:
                 self._pos = (self._pos[0], value)

@@ -4,6 +4,8 @@ from typing import Optional, Union, Callable, Any
 
 
 class SelectButton(Button):
+    """Render a button that cycles through options."""
+
     def __init__(self, screen: Screen,
                  options: list[str],
                  pos: tuple[int, int] | None = None,
@@ -12,6 +14,7 @@ class SelectButton(Button):
                  callback: Optional[Union[Callable[..., Any],
                                           list[Callable[..., Any]]]] = None
                  ) -> None:
+        """Initialize a select button."""
         super().__init__(screen, options[0], pos, size, color, callback)
         self.__options = options
         self.__index = 0
@@ -28,14 +31,17 @@ class SelectButton(Button):
                                   color=color)
 
     def __left_option(self) -> None:
+        """Select the previous option."""
         self.__index = (self.__index - 1) % len(self.__options)
         self._text = self.__options[self.__index]
 
     def __right_option(self) -> None:
+        """Select the next option."""
         self.__index = (self.__index + 1) % len(self.__options)
         self._text = self.__options[self.__index]
 
     def render(self) -> None:
+        """Render the select button and arrows."""
         self._text = self.__options[self.__index]
         super().render()
         if self._pos and self._size:
@@ -52,6 +58,7 @@ class SelectButton(Button):
             self.__right_btn.render()
 
     def set_index(self, index: Union[int, str]) -> None:
+        """Set the selected option by index or value."""
         if isinstance(index, int):
             if index > 0 and index < len(self.__options) - 1:
                 self.__index = index
@@ -65,5 +72,5 @@ class SelectButton(Button):
 
     @property
     def value(self) -> str:
-        """Retourne l'option actuellement sélectionnée"""
+        """Return the selected option."""
         return self.__options[self.__index]

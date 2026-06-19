@@ -7,25 +7,30 @@ from typing import Optional
 
 
 class HighScoreState(ScreenState):
+    """Render the highscore screen."""
 
     def __init__(self, screen: Screen,
                  state_manager: Optional[StateManager] = None,
                  highscore_path: Optional[str] = None
                  ) -> None:
+        """Initialize the highscore state."""
         super().__init__(screen, state_manager)
         self.__highscore_path = highscore_path
         self.__container = self.__load_renderer()
 
     def render(self) -> None:
+        """Render the highscore screen."""
         if self.__container:
             self._screen.clear()
             self.__container.render()
             self._screen.flip()
 
     def update(self) -> None:
+        """Update the highscore screen."""
         return
 
     def __load_renderer(self) -> Container:
+        """Build the highscore screen container."""
         from pacman.render.RenderText import RenderText
         from pacman.render.interactives.Button import Button
         from pacman.render.Divider import Divider
@@ -67,6 +72,7 @@ class HighScoreState(ScreenState):
             ])
 
         def on_quit() -> None:
+            """Return to the main menu."""
             if self._state_manager:
                 self._state_manager.set_state(StateManager.MENU)
 
