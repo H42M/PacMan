@@ -38,8 +38,10 @@ class HighScoreState(ScreenState):
 
         header_ctn = Container(self._screen, 'VERTICAL')
         header_ctn.add_content([
-            {RenderText(self._screen, 'PACMAN', font_family=RenderConfig.FONT,
-                        font_size=42, font_color=RenderConfig.YELLOW): '90%'},
+            {RenderText(self._screen, 'PACMAN',
+                        font_family=RenderConfig.FONT,
+                        font_size=42,
+                        font_color=RenderConfig.YELLOW): '90%'},
             {Divider(self._screen, color=RenderConfig.YELLOW): '2%'}
         ])
 
@@ -78,12 +80,14 @@ class HighScoreState(ScreenState):
 
         back_btn = Button(self._screen, 'Back to menu',
                           font_family=RenderConfig.FONT,
-                          callback=on_quit)
+                          callback=on_quit,
+                          color=RenderConfig.RED)
 
         main_ctn = Container(self._screen, 'VERTICAL', pos=(0, 0),
                              size=RenderConfig.screen_size,
                              padding=50,
-                             gap=20)
+                             gap=20,
+                             bg_color=RenderConfig.BLACK)
         main_ctn.add_content([
             {header_ctn: '11%'},
             {highscores_ctn: '70%'},
