@@ -1,4 +1,5 @@
 pygame
 flake8
 mypy
+pyinstaller
 ./external/mazegenerator-00001-py3-none-any.whl

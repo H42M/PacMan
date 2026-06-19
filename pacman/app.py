@@ -42,7 +42,7 @@ def run(config: GameConfig) -> int:
         RenderConfig.init(
             (WINDOW_WIDTH, WINDOW_HEIGHT),
             (config.levels[0].width, config.levels[0].height),
-        )  # TODO: revisit when levels can use different maze dimensions.
+        )
 
         screen = Screen()
         state_manager = StateManager(

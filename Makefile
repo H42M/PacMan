@@ -5,7 +5,7 @@ MAIN = pac-man.py
 CONFIG = config/config.json
 DEPENDENCIES = requirements.txt
 
-.PHONY: install run debug clean fclean re lint lint-strict
+.PHONY: install run debug clean fclean re lint lint-strict package package-clean package-zip
 
 $(PYTHON):
 	python3 -m venv $(VENV)
@@ -19,6 +19,15 @@ run: $(PYTHON)
 
 debug: $(PYTHON)
 	$(PYTHON) -m pdb $(MAIN) $(CONFIG)
+
+package: install
+	$(PYTHON) -m PyInstaller --clean --noconfirm pacman.spec
+
+package-clean:
+	rm -rf build dist
+
+package-zip: package
+	cd dist && zip -r PacMan-linux.zip PacMan
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
