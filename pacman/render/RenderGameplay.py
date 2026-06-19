@@ -8,7 +8,8 @@ from pacman.render.Screen import Screen
 from pacman.render.RenderConfig import RenderConfig
 from pacman.render.RenderObj import RenderOBJ
 from pacman.render.animation import AnimGhost
-from pacman.render.animation.AnimPacman import AnimPacman, AnimSet
+from pacman.render.animation.AnimPacman import AnimPacman
+from pacman.render.animation.AnimEntity import AnimSet
 
 
 class RenderGameplay (RenderOBJ):
